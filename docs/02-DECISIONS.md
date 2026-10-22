@@ -10,6 +10,9 @@
 | ADR-006 | APPROVED | Default guided learning path + free skill browsing | Shared content/progress model |
 | ADR-007 | APPROVED | Onboarding as spotlight element tour | Dim overlay, anchored arrow, Back/Next/Skip, progress, replay |
 | ADR-008 | APPROVED | Learn-by-building product approach | Personal journey is hypothesis source, not expert-certified pedagogy |
+| ADR-009 | APPROVED | Centralized CSS semantic theme tokens + Light/Dark/System | Default System, persist selection, avoid theme flash |
+| ADR-010 | APPROVED | Modern Japanese Learning Studio art direction | Japanese editorial + restrained calligraphy + education-first, avoid generic AI dashboards |
+| ADR-011 | APPROVED | Product name Nichigo | Final logo asset/domain remain separately reviewable |
 
 ## PM proposals, not yet owner decisions
 - Guest quota default **2 unique lessons per day**, reset at 00:00 Asia/Ho_Chi_Minh.
@@ -24,7 +27,7 @@
 3. Email verification/password reset at first beta versus later; associated email provider and cost.
 4. First release minimum content quantity and rights-cleared audio/stroke assets.
 5. Public beta date, target audience, performance budget, backup retention/RPO/RTO.
-6. Product brand/domain name (working name only until approved).
+6. Final public domain, final logo asset and any legal/trademark checks; **product name Nichigo is approved**.
 
 ## Change control
 Product Owner approves product decisions and spend. PM maintains PRD and backlog. Engineering may propose technical defaults but must flag material product/security/cost tradeoffs before implementation.

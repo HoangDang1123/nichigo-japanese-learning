@@ -6,7 +6,9 @@
 |---|---|---:|---|---|
 | JPN-001 | P0 | 1–2d | — | Monorepo, Next.js/Spring Boot scaffolds, formatting, README, env examples, CI checks |
 | JPN-002 | P0 | 2–3d | 001 | Neon connection config, Flyway baseline, core schema, constraints; migration tests |
-| JPN-003 | P0 | 2–3d | 001 | Shared UI shell, mobile nav, empty/loading/error states, basic a11y |
+| JPN-003 | P0 | 2–3d | 001,UI-001,UI-002 | Shared UI shell, mobile nav, empty/loading/error states, basic a11y using approved design system |
+| JPN-UI-001 | P0 | 2–3d | 001 | Central CSS semantic color tokens + Light/Dark/System theme provider/switcher, local persistence, OS sync, no theme flash, a11y |
+| JPN-UI-002 | P0 | 2–3d | UI-001 | Modern Japanese Learning Studio design foundation: typography, spacing, fine borders, buttons/inputs/cards/dialog/tooltip/progress, visual review in both themes |
 | JPN-010 | P0 | 3–5d | 002 | Email/password register/login/logout, secure session, negative auth tests |
 | JPN-011 | P0 | 3–4d | 002 | Guest ID + daily unique-lesson quota, transactional concurrency tests; numeric limit config only pending approval |
 | JPN-012 | P0* | 2–3d | 010,011 | Guest progress claim on signup, conflict-safe idempotent merge; *release gate pending owner decision* |
@@ -26,7 +28,13 @@
 | JPN-052 | P0 | 3–4d | all P0 | E2E vertical slice incl guest→account, quota, tour skip, mobile, cold-start handling |
 
 ## Recommended build sequence
-M1: 001,002,003 → M2: 010,011,020 → M3: 021,022,023,030,034 → M4: 031,032,040,041 → M5: 050,051,052. JPN-012 timing depends on owner approval; if approved for first beta, add before JPN-052.
+M1: 001,UI-001,UI-002,002,003 → M2: 010,011,020 → M3: 021,022,023,030,034 → M4: 031,032,040,041 → M5: 050,051,052. JPN-012 timing depends on owner approval; if approved for first beta, add before JPN-052.
+
+### JPN-UI-001 — Theme infrastructure
+**Story:** as a learner, I can choose Light, Dark or System and get a consistent, readable interface. **AC:** central semantic CSS tokens (not scattered hardcoded colors); default System; explicit preference persisted; System reacts to OS changes; no initial wrong-theme flash or hydration warning; keyboard-accessible selector; examples document how to recolor; light/dark coverage for foundational components.
+
+### JPN-UI-002 — Visual design foundation
+**Story:** as a learner, I recognize Nichigo as a distinctive Japanese learning environment rather than a generic dashboard. **AC:** implement typography suitable for Vietnamese/Japanese; spacing/radius/borders and baseline input/button/dialog/tooltip/progress states; reviewed desktop/mobile in light and dark; editorial and subtle brush/stamp accents used sparingly; no repeated hero/gradient/glass-card layout pattern. Follow `docs/07-DESIGN-SYSTEM.md`. Do not build full product screens or invent logo assets.
 
 ## Ticket definition of ready
 - One user story, scope and exclusions.

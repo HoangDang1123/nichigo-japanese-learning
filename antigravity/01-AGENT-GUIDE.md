@@ -11,7 +11,8 @@ Product Owner makes final product and spending decisions. PM supplies spec/backl
 5. Run lint, typecheck, unit/integration tests and report exact commands/results.
 6. Include changed files, decisions, limitations, security implications and manual test steps.
 7. Never paste secrets or credentials in code, logs or answer.
-8. Stop at approval gate; do not merge, deploy to production or purchase services without authorization.
+8. Follow `docs/07-DESIGN-SYSTEM.md` for all frontend work. CSS semantic tokens and Light/Dark/System are required; Japanese editorial/calligraphy accents must be restrained, typography readable, and avoid generic AI dashboard layouts. Do not invent the final logo/domain.
+9. Stop at approval gate; do not merge, deploy to production or purchase services without authorization.
 
 ## Copy/paste prompt — first ticket
 ```
@@ -22,6 +23,8 @@ docs/03-ARCHITECTURE.md, contracts/01-API-CONTRACT.md and this guide.
 Scope ONLY JPN-001: scaffold Next.js TypeScript and Java Spring Boot
 in a documented monorepo, basic CI checks, .env.example,
 local startup instructions and formatting/lint/test commands.
+Preserve Nichigo naming in user-visible metadata. Read docs/07-DESIGN-SYSTEM.md
+but do not implement JPN-UI-001/002 inside JPN-001; those are separate tasks.
 Do not implement authentication, database tables or lessons yet.
 Do not invent unapproved product choices or create paid services.
 

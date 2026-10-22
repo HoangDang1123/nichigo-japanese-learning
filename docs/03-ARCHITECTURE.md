@@ -8,14 +8,17 @@
 - Backend modules: `identity`, `content`, `learning`, `practice`, `quota`, `contentimport`, `admin`, `common`.
 - Prefer standard PostgreSQL, env-based config, and no vendor-specific business logic for portability.
 
-## Suggested repository
+## Repository structure (approved — JPN-001)
 ```
-apps/web/                 # Next.js frontend
-apps/api/                 # Spring Boot backend
+nichigo_frontend/         # Next.js frontend (App Router, TypeScript)
+nichigo_backend/          # Spring Boot backend (Maven Wrapper, Java 21)
 content/schemas/          # CSV/JSON validation schemas
 content/seeds/            # Reviewed example datasets
-infra/                    # deployment docs/config (no secrets)
-docs/                     # project documents
+infra/                    # Deployment docs/config (no secrets)
+docs/                     # Project documents
+contracts/                # Proposed API and import contracts
+antigravity/              # Agent operating guide
+.github/workflows/        # GitHub Actions CI
 ```
 
 ## Data model (conceptual, adjust with migrations)

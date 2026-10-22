@@ -1,0 +1,62 @@
+/*
+ * globals.css
+ *
+ * Imports the centralized design token file (tokens.css).
+ * All color, typography, spacing and radius values must be referenced
+ * via CSS custom properties defined there — never hardcoded in components.
+ *
+ * Full Light / Dark / System token implementation: JPN-UI-001
+ * Visual design foundation (typography, spacing, components): JPN-UI-002
+ */
+@import "../styles/tokens.css";
+
+/* ── Base reset ────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  height: 100%;
+  /* color-scheme follows the resolved theme; set by JS in JPN-UI-001 */
+}
+
+body {
+  min-height: 100%;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-body, system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+}
+
+/* ── Bootstrap-only placeholder layout ────────────────────────────────── */
+/* Replace this block in JPN-UI-002 with the full design foundation */
+.nichigo-home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.nichigo-home__title {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.nichigo-home__tagline {
+  font-size: 1.125rem;
+  opacity: 0.75;
+}
+

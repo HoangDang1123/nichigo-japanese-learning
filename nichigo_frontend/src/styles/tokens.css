@@ -1,0 +1,107 @@
+﻿/*
+ * tokens.css — Centralized design tokens for Nichigo
+ *
+ * This file is the single source of truth for all color, typography,
+ * spacing, radius and motion values. Components reference these variables;
+ * they never embed raw hex values or magic numbers.
+ *
+ * Implementation: JPN-UI-001 (Light/Dark/System themes)
+ * Design foundation: JPN-UI-002 (typography, spacing, components)
+ *
+ * ─────────────────────────────────────────────────────────────────────────
+ * USAGE:
+ *   - Light theme: :root  (default)
+ *   - Dark theme:  [data-theme="dark"]
+ *   - System:      resolved via prefers-color-scheme in JPN-UI-001
+ *
+ * To swap the palette, edit only this file. No component JSX changes needed.
+ * ─────────────────────────────────────────────────────────────────────────
+ *
+ * Approved initial palette (docs/07-DESIGN-SYSTEM.md):
+ *   sage green:  #4F8F7B
+ *   warm cream:  #FBFAF6
+ *   amber accent:#F4B860
+ *   dark ink:    #263238
+ *
+ * These are editable defaults, NOT immutable brand requirements.
+ * ─────────────────────────────────────────────────────────────────────────
+ */
+
+/* ── Light theme (default) ──────────────────────────────────────────── */
+:root,
+[data-theme="light"] {
+  /* Surface */
+  --color-background: #fbfaf6;
+  --color-surface: #ffffff;
+  --color-surface-raised: #f4f1ec;
+
+  /* Text */
+  --color-text: #263238;
+  --color-text-muted: #5a6a72;
+
+  /* Brand */
+  --color-primary: #4f8f7b;
+  --color-on-primary: #ffffff;
+  --color-accent: #f4b860;
+  --color-on-accent: #263238;
+
+  /* Semantic */
+  --color-border: #d8d3c9;
+  --color-focus: #4f8f7b;
+  --color-danger: #c0392b;
+  --color-success: #27ae60;
+
+  /* Typography */
+  --font-body: system-ui, sans-serif;
+  --font-heading: system-ui, sans-serif;
+  --font-mono: ui-monospace, monospace;
+
+  /* Spacing scale (rem) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Radius */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+
+  /* Border */
+  --border-width: 1px;
+  --border-width-thick: 2px;
+
+  /* Motion */
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+  --easing-default: ease-in-out;
+}
+
+/* ── Dark theme ─────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  --color-background: #1a1f21;
+  --color-surface: #232b2e;
+  --color-surface-raised: #2d383b;
+
+  --color-text: #e8e4dc;
+  --color-text-muted: #8fa3aa;
+
+  --color-primary: #66b09a;
+  --color-on-primary: #1a1f21;
+  --color-accent: #f4b860;
+  --color-on-accent: #1a1f21;
+
+  --color-border: #3a4a4e;
+  --color-focus: #66b09a;
+  --color-danger: #e74c3c;
+  --color-success: #2ecc71;
+}
+
+/*
+ * NOTE: The data-theme="system" case is resolved in JavaScript (JPN-UI-001).
+ * Until then, :root defaults apply (light palette) for this bootstrap.
+ */

@@ -1,0 +1,63 @@
+# ── Secrets & local env ─────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ── Next.js (nichigo_frontend) ───────────────────────────────────────────────
+nichigo_frontend/node_modules/
+nichigo_frontend/.next/
+nichigo_frontend/out/
+nichigo_frontend/.vercel/
+nichigo_frontend/dist/
+nichigo_frontend/.cache/
+nichigo_frontend/next-env.d.ts
+
+# ── Java / Spring Boot / Maven (nichigo_backend) ─────────────────────────────
+nichigo_backend/target/
+nichigo_backend/build/
+*.class
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+# Maven wrapper jar is checked in via .mvn/wrapper/ — exclude its download cache
+!nichigo_backend/.mvn/wrapper/maven-wrapper.jar
+
+# ── IDE & editors ────────────────────────────────────────────────────────────
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.swp
+*.swo
+.project
+.classpath
+.settings/
+
+# ── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+logs/
+spring.log
+
+# ── Local databases (dev only) ────────────────────────────────────────────────
+*.db
+*.sqlite
+*.h2.db

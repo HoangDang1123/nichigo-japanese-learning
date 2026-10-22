@@ -1,0 +1,33 @@
+﻿# nichigo-api — application configuration
+#
+# Secrets and environment-specific values come from environment variables.
+# See nichigo_backend/.env.example for the full list.
+# Never commit real values to source control.
+
+spring:
+  application:
+    name: nichigo-api
+
+server:
+  port: ${SERVER_PORT:8080}
+
+# CORS allowed origins (comma-separated). Override in environment.
+app:
+  cors:
+    allowed-origins: ${ALLOWED_ORIGINS:http://localhost:3000}
+
+# Spring Actuator: only /actuator/health is exposed publicly.
+# Details are never shown externally (avoids leaking infrastructure info).
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
+logging:
+  level:
+    root: INFO
+    com.nichigo: DEBUG

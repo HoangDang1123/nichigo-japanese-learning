@@ -14,6 +14,15 @@ A Vietnamese-first Japanese learning website for absolute beginners, with a grad
 - **Onboarding:** guided *element-level spotlight tour*, not a welcome questionnaire. Dim page; highlight the exact target control/input; anchored popover with arrow; Back/Next/Skip/Finish; step number and progress; responsive placement, keyboard support, skip at any time; reopen from Help. Avoid blocking app when target missing or route changes.
 - **Beginner-first content:** first usable vertical slice focuses on Hiragana recognition, sound, stroke guidance (where licensed/verified assets exist), quiz, and persisted progress.
 
+## 2A. Approved visual identity and theme requirements
+- **Product name:** Nichigo. Do not use “Japanese Learning Web” as the outward-facing brand label; logo/domain final assets remain separately reviewable.
+- **Visual direction:** “Modern Japanese Learning Studio”: modern education + Japanese editorial/bookish typography + restrained shodō/calligraphy accents. Content-first screens rather than generic AI/SaaS dashboards.
+- **Initial palette:** sage green / warm cream / dark ink / small amber accents; color palette must remain easy to change.
+- **Theme system:** centralized semantic CSS color tokens; Light, Dark and System modes, default System; save preference locally; follow OS changes for System; avoid wrong-theme flash/hydration mismatch.
+- **All UI states:** navigation, lessons, quiz, inputs, modal, spotlight tour and feedback states must work in both effective light/dark themes, responsive and accessible.
+- **Design quality:** avoid excessive gradients, glass effects, large repeated rounded cards, shadows and decorative icons. Use Japanese-inspired editorial detail sparingly, never at the expense of legible kana/kanji glyphs.
+- **Reference:** `docs/07-DESIGN-SYSTEM.md` defines tokens, style principles and UI acceptance checks.
+
 ## 3. User journeys
 **Guest:** land on home → spotlight tour (or skip) → see default beginner path → open a published lesson → practice → see feedback and daily lesson allowance → sign up to retain progress.
 
@@ -61,6 +70,7 @@ A Vietnamese-first Japanese learning website for absolute beginners, with a grad
 
 ## 7. Nonfunctional requirements
 - Mobile-first, accessible controls, keyboard-navigable tour, focus management.
+- Theme switching: light/dark/system, persisted preference, reduced motion and sufficient color contrast; no UI theme flash.
 - Security: input validation, password hash (Argon2id/bcrypt), secure sessions, rate limiting, CSRF/cookie/CORS strategy.
 - Privacy: collect minimal data, no sensitive telemetry by default.
 - Reliability: idempotent mutations, graceful backend/database cold starts; do not promise an SLA on free plans.

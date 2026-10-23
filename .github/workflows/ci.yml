@@ -57,7 +57,7 @@ jobs:
           cache-dependency-path: nichigo_backend/pom.xml
 
       - name: Run tests
-        run: ./mvnw test --no-transfer-progress
+        run: bash ./mvnw test --no-transfer-progress
 
       - name: Verify build
-        run: ./mvnw verify -DskipTests --no-transfer-progress
+        run: bash ./mvnw verify -DskipTests --no-transfer-progress

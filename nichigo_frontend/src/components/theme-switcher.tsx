@@ -79,6 +79,7 @@ const emptySubscribe = () => () => {};
 
 export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
+  const buttonRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
 
   // Idiomatic React 18/19 hydration detection without cascading renders
   const mounted = React.useSyncExternalStore(
@@ -87,13 +88,27 @@ export function ThemeSwitcher() {
     () => false
   );
 
+  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+    let nextIndex = -1;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      nextIndex = (index + 1) % THEME_OPTIONS.length;
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      nextIndex = (index - 1 + THEME_OPTIONS.length) % THEME_OPTIONS.length;
+    }
+    if (nextIndex !== -1) {
+      e.preventDefault();
+      buttonRefs.current[nextIndex]?.focus();
+      setTheme(THEME_OPTIONS[nextIndex].value);
+    }
+  };
+
   return (
     <div
       role="group"
       aria-label="Chọn giao diện hiển thị"
       className={styles.switcherContainer}
     >
-      {THEME_OPTIONS.map((option) => {
+      {THEME_OPTIONS.map((option, index) => {
         // Before mounting on the client, match 'system' fallback
         // to prevent SSR/client hydration mismatch.
         const isActive = mounted ? theme === option.value : option.value === "system";
@@ -101,12 +116,15 @@ export function ThemeSwitcher() {
         return (
           <button
             key={option.value}
+            ref={(el) => {
+              buttonRefs.current[index] = el;
+            }}
             type="button"
-            role="radio"
-            aria-checked={isActive}
+            aria-pressed={isActive}
             aria-label={option.description}
             className={`${styles.switcherButton} ${isActive ? styles.active : ""}`}
             onClick={() => setTheme(option.value)}
+            onKeyDown={(e) => handleKeyDown(e, index)}
           >
             {option.icon}
             <span>{option.label}</span>

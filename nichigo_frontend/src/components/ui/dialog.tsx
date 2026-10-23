@@ -13,6 +13,17 @@ export interface DialogProps {
   footer?: React.ReactNode;
 }
 
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+  return Array.from(
+    container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+  ).filter(
+    (el) => el.offsetParent !== null || el.offsetWidth > 0 || el.offsetHeight > 0
+  );
+}
+
 const emptySubscribe = () => () => {};
 
 export function Dialog({
@@ -43,6 +54,38 @@ export function Dialog({
       if (e.key === "Escape") {
         e.stopPropagation();
         onClose();
+        return;
+      }
+
+      // Modal focus containment: trap Tab and Shift+Tab inside the dialog
+      if (e.key === "Tab") {
+        if (!contentRef.current) return;
+        const focusables = getFocusableElements(contentRef.current);
+        if (focusables.length === 0) {
+          e.preventDefault();
+          return;
+        }
+
+        const firstElement = focusables[0];
+        const lastElement = focusables[focusables.length - 1];
+
+        if (e.shiftKey) {
+          if (
+            document.activeElement === firstElement ||
+            !contentRef.current.contains(document.activeElement)
+          ) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (
+            document.activeElement === lastElement ||
+            !contentRef.current.contains(document.activeElement)
+          ) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
 
@@ -50,10 +93,19 @@ export function Dialog({
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", handleKeyDown);
 
-    // Focus initial element inside dialog
-    contentRef.current?.focus();
+    // Initial focus: focus the first interactive element or dialog container
+    const animFrame = requestAnimationFrame(() => {
+      if (!contentRef.current) return;
+      const focusables = getFocusableElements(contentRef.current);
+      if (focusables.length > 0) {
+        focusables[0].focus();
+      } else {
+        contentRef.current.focus();
+      }
+    });
 
     return () => {
+      cancelAnimationFrame(animFrame);
       document.body.style.overflow = originalOverflow;
       window.removeEventListener("keydown", handleKeyDown);
       previousActiveElement.current?.focus();

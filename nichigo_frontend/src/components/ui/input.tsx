@@ -17,6 +17,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       required,
       disabled,
       className = "",
+      "aria-describedby": externalDescribedBy,
       ...props
     },
     ref
@@ -33,7 +34,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const messageId = hasError ? errorId : showHelper ? helperId : null;
 
     const describedBy = [
-      props["aria-describedby"],
+      externalDescribedBy,
       messageId,
     ]
       .filter(Boolean)

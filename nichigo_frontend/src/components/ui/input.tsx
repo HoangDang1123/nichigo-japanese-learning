@@ -27,10 +27,14 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const errorId = `${id}-error`;
 
     const hasError = Boolean(errorMessage);
+    const showHelper = !hasError && Boolean(helperText);
+
+    // Only reference the ID of the element that is actually rendered in the DOM
+    const messageId = hasError ? errorId : showHelper ? helperId : null;
 
     const describedBy = [
-      hasError ? errorId : null,
-      helperText ? helperId : null,
+      props["aria-describedby"],
+      messageId,
     ]
       .filter(Boolean)
       .join(" ") || undefined;
@@ -59,7 +63,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <span id={errorId} className={styles.errorMessage} role="alert">
             {errorMessage}
           </span>
-        ) : helperText ? (
+        ) : showHelper ? (
           <span id={helperId} className={styles.helperText}>
             {helperText}
           </span>

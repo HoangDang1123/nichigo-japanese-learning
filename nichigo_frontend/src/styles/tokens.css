@@ -1,107 +1,77 @@
-﻿/*
+/**
  * tokens.css — Centralized design tokens for Nichigo
  *
- * This file is the single source of truth for all color, typography,
- * spacing, radius and motion values. Components reference these variables;
- * they never embed raw hex values or magic numbers.
+ * This file defines non-color design tokens (typography scales, spacing,
+ * borders, radii, and motion) and imports the semantic color themes.
  *
- * Implementation: JPN-UI-001 (Light/Dark/System themes)
- * Design foundation: JPN-UI-002 (typography, spacing, components)
+ * All components must reference these CSS custom properties.
  *
- * ─────────────────────────────────────────────────────────────────────────
- * USAGE:
- *   - Light theme: :root  (default)
- *   - Dark theme:  [data-theme="dark"]
- *   - System:      resolved via prefers-color-scheme in JPN-UI-001
+ * Implementation: JPN-UI-001 (Theme Infrastructure)
+ * Component foundations: JPN-UI-002
  *
- * To swap the palette, edit only this file. No component JSX changes needed.
- * ─────────────────────────────────────────────────────────────────────────
- *
- * Approved initial palette (docs/07-DESIGN-SYSTEM.md):
- *   sage green:  #4F8F7B
- *   warm cream:  #FBFAF6
- *   amber accent:#F4B860
- *   dark ink:    #263238
- *
- * These are editable defaults, NOT immutable brand requirements.
- * ─────────────────────────────────────────────────────────────────────────
+ * To swap or adjust palettes, see src/styles/themes.css.
  */
 
-/* ── Light theme (default) ──────────────────────────────────────────── */
-:root,
-[data-theme="light"] {
-  /* Surface */
-  --color-background: #fbfaf6;
-  --color-surface: #ffffff;
-  --color-surface-raised: #f4f1ec;
+@import "./themes.css";
 
-  /* Text */
-  --color-text: #263238;
-  --color-text-muted: #5a6a72;
+:root {
+  /* ── Typography Scales ─────────────────────────────────────────────────── */
+  --font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+  --font-heading: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+  --font-japanese: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", system-ui, sans-serif;
+  --font-japanese-serif: "Hiragino Mincho ProN", "Yu Mincho", "MS PMincho", "Noto Serif JP", serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-  /* Brand */
-  --color-primary: #4f8f7b;
-  --color-on-primary: #ffffff;
-  --color-accent: #f4b860;
-  --color-on-accent: #263238;
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 1.875rem;  /* 30px */
+  --font-size-4xl: 2.25rem;   /* 36px */
+  --font-size-5xl: 3rem;      /* 48px */
 
-  /* Semantic */
-  --color-border: #d8d3c9;
-  --color-focus: #4f8f7b;
-  --color-danger: #c0392b;
-  --color-success: #27ae60;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 
-  /* Typography */
-  --font-body: system-ui, sans-serif;
-  --font-heading: system-ui, sans-serif;
-  --font-mono: ui-monospace, monospace;
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
 
-  /* Spacing scale (rem) */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
+  /* ── Spacing Scale ─────────────────────────────────────────────────────── */
+  --space-0-5: 0.125rem; /* 2px */
+  --space-1: 0.25rem;    /* 4px */
+  --space-1-5: 0.375rem; /* 6px */
+  --space-2: 0.5rem;     /* 8px */
+  --space-2-5: 0.625rem; /* 10px */
+  --space-3: 0.75rem;    /* 12px */
+  --space-4: 1rem;       /* 16px */
+  --space-5: 1.25rem;    /* 20px */
+  --space-6: 1.5rem;     /* 24px */
+  --space-8: 2rem;       /* 32px */
+  --space-10: 2.5rem;    /* 40px */
+  --space-12: 3rem;      /* 48px */
+  --space-16: 4rem;      /* 64px */
 
-  /* Radius */
-  --radius-sm: 2px;
-  --radius-md: 4px;
+  /* ── Border Radius ─────────────────────────────────────────────────────── */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
   --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
 
-  /* Border */
+  /* ── Borders & Stroke ──────────────────────────────────────────────────── */
   --border-width: 1px;
   --border-width-thick: 2px;
 
-  /* Motion */
+  /* ── Motion & Animation ────────────────────────────────────────────────── */
   --duration-fast: 120ms;
   --duration-normal: 200ms;
-  --easing-default: ease-in-out;
+  --duration-slow: 300ms;
+  --easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-out: cubic-bezier(0, 0, 0.2, 1);
 }
-
-/* ── Dark theme ─────────────────────────────────────────────────────── */
-[data-theme="dark"] {
-  --color-background: #1a1f21;
-  --color-surface: #232b2e;
-  --color-surface-raised: #2d383b;
-
-  --color-text: #e8e4dc;
-  --color-text-muted: #8fa3aa;
-
-  --color-primary: #66b09a;
-  --color-on-primary: #1a1f21;
-  --color-accent: #f4b860;
-  --color-on-accent: #1a1f21;
-
-  --color-border: #3a4a4e;
-  --color-focus: #66b09a;
-  --color-danger: #e74c3c;
-  --color-success: #2ecc71;
-}
-
-/*
- * NOTE: The data-theme="system" case is resolved in JavaScript (JPN-UI-001).
- * Until then, :root defaults apply (light palette) for this bootstrap.
- */

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Nichigo",
+  title: "Nichigo — Học tiếng Nhật cho người Việt",
   description:
     "Nichigo — Học tiếng Nhật dành cho người Việt bắt đầu từ con số 0.",
 };
@@ -13,10 +14,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // lang="vi" — primary content language is Vietnamese (PRD §1)
-    // data-theme attribute is the hook for the future CSS token system (JPN-UI-001)
-    <html lang="vi" data-theme="system">
-      <body>{children}</body>
+    // suppressHydrationWarning is required on <html> when using next-themes
+    // to prevent hydration warnings from the theme script setting data-theme.
+    <html lang="vi" suppressHydrationWarning>
+      <body>
+        <ThemeProvider
+          attribute="data-theme"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange={false}
+        >
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

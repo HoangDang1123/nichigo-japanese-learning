@@ -41,6 +41,24 @@ jobs:
   backend:
     name: Backend (Spring Boot)
     runs-on: ubuntu-latest
+    env:
+      DB_URL: jdbc:postgresql://localhost:5432/nichigo
+      DB_USERNAME: nichigo_ci
+      DB_PASSWORD: nichigo_ci_test_only
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: nichigo
+          POSTGRES_USER: nichigo_ci
+          POSTGRES_PASSWORD: nichigo_ci_test_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U nichigo_ci -d nichigo"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     defaults:
       run:
         working-directory: nichigo_backend

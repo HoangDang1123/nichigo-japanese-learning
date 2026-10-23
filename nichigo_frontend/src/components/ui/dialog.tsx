@@ -41,6 +41,10 @@ export function Dialog({
   );
   const previousActiveElement = React.useRef<HTMLElement | null>(null);
   const contentRef = React.useRef<HTMLDivElement>(null);
+  const onCloseRef = React.useRef(onClose);
+  React.useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   const titleId = React.useId();
   const descriptionId = React.useId();
@@ -53,7 +57,7 @@ export function Dialog({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.stopPropagation();
-        onClose();
+        onCloseRef.current();
         return;
       }
 
@@ -110,7 +114,7 @@ export function Dialog({
       window.removeEventListener("keydown", handleKeyDown);
       previousActiveElement.current?.focus();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   if (!isMounted || !isOpen) {
     return null;

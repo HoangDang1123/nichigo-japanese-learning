@@ -1,55 +1,28 @@
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import Link from "next/link";
+import { AppShell } from "@/components/layout/app-shell";
+import styles from "./home.module.css";
 
 export default function HomePage() {
   return (
-    <div className="nichigo-page">
-      <header className="nichigo-header">
-        <ThemeSwitcher />
-      </header>
-
-      <main className="nichigo-main">
-        <h1 className="nichigo-title">Nichigo</h1>
-        <p className="nichigo-tagline">
-          Học tiếng Nhật dành cho người Việt bắt đầu từ con số 0.
+    <AppShell title="Trang chủ">
+      <section className={styles.intro} aria-labelledby="intro-title">
+        <p className={styles.eyebrow}>日本語 · Hành trình mới</p>
+        <h1 id="intro-title" className={styles.heading}>Tiếng Nhật, từng bước một.</h1>
+        <p className={styles.description}>
+          Chào mừng đến Nichigo — không gian học tiếng Nhật dành cho người Việt bắt đầu từ con số 0.
+          Nội dung học tập đang được xây dựng; bạn có thể khám phá các khu vực sắp ra mắt.
         </p>
-
-        {/* Semantic theme preview card to verify light/dark/system tokens */}
-        <section
-          className="nichigo-preview-card"
-          aria-label="Kiểm tra hệ thống màu giao diện"
-        >
-          <div className="nichigo-preview-card__header">
-            <span className="nichigo-preview-card__title">Giao diện màu ngữ nghĩa</span>
-            <span className="nichigo-badge">JPN-UI-001</span>
-          </div>
-          <p className="nichigo-preview-card__text">
-            Hệ thống giao diện sử dụng các biến CSS tập trung tại{" "}
-            <code>src/styles/themes.css</code>. Hỗ trợ đầy đủ ba chế độ: Sáng, Tối và Hệ thống.
-          </p>
-          <div className="nichigo-preview-card__swatches" aria-hidden="true">
-            <div className="nichigo-swatch">
-              <div className="nichigo-swatch__box nichigo-swatch__box--primary" />
-              <span>Chính</span>
-            </div>
-            <div className="nichigo-swatch">
-              <div className="nichigo-swatch__box nichigo-swatch__box--accent" />
-              <span>Điểm nhấn</span>
-            </div>
-            <div className="nichigo-swatch">
-              <div className="nichigo-swatch__box nichigo-swatch__box--surface" />
-              <span>Bề mặt</span>
-            </div>
-            <div className="nichigo-swatch">
-              <div className="nichigo-swatch__box nichigo-swatch__box--border" />
-              <span>Đường viền</span>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer className="nichigo-footer">
-        <p>Nichigo &bull; Modern Japanese Learning Studio</p>
-      </footer>
-    </div>
+        <div className={styles.actions}>
+          <Link href="/learn" className={styles.primary}>Khám phá lộ trình <span aria-hidden="true">→</span></Link>
+          <Link href="/skills" className={styles.secondary}>Xem kỹ năng</Link>
+        </div>
+      </section>
+      <section className={styles.note} aria-labelledby="coming-title">
+        <span className={styles.sectionNumber}>01 / はじめに</span>
+        <h2 id="coming-title">Một nơi để bắt đầu</h2>
+        <p>Những bài học nhập môn, luyện chữ và bài tập sẽ được bổ sung dần.
+          Hiện tại Nichigo chưa lưu kết quả học tập.</p>
+      </section>
+    </AppShell>
   );
 }

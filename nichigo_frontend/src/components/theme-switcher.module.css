@@ -48,3 +48,25 @@
   height: 14px;
   flex-shrink: 0;
 }
+
+@media (max-width: 480px) {
+  .switcherContainer {
+    gap: 0;
+    padding: var(--space-0-5);
+  }
+
+  .switcherButton {
+    justify-content: center;
+    padding: var(--space-2);
+  }
+
+  .switcherButton span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
+  }
+}

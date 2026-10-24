@@ -140,15 +140,14 @@
   font-weight: var(--font-weight-semibold);
 }
 
+/* Content fills the available workspace; individual sections own their surfaces. */
 .main {
-  width: min(100%, 76rem);
+  width: 100%;
   min-width: 0;
   flex: 1;
-  margin: 0 auto;
-  padding: clamp(var(--space-5), 3vw, var(--space-8));
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-xl);
-  background: var(--color-surface);
+  margin: 0;
+  padding: 0;
+  background: transparent;
 }
 
 .mobileBrand {
@@ -261,8 +260,4 @@
     padding: var(--space-2) var(--space-3);
   }
 
-  .main {
-    padding: var(--space-4);
-    border-radius: var(--radius-lg);
-  }
 }

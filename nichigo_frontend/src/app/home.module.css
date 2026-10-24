@@ -1,0 +1,13 @@
+.intro{padding:clamp(1rem,5vw,4rem) 0 clamp(2.5rem,6vw,5rem);border-bottom:1px solid var(--color-border)}
+.eyebrow,.sectionNumber{font-family:var(--font-japanese);color:var(--color-primary);font-size:var(--font-size-sm);letter-spacing:.08em}
+.heading{margin:var(--space-5) 0;font-size:clamp(2.2rem,5vw,4.2rem);font-weight:var(--font-weight-semibold);line-height:1.18;letter-spacing:-.04em;max-width:48rem;text-wrap:balance}
+.description{color:var(--color-text-muted);line-height:var(--line-height-relaxed);max-width:38rem}
+.actions{display:flex;flex-wrap:wrap;gap:var(--space-3);margin-top:var(--space-8)}
+.primary,.secondary{display:inline-flex;align-items:center;gap:var(--space-2);padding:var(--space-3) var(--space-5);border-radius:var(--radius-sm);font-weight:var(--font-weight-semibold);font-size:var(--font-size-sm);border:1px solid var(--color-primary)}
+.primary{background:var(--color-primary);color:var(--color-on-primary)}
+.primary:hover{background:var(--color-primary-hover)}
+.secondary{background:transparent;color:var(--color-primary)}
+.secondary:hover{background:var(--color-primary-subtle)}
+.note{padding:var(--space-8) 0;display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-3)}
+.note h2{font-size:var(--font-size-xl);font-weight:var(--font-weight-semibold)}
+.note p{max-width:36rem;color:var(--color-text-muted);line-height:var(--line-height-relaxed)}

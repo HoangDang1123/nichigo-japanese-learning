@@ -83,16 +83,16 @@
  --color-text-muted: #c9adbd;
  --color-text-subtle: #a38699;
 
- /* Primary Brand (Light Sakura Pink for dark surfaces) */
- --color-primary: #f0a8c5;
- --color-primary-hover: #ffc1d8;
- --color-primary-active: #df8dac;
- --color-primary-subtle: rgba(240, 168, 197, 0.18);
+ /* Primary Brand (Dusty Sakura Rose for dark surfaces) */
+ --color-primary: #c58fa8;
+ --color-primary-hover: #d3a1b8;
+ --color-primary-active: #b77d99;
+ --color-primary-subtle: rgba(197, 143, 168, 0.12);
  --color-on-primary: #1f1921;
 
- /* Accent (Blossom Pink) */
- --color-accent: #f3b6cb;
- --color-accent-hover: #ffd0e0;
+ /* Accent (Muted Blossom Pink) */
+ --color-accent: #b9879e;
+ --color-accent-hover: #c99aae;
  --color-on-accent: #1f1921;
 
  /* Borders & Dividers */
@@ -100,7 +100,7 @@
  --color-border-hover: #74576c;
 
  /* Focus Indicator */
- --color-focus: #f0a8c5;
+ --color-focus: #c58fa8;
 
  /* Feedback / Status */
  --color-danger: #e74c3c;
@@ -130,20 +130,20 @@
   --color-text-muted: #c9adbd;
   --color-text-subtle: #a38699;
 
-  --color-primary: #f0a8c5;
-  --color-primary-hover: #ffc1d8;
-  --color-primary-active: #df8dac;
-  --color-primary-subtle: rgba(240, 168, 197, 0.18);
+  --color-primary: #c58fa8;
+  --color-primary-hover: #d3a1b8;
+  --color-primary-active: #b77d99;
+  --color-primary-subtle: rgba(197, 143, 168, 0.12);
   --color-on-primary: #1f1921;
 
-  --color-accent: #f3b6cb;
-  --color-accent-hover: #ffd0e0;
+  --color-accent: #b9879e;
+  --color-accent-hover: #c99aae;
   --color-on-accent: #1f1921;
 
   --color-border: #544150;
   --color-border-hover: #74576c;
 
-  --color-focus: #f0a8c5;
+  --color-focus: #c58fa8;
 
   --color-danger: #e74c3c;
   --color-danger-subtle: rgba(231, 76, 60, 0.16);

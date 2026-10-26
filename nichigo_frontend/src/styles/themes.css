@@ -11,11 +11,11 @@
  * - Changing --color-primary, --color-background, etc., will instantly update
  *   the entire application across all components and pages.
  *
- * APPROVED NICHIGO PALETTE (docs/07-DESIGN-SYSTEM.md):
- *   Primary:    #4F8F7B (Muted Sage Green)
- *   Background: #FBFAF6 (Warm Cream)
- *   Accent:     #F4B860 (Amber Accent)
- *   Text:       #263238 (Dark Ink)
+ * SAKURA PINK PALETTE EXPERIMENT (features/ui-preview):
+ *   Primary:    #983B62 (Deep Sakura, accessible on white)
+ *   Background: #FFF9FB (Sakura Paper)
+ *   Accent:     #F3B6CB (Blossom Pink)
+ *   Text:       #30252C (Plum Ink)
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
@@ -25,34 +25,34 @@
  color-scheme: light;
 
  /* Surfaces & Backgrounds */
- --color-background: #fbfaf6;
+ --color-background: #fff9fb;
  --color-surface: #ffffff;
- --color-surface-hover: #f4f1ec;
- --color-surface-raised: #efece5;
+ --color-surface-hover: #fff0f5;
+ --color-surface-raised: #f9e4ed;
 
  /* Typography / Text */
- --color-text: #263238;
- --color-text-muted: #5a6a72;
- --color-text-subtle: #82929b;
+ --color-text: #30252c;
+ --color-text-muted: #685763;
+ --color-text-subtle: #8e7a86;
 
- /* Primary Brand (Sage Green) */
- --color-primary: #4f8f7b;
- --color-primary-hover: #427b69;
- --color-primary-active: #386859;
- --color-primary-subtle: rgba(79, 143, 123, 0.12);
+ /* Primary Brand (Deep Sakura Pink, white text contrast) */
+ --color-primary: #983b62;
+ --color-primary-hover: #822e52;
+ --color-primary-active: #702445;
+ --color-primary-subtle: rgba(152, 59, 98, 0.11);
  --color-on-primary: #ffffff;
 
- /* Accent (Amber) */
- --color-accent: #f4b860;
- --color-accent-hover: #eaa745;
- --color-on-accent: #263238;
+ /* Accent (Blossom Pink) */
+ --color-accent: #f3b6cb;
+ --color-accent-hover: #eb9eb9;
+ --color-on-accent: #30252c;
 
  /* Borders & Dividers */
- --color-border: #d8d3c9;
- --color-border-hover: #bcb6aa;
+ --color-border: #e8d2dd;
+ --color-border-hover: #d1abba;
 
  /* Focus Indicator (WCAG 2.1 AA compliant) */
- --color-focus: #4f8f7b;
+ --color-focus: #983b62;
 
  /* Feedback / Status */
  --color-danger: #c0392b;
@@ -64,8 +64,8 @@
  --color-on-success: #ffffff;
 
  /* Disabled State */
- --color-disabled: #e5e1d8;
- --color-disabled-text: #9ca6ac;
+ --color-disabled: #f2e3ea;
+ --color-disabled-text: #9a8993;
 }
 
 /* ── Dark Theme ──────────────────────────────────────────────────────────── */
@@ -73,34 +73,34 @@
  color-scheme: dark;
 
  /* Surfaces & Backgrounds */
- --color-background: #1a1f21;
- --color-surface: #232b2e;
- --color-surface-hover: #2d383b;
- --color-surface-raised: #344044;
+ --color-background: #17191c;
+ --color-surface: #22262b;
+ --color-surface-hover: #2e343a;
+ --color-surface-raised: #393f46;
 
  /* Typography / Text */
- --color-text: #e8e4dc;
- --color-text-muted: #8fa3aa;
- --color-text-subtle: #6e8087;
+ --color-text: #f0edf0;
+ --color-text-muted: #bcb6bd;
+ --color-text-subtle: #99939b;
 
- /* Primary Brand (Lighter Sage Green for high contrast on dark surfaces) */
- --color-primary: #66b09a;
- --color-primary-hover: #7bc0ac;
- --color-primary-active: #589f8a;
- --color-primary-subtle: rgba(102, 176, 154, 0.16);
- --color-on-primary: #1a1f21;
+ /* Primary Brand (Soft Sakura Rose on neutral charcoal) */
+ --color-primary: #dda3bd;
+ --color-primary-hover: #edb5ce;
+ --color-primary-active: #cc92ad;
+ --color-primary-subtle: rgba(221, 163, 189, 0.12);
+ --color-on-primary: #17191c;
 
- /* Accent (Amber) */
- --color-accent: #f4b860;
- --color-accent-hover: #f7c57e;
- --color-on-accent: #1a1f21;
+ /* Accent (Soft Blossom Pink) */
+ --color-accent: #c695ab;
+ --color-accent-hover: #d9a8be;
+ --color-on-accent: #17191c;
 
  /* Borders & Dividers */
- --color-border: #3a4a4e;
- --color-border-hover: #4d6065;
+ --color-border: #41454c;
+ --color-border-hover: #5a6069;
 
  /* Focus Indicator */
- --color-focus: #66b09a;
+ --color-focus: #dda3bd;
 
  /* Feedback / Status */
  --color-danger: #e74c3c;
@@ -109,11 +109,11 @@
 
  --color-success: #2ecc71;
  --color-success-subtle: rgba(46, 204, 113, 0.16);
- --color-on-success: #1a1f21;
+ --color-on-success: #17191c;
 
  /* Disabled State */
- --color-disabled: #2c3538;
- --color-disabled-text: #5a6b70;
+ --color-disabled: #30343a;
+ --color-disabled-text: #827f85;
 }
 
 /* ── Fallback for no-JS environments when OS is in Dark Mode ─────────────── */
@@ -121,29 +121,29 @@
  :root:not([data-theme="light"]) {
   color-scheme: dark;
 
-  --color-background: #1a1f21;
-  --color-surface: #232b2e;
-  --color-surface-hover: #2d383b;
-  --color-surface-raised: #344044;
+  --color-background: #17191c;
+  --color-surface: #22262b;
+  --color-surface-hover: #2e343a;
+  --color-surface-raised: #393f46;
 
-  --color-text: #e8e4dc;
-  --color-text-muted: #8fa3aa;
-  --color-text-subtle: #6e8087;
+  --color-text: #f0edf0;
+  --color-text-muted: #bcb6bd;
+  --color-text-subtle: #99939b;
 
-  --color-primary: #66b09a;
-  --color-primary-hover: #7bc0ac;
-  --color-primary-active: #589f8a;
-  --color-primary-subtle: rgba(102, 176, 154, 0.16);
-  --color-on-primary: #1a1f21;
+  --color-primary: #dda3bd;
+  --color-primary-hover: #edb5ce;
+  --color-primary-active: #cc92ad;
+  --color-primary-subtle: rgba(221, 163, 189, 0.12);
+  --color-on-primary: #17191c;
 
-  --color-accent: #f4b860;
-  --color-accent-hover: #f7c57e;
-  --color-on-accent: #1a1f21;
+  --color-accent: #c695ab;
+  --color-accent-hover: #d9a8be;
+  --color-on-accent: #17191c;
 
-  --color-border: #3a4a4e;
-  --color-border-hover: #4d6065;
+  --color-border: #41454c;
+  --color-border-hover: #5a6069;
 
-  --color-focus: #66b09a;
+  --color-focus: #dda3bd;
 
   --color-danger: #e74c3c;
   --color-danger-subtle: rgba(231, 76, 60, 0.16);
@@ -151,9 +151,9 @@
 
   --color-success: #2ecc71;
   --color-success-subtle: rgba(46, 204, 113, 0.16);
-  --color-on-success: #1a1f21;
+  --color-on-success: #17191c;
 
-  --color-disabled: #2c3538;
-  --color-disabled-text: #5a6b70;
+  --color-disabled: #30343a;
+  --color-disabled-text: #827f85;
  }
 }

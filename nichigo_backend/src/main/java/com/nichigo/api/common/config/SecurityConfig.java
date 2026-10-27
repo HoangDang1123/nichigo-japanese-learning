@@ -28,14 +28,12 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        HttpSessionCsrfTokenRepository csrfRepository = new HttpSessionCsrfTokenRepository();
-        csrfRepository.setHeaderName("X-CSRF-TOKEN");
         CsrfTokenRequestAttributeHandler csrfHandler = new CsrfTokenRequestAttributeHandler();
 
         http
                 .cors(cors -> {})
                 .csrf(csrf -> csrf
-                        .csrfTokenRepository(csrfRepository)
+                        .csrfTokenRepository(csrfTokenRepository())
                         .csrfTokenRequestHandler(csrfHandler))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
@@ -57,6 +55,13 @@ public class SecurityConfig {
                                 "{\"code\":\"forbidden\",\"message\":\"The request is not allowed.\"}")));
 
         return http.build();
+    }
+
+    @Bean
+    HttpSessionCsrfTokenRepository csrfTokenRepository() {
+        HttpSessionCsrfTokenRepository repository = new HttpSessionCsrfTokenRepository();
+        repository.setHeaderName("X-CSRF-TOKEN");
+        return repository;
     }
 
     private void writeError(HttpServletResponse response, int status, String body) throws java.io.IOException {

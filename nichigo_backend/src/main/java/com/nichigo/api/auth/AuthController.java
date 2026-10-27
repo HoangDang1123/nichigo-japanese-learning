@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,15 +36,18 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final HttpSessionSecurityContextRepository securityContextRepository;
     private final SessionAuthenticationStrategy sessionAuthenticationStrategy;
+    private final CsrfTokenRepository csrfTokenRepository;
     private final SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
 
     public AuthController(AuthService authService, AuthenticationManager authenticationManager,
                           HttpSessionSecurityContextRepository securityContextRepository,
-                          SessionAuthenticationStrategy sessionAuthenticationStrategy) {
+                          SessionAuthenticationStrategy sessionAuthenticationStrategy,
+                          CsrfTokenRepository csrfTokenRepository) {
         this.authService = authService;
         this.authenticationManager = authenticationManager;
         this.securityContextRepository = securityContextRepository;
         this.sessionAuthenticationStrategy = sessionAuthenticationStrategy;
+        this.csrfTokenRepository = csrfTokenRepository;
     }
 
     @GetMapping("/csrf")
@@ -72,6 +76,8 @@ public class AuthController {
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
         securityContextRepository.saveContext(context, servletRequest, servletResponse);
+        // A token obtained before login belongs to the anonymous context. Require a fresh one.
+        csrfTokenRepository.saveToken(null, servletRequest, servletResponse);
         return UserResponse.from(authService.getByEmail(authentication.getName()));
     }
 
@@ -79,6 +85,7 @@ public class AuthController {
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response,
                                        Authentication authentication) {
         logoutHandler.logout(request, response, authentication);
+        csrfTokenRepository.saveToken(null, request, response);
         return ResponseEntity.noContent().build();
     }
 

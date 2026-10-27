@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Map;
+import java.util.Base64;
 import java.util.UUID;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -71,7 +72,13 @@ class AuthControllerIntegrationTest {
         String email = newEmail();
         register(email);
 
-        MvcResult login = mockMvc.perform(post("/api/v1/auth/login").with(csrf())
+        MvcResult csrfResult = mockMvc.perform(get("/api/v1/auth/csrf"))
+                .andExpect(status().isOk()).andReturn();
+        CsrfResponse csrf = objectMapper.readValue(csrfResult.getResponse().getContentAsString(), CsrfResponse.class);
+        Cookie anonymousSession = csrfResult.getResponse().getCookie("SESSION");
+
+        MvcResult login = mockMvc.perform(post("/api/v1/auth/login").cookie(anonymousSession)
+                        .header(csrf.headerName(), csrf.token())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json(Map.of("email", email.toUpperCase(), "password", "beginner-password-123"))))
                 .andExpect(status().isOk())
@@ -86,10 +93,20 @@ class AuthControllerIntegrationTest {
                 .andExpect(jsonPath("$.email").value(email))
                 .andExpect(jsonPath("$.passwordHash").doesNotExist());
 
-        mockMvc.perform(post("/api/v1/auth/logout").cookie(sessionCookie).with(csrf()))
+        MvcResult refreshedCsrfResult = mockMvc.perform(get("/api/v1/auth/csrf").cookie(sessionCookie))
+                .andExpect(status().isOk()).andReturn();
+        CsrfResponse refreshedCsrf = objectMapper.readValue(
+                refreshedCsrfResult.getResponse().getContentAsString(), CsrfResponse.class);
+        mockMvc.perform(post("/api/v1/auth/logout").cookie(sessionCookie)
+                        .header(refreshedCsrf.headerName(), refreshedCsrf.token()))
                 .andExpect(status().isNoContent());
         mockMvc.perform(get("/api/v1/auth/me").cookie(sessionCookie))
                 .andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/api/v1/auth/register").cookie(sessionCookie)
+                        .header(refreshedCsrf.headerName(), refreshedCsrf.token())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(Map.of("email", newEmail(), "password", "beginner-password-123"))))
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -128,6 +145,67 @@ class AuthControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json(Map.of("email", newEmail(), "password", "beginner-password-123"))))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    void loginRotatesExistingSessionAndRequiresFreshCsrfToken() throws Exception {
+        String email = newEmail();
+        register(email);
+        MvcResult anonymous = mockMvc.perform(get("/api/v1/auth/csrf"))
+                .andExpect(status().isOk()).andReturn();
+        CsrfResponse oldCsrf = objectMapper.readValue(anonymous.getResponse().getContentAsString(), CsrfResponse.class);
+        Cookie anonymousSession = anonymous.getResponse().getCookie("SESSION");
+
+        MvcResult login = mockMvc.perform(post("/api/v1/auth/login")
+                        .cookie(anonymousSession)
+                        .header(oldCsrf.headerName(), oldCsrf.token())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(Map.of("email", email, "password", "beginner-password-123"))))
+                .andExpect(status().isOk()).andReturn();
+
+        Cookie authenticatedSession = login.getResponse().getCookie("SESSION");
+        org.junit.jupiter.api.Assertions.assertNotNull(authenticatedSession);
+        org.junit.jupiter.api.Assertions.assertNotEquals(anonymousSession.getValue(), authenticatedSession.getValue());
+        mockMvc.perform(post("/api/v1/auth/logout").cookie(authenticatedSession)
+                        .header(oldCsrf.headerName(), oldCsrf.token()))
+                .andExpect(status().isForbidden());
+
+        MvcResult refreshed = mockMvc.perform(get("/api/v1/auth/csrf").cookie(authenticatedSession))
+                .andExpect(status().isOk()).andReturn();
+        CsrfResponse freshCsrf = objectMapper.readValue(refreshed.getResponse().getContentAsString(), CsrfResponse.class);
+        mockMvc.perform(post("/api/v1/auth/logout").cookie(authenticatedSession)
+                        .header(freshCsrf.headerName(), freshCsrf.token()))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void invalidAndExpiredSessionCookiesAreUnauthorizedForMe() throws Exception {
+        mockMvc.perform(get("/api/v1/auth/me").cookie(new Cookie("SESSION", "invalid-session-id")))
+                .andExpect(status().isUnauthorized());
+
+        String email = newEmail();
+        register(email);
+        MvcResult csrfResult = mockMvc.perform(get("/api/v1/auth/csrf"))
+                .andExpect(status().isOk()).andReturn();
+        CsrfResponse csrf = objectMapper.readValue(csrfResult.getResponse().getContentAsString(), CsrfResponse.class);
+        MvcResult login = mockMvc.perform(post("/api/v1/auth/login")
+                        .cookie(csrfResult.getResponse().getCookie("SESSION"))
+                        .header(csrf.headerName(), csrf.token())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(Map.of("email", email, "password", "beginner-password-123"))))
+                .andExpect(status().isOk()).andReturn();
+        Cookie sessionCookie = login.getResponse().getCookie("SESSION");
+        org.junit.jupiter.api.Assertions.assertNotNull(sessionCookie);
+
+        String sessionId = new String(Base64.getDecoder().decode(sessionCookie.getValue()),
+                java.nio.charset.StandardCharsets.UTF_8);
+        int updated = jdbcTemplate.update("UPDATE SPRING_SESSION SET LAST_ACCESS_TIME = 0, MAX_INACTIVE_INTERVAL = 1, " +
+                "EXPIRY_TIME = 0 " +
+                "WHERE SESSION_ID = ?", sessionId);
+        org.junit.jupiter.api.Assertions.assertEquals(1, updated);
+
+        mockMvc.perform(get("/api/v1/auth/me").cookie(sessionCookie))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

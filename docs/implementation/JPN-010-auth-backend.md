@@ -14,9 +14,16 @@ JWT thường phù hợp khi nhiều dịch vụ độc lập cần xác minh to
 
 `spring_auth` là dự án tham khảo riêng, không thuộc mã nguồn hoặc phạm vi chỉnh sửa JPN-010A. Nichigo dùng API JSON dưới `/api/v1/auth`, bảng `users` riêng và `SESSION` cookie qua Spring Session JDBC. Spring Security tự cung cấp cơ chế nền tảng như `SecurityContext`, bộ lọc xác thực và bảo vệ CSRF; `spring_auth` không phải một phần trong runtime Nichigo.
 
-### Ghi chú học tập về các điểm yếu cần rà soát ở dự án tham khảo
+### Đối chiếu thực tế với project học `spring_auth`
 
-Trong lần rà soát này không thể truy cập mã nguồn `spring_auth` từ workspace hiện tại; do đó không gán phát hiện cụ thể nào cho dự án đó. Khi đối chiếu, cần kiểm tra việc lưu mật khẩu rõ, cấu hình CSRF, xoay session khi xác thực, logout có vô hiệu hóa session hay không, cookie `Secure`/`HttpOnly`/`SameSite`, CORS có wildcard cùng credentials, giới hạn brute force, lỗi có tiết lộ tài khoản tồn tại, và ràng buộc email duy nhất ở database. Không sửa dự án tham khảo trong ticket này.
+Trong Phase 1, Codex đã đọc project `spring_auth` tại máy local và báo cáo các luồng sau (những nhận xét này dựa trên **báo cáo review của Codex**, không phải việc truy cập lại source `spring_auth` trong lần cập nhật docs này):
+
+- **Register:** kiểm tra username tồn tại, băm mật khẩu bằng BCrypt và lưu người dùng qua JPA.
+- **Login:** dùng `AuthenticationManager` kiểm tra username/password, sau đó phát hành JWT đã ký có thời hạn 10 giờ và trả token cho client.
+- **Request mang JWT:** `JwtRequestFilter` đọc `Authorization: Bearer ...`, kiểm tra chữ ký/hạn dùng, tìm người dùng và đặt `Authentication` vào Spring Security context.
+- **Vấn đề đã được nhận diện:** chưa có refresh-token flow hoặc cơ chế logout/revocation; cấu hình chưa thể hiện rõ việc gắn JWT filter vào security filter chain và sử dụng stateless sessions. Ngoài ra, signing key hardcoded, register response trả password, thiếu request validation, CSRF bị tắt, kiểm tra user tồn tại có race condition và test chỉ kiểm tra context load.
+
+Những vấn đề trên là lý do **không copy nguyên xi** code JWT sang Nichigo. Nichigo áp dụng khái niệm `AuthenticationManager`, `UserDetailsService`, BCrypt và Spring Security, nhưng sử dụng **HTTP session được lưu qua Spring Session JDBC** để logout có thể vô hiệu hóa session tại máy chủ. Lựa chọn này phù hợp giai đoạn browser-first và đã được chấp thuận sau Phase 1, không đồng nghĩa JWT luôn kém phù hợp. Khi phát triển mobile/public API, cần đánh giá lại token storage, short-lived access tokens, refresh-token rotation và revocation.
 
 ## 4. Thành phần chính
 
@@ -176,9 +183,19 @@ Lỗi CSRF trả 403; lỗi đăng ký không hợp lệ trả 400 `invalid_requ
 
 ## 14. Kiểm thử và kết quả thực tế
 
-`AuthControllerIntegrationTest` kiểm tra băm mật khẩu và response an toàn, email trùng không phân biệt hoa thường, input sai, đăng nhập, session cookie, `/me`, logout, lỗi thông tin đăng nhập, CSRF bootstrap và bảo vệ CSRF, schema Flyway, health. JPN-010A bổ sung kiểm tra session ID đổi sau login và token cũ không còn dùng được.
+`AuthControllerIntegrationTest` bao gồm registration/password hashing, response không lộ hash, kiểm tra email trùng không phân biệt hoa thường, validation, login và `/me`, logout, credentials sai, CSRF bootstrap và lifecycle, session ID rotation, invalid/expired session, health endpoint, và sự tồn tại của bảng Flyway. Một số request dùng CSRF token/session cookie thực được lấy từ `GET /auth/csrf` thay vì chỉ dùng mock CSRF.
 
-Kết quả trong môi trường thực hiện: chưa chạy được test. Lệnh được yêu cầu `bash ./mvnw test` bị hệ thống Windows chặn tạo tiến trình `bash` (`E_ACCESSDENIED`). Thử `./mvnw.cmd test` cũng dừng trước Maven do lỗi wrapper PowerShell (`Cannot index into a null array`); không tìm thấy lệnh Maven hệ thống. Vì vậy không có kết quả pass/fail của test code. Lệnh `bash ./mvnw verify` cũng chưa thể chạy vì cùng giới hạn. Cần chạy lại trong shell Unix có quyền chạy wrapper hoặc sửa môi trường Maven/PowerShell rồi thực hiện cả hai lệnh.
+**Kết quả do Codex báo cáo sau khi sửa Maven Wrapper và test fixture:**
+
+- `./mvnw.cmd test` — **thành công**.
+- `./mvnw.cmd verify` — **thành công**, tạo Spring Boot artifact.
+- Tổng cộng **13 tests, 0 failures, 0 errors**.
+- Flyway kiểm tra cả ba migration V1/V2/V3; trong lần chạy đầu áp dụng V2/V3 với PostgreSQL local/test, sau đó schema được xác nhận cập nhật.
+- Chạy bằng **JDK 25**, với compiler `--release 21`. Chưa xác nhận runtime Java 21; cần GitHub Actions CI (Temurin 21) kiểm tra trước merge.
+- Maven Wrapper 3.3.4 `only-script` trên Windows PowerShell 5.1 đã được sửa guard `.Target` null/empty trong `nichigo_backend/mvnw.cmd`. Test hết hạn session cũng được chỉnh theo `EXPIRY_TIME` và session ID giải mã từ cookie.
+- Trong môi trường agent, Maven cần quyền ghi user cache và sử dụng database PostgreSQL localhost đã cấu hình trong IntelliJ; **không chạy trên production database**.
+
+Đây là **kết quả test Codex báo cáo**, chưa phải kết quả CI được xác minh độc lập trong lượt cập nhật tài liệu. Trước khi merge cần kiểm tra GitHub Actions chạy thành công trên Java 21.
 
 ## 15. Giới hạn bảo mật đã biết
 

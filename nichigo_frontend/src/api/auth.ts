@@ -5,13 +5,39 @@ export interface AuthUser { id: string; email: string; createdAt: string; update
 interface CsrfResponse { headerName: string; token: string }
 let csrf: CsrfResponse | null = null;
 let csrfRequest: Promise<CsrfResponse> | null = null;
-export function clearCsrfCache() { csrf = null; csrfRequest = null; }
+let csrfGeneration = 0;
+export function clearCsrfCache() {
+  csrf = null;
+  csrfGeneration += 1;
+  csrfRequest = null;
+}
+
+function waitForCaller<T>(request: Promise<T>, signal?: AbortSignal): Promise<T> {
+  if (!signal) return request;
+  if (signal.aborted) return Promise.reject(new ApiError("cancelled", 0, "cancelled", "Request cancelled."));
+  return new Promise<T>((resolve, reject) => {
+    const onAbort = () => reject(new ApiError("cancelled", 0, "cancelled", "Request cancelled."));
+    const cleanup = () => signal.removeEventListener("abort", onAbort);
+    signal.addEventListener("abort", onAbort, { once: true });
+    request.then((value) => { cleanup(); resolve(value); }, (error: unknown) => { cleanup(); reject(error); });
+  });
+}
 
 export async function bootstrapCsrf(signal?: AbortSignal): Promise<CsrfResponse> {
   if (csrf) return csrf;
-  if (!csrfRequest) csrfRequest = apiRequest<CsrfResponse>({ url: "/api/v1/auth/csrf", method: "GET", signal })
-    .then((value) => { csrf = value; return value; }).finally(() => { csrfRequest = null; });
-  return csrfRequest;
+  if (!csrfRequest) {
+    const generation = csrfGeneration;
+    const request = apiRequest<CsrfResponse>({ url: "/api/v1/auth/csrf", method: "GET" })
+      .then((value) => {
+        // A response started under the anonymous session must not repopulate the cache after login/logout.
+        if (generation === csrfGeneration) csrf = value;
+        return value;
+      }).finally(() => {
+        if (csrfRequest === request) csrfRequest = null;
+      });
+    csrfRequest = request;
+  }
+  return waitForCaller(csrfRequest, signal);
 }
 async function mutate<T>(url: string, data?: unknown, signal?: AbortSignal): Promise<T> {
   const token = await bootstrapCsrf(signal);
@@ -34,7 +60,7 @@ export const authApi = {
   async login(email: string, password: string, signal?: AbortSignal) {
     const user = await mutate<AuthUser>("/api/v1/auth/login", { email, password }, signal);
     clearCsrfCache();
-    try { await bootstrapCsrf(signal); } catch { /* next mutation will bootstrap again */ }
+    try { await bootstrapCsrf(); } catch { /* next mutation will bootstrap again */ }
     return user;
   },
   async logout(signal?: AbortSignal) {

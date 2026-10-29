@@ -12,7 +12,7 @@ function fail<T>(status: number, data: T, config: Parameters<AxiosAdapter>[0]): 
 }
 test("Axios auth contracts, CSRF lifecycle and Redux auth transitions", async () => {
   process.env.NEXT_PUBLIC_API_BASE_URL = "http://api.test";
-  const [{ apiClient, ApiError }, { authApi, clearCsrfCache }, { makeStore }, { checkSession, login, logout }] = await Promise.all([
+  const [{ apiClient, ApiError }, { authApi, authErrorMessage, bootstrapCsrf, clearCsrfCache }, { makeStore }, { checkSession, login, logout }] = await Promise.all([
     import("./index"), import("./auth"), import("../store"), import("../store/slices/auth-slice"),
   ]);
   const originalAdapter = apiClient.defaults.adapter;
@@ -42,6 +42,66 @@ test("Axios auth contracts, CSRF lifecycle and Redux auth transitions", async ()
     await authApi.register(user.email, "password-789");
     assert.equal(seen.filter((x) => x.url?.endsWith("/csrf")).length, 2, "login reboots CSRF before the next mutation");
 
+    clearCsrfCache();
+    let releaseSharedCsrf!: () => void;
+    let markCsrfStarted!: () => void;
+    const csrfStarted = new Promise<void>((resolve) => { markCsrfStarted = resolve; });
+    let concurrentMutationCount = 0;
+    adapter = async (config) => {
+      if (config.url?.endsWith("/csrf")) {
+        assert.equal(config.signal, undefined, "shared bootstrap is not owned by an individual caller signal");
+        markCsrfStarted();
+        return new Promise((resolve) => { releaseSharedCsrf = () => resolve(reply(200, { headerName: "X-CSRF-TOKEN", token: "shared-token" }, config)); });
+      }
+      concurrentMutationCount += 1;
+      return reply(201, user, config);
+    };
+    const abortOne = new AbortController();
+    const abortedMutation = authApi.register(user.email, "password-123", abortOne.signal);
+    const independentMutation = authApi.register(user.email, "password-456");
+    await csrfStarted;
+    abortOne.abort();
+    await assert.rejects(abortedMutation, (error: unknown) => error instanceof ApiError && error.category === "cancelled");
+    releaseSharedCsrf();
+    await independentMutation;
+    assert.equal(concurrentMutationCount, 1, "one aborted caller does not cancel its concurrent mutation");
+
+    clearCsrfCache();
+    let csrfAttempts = 0;
+    let recoveredMutationCount = 0;
+    adapter = async (config) => {
+      if (config.url?.endsWith("/csrf")) {
+        csrfAttempts += 1;
+        if (csrfAttempts === 1) return fail(503, { code: "temporary" }, config);
+        return reply(200, { headerName: "X-CSRF-TOKEN", token: "recovered-token" }, config);
+      }
+      recoveredMutationCount += 1;
+      return reply(201, user, config);
+    };
+    await assert.rejects(authApi.register(user.email, "password-123"));
+    await authApi.register(user.email, "password-456");
+    assert.equal(csrfAttempts, 2, "failed CSRF bootstrap is cleared so a later user action can retry it");
+    assert.equal(recoveredMutationCount, 1, "failed mutation is never replayed");
+
+    clearCsrfCache();
+    let releaseOldBootstrap!: () => void;
+    let markOldBootstrapStarted!: () => void;
+    const oldBootstrapStarted = new Promise<void>((resolve) => { markOldBootstrapStarted = resolve; });
+    let bootstrapCount = 0;
+    adapter = async (config) => {
+      if (!config.url?.endsWith("/csrf")) return reply(200, user, config);
+      bootstrapCount += 1;
+      if (bootstrapCount === 1) return new Promise((resolve) => { markOldBootstrapStarted(); releaseOldBootstrap = () => resolve(reply(200, { headerName: "X-CSRF-TOKEN", token: "old-session-token" }, config)); });
+      return reply(200, { headerName: "X-CSRF-TOKEN", token: "new-session-token" }, config);
+    };
+    const oldSessionBootstrap = bootstrapCsrf();
+    await oldBootstrapStarted;
+    clearCsrfCache(); // Session rotation at successful login/logout fences the in-flight old response.
+    assert.equal((await bootstrapCsrf()).token, "new-session-token");
+    releaseOldBootstrap();
+    await oldSessionBootstrap;
+    assert.equal((await bootstrapCsrf()).token, "new-session-token", "stale bootstrap cannot overwrite the rotated session token");
+
     adapter = async (config) => fail(401, { code: "unauthorized" }, config);
     assert.equal(await authApi.currentUser(), null, "me 401 is expected guest");
     adapter = async (config) => { throw new AxiosError("offline", "ERR_NETWORK", config); };
@@ -53,13 +113,34 @@ test("Axios auth contracts, CSRF lifecycle and Redux auth transitions", async ()
     await store.dispatch(checkSession());
     assert.equal(store.getState().auth.status, "authenticated");
 
+    adapter = async (config) => fail(401, { code: "invalid_credentials" }, config);
+    const authenticatedFailure = await store.dispatch(login({ email: user.email, password: "wrong-password" }));
+    const authenticatedLoginError = login.rejected.match(authenticatedFailure) ? authenticatedFailure.error : {};
+    assert.equal(store.getState().auth.status, "authenticated", "invalid credentials do not replace an existing authenticated session");
+    assert.equal(store.getState().auth.user?.id, user.id);
+    assert.match(authErrorMessage(authenticatedLoginError, "login"), /mật khẩu/i, "401 remains a form-level invalid-credentials error");
+
+    const guestStore = makeStore();
     adapter = async (config) => fail(401, { code: "unauthorized" }, config);
-    await store.dispatch(login({ email: user.email, password: "wrong-password" }));
-    assert.equal(store.getState().auth.status, "unavailable", "failed login does not authenticate");
-    assert.equal(store.getState().auth.user, null);
+    await guestStore.dispatch(checkSession());
+    assert.equal(guestStore.getState().auth.status, "guest");
+    adapter = async (config) => config.url?.endsWith("/login")
+      ? fail(401, { code: "invalid_credentials" }, config)
+      : reply(200, { headerName: "X-CSRF-TOKEN", token: "login-csrf" }, config);
+    const invalidLogin = guestStore.dispatch(login({ email: user.email, password: "wrong-password" }));
+    assert.equal(guestStore.getState().auth.status, "guest", "login pending does not replace global auth status with checking");
+    const invalidLoginAction = await invalidLogin;
+    const invalidLoginError = login.rejected.match(invalidLoginAction) ? invalidLoginAction.error : {};
+    assert.equal(guestStore.getState().auth.status, "guest", "invalid credentials leave an unauthenticated user Guest");
+    assert.match(authErrorMessage(invalidLoginError, "login"), /mật khẩu/i);
+
     adapter = async (config) => { throw new AxiosError("offline", "ERR_NETWORK", config); };
-    await store.dispatch(checkSession());
-    assert.equal(store.getState().auth.status, "unavailable", "network failure is unavailable");
+    await guestStore.dispatch(checkSession());
+    assert.equal(guestStore.getState().auth.status, "unavailable", "network failure is unavailable");
+    adapter = async (config) => fail(401, { code: "invalid_credentials" }, config);
+    await guestStore.dispatch(login({ email: user.email, password: "wrong-password" }));
+    assert.equal(guestStore.getState().auth.status, "guest", "a confirmed invalid-credentials response clears an earlier unavailable state");
+    assert.equal(guestStore.getState().auth.errorCategory, null);
 
     adapter = async (config) => {
       if (config.url?.endsWith("/csrf")) return reply(200, { headerName: "X-CSRF-TOKEN", token: "login-csrf" }, config);

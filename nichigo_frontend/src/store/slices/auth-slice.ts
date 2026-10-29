@@ -4,8 +4,20 @@ import { authApi, type AuthUser } from "../../api/auth";
 
 export type AuthStatus = "checking" | "guest" | "authenticated" | "unavailable";
 export type AuthErrorCategory = "network" | "configuration" | "server" | "request" | null;
-export interface AuthState { status: AuthStatus; user: AuthUser | null; errorCategory: AuthErrorCategory; activeRequestId: string | null }
-const initialState: AuthState = { status: "checking", user: null, errorCategory: null, activeRequestId: null };
+export interface AuthState {
+  status: AuthStatus;
+  user: AuthUser | null;
+  errorCategory: AuthErrorCategory;
+  activeRequestId: string | null;
+  sessionRevision: number;
+  checkRevision: number;
+  loginRequestId: string | null;
+  logoutRequestId: string | null;
+}
+const initialState: AuthState = {
+  status: "checking", user: null, errorCategory: null, activeRequestId: null,
+  sessionRevision: 0, checkRevision: 0, loginRequestId: null, logoutRequestId: null,
+};
 
 function category(error: unknown): Exclude<AuthErrorCategory, null> {
   if (error instanceof ApiError) {
@@ -23,35 +35,89 @@ function category(error: unknown): Exclude<AuthErrorCategory, null> {
 function serializedFailure(error: unknown) {
   return { message: category(error), ...(error instanceof ApiError ? { status: error.status, code: error.code } : {}) };
 }
-export const checkSession = createAsyncThunk("auth/checkSession", async (_, { signal }) => authApi.currentUser(signal));
+function isInvalidCredentials(error: unknown): boolean {
+  return Boolean(error && typeof error === "object" && "status" in error && error.status === 401);
+}
+function isAborted(error: unknown, aborted: boolean): boolean {
+  return aborted || (error instanceof ApiError && error.category === "cancelled");
+}
+export const checkSession = createAsyncThunk("auth/checkSession", async (_, { signal }) => authApi.currentUser(signal), { serializeError: serializedFailure });
 export const login = createAsyncThunk("auth/login", async ({ email, password }: { email: string; password: string }, { signal }) => authApi.login(email, password, signal), { serializeError: serializedFailure });
-export const logout = createAsyncThunk("auth/logout", async (_, { signal }) => { await authApi.logout(signal); });
+export const logout = createAsyncThunk("auth/logout", async (_, { signal }) => { await authApi.logout(signal); }, { serializeError: serializedFailure });
 export const register = createAsyncThunk("auth/register", async ({ email, password }: { email: string; password: string }, { signal }) => authApi.register(email, password, signal), { serializeError: serializedFailure });
 
 const authSlice = createSlice({
   name: "auth", initialState, reducers: {},
   extraReducers(builder) {
-    const pending = (state: AuthState, requestId: string) => { state.status = "checking"; state.errorCategory = null; state.activeRequestId = requestId; };
-    const fulfilled = (state: AuthState, requestId: string, user: AuthUser | null) => {
-      if (state.activeRequestId !== requestId) return;
-      state.activeRequestId = null; state.user = user; state.status = user ? "authenticated" : "guest"; state.errorCategory = null;
-    };
-    const rejected = (state: AuthState, requestId: string, error: unknown, aborted = false) => {
-      if (state.activeRequestId !== requestId) return;
-      state.activeRequestId = null;
-      if (aborted || (error instanceof ApiError && error.category === "cancelled")) return;
-      state.status = "unavailable"; state.user = null; state.errorCategory = category(error);
-    };
     builder
-      .addCase(checkSession.pending, (s, a) => pending(s, a.meta.requestId))
-      .addCase(checkSession.fulfilled, (s, a) => fulfilled(s, a.meta.requestId, a.payload))
-      .addCase(checkSession.rejected, (s, a) => rejected(s, a.meta.requestId, a.error, a.meta.aborted))
-      .addCase(login.pending, (s, a) => pending(s, a.meta.requestId))
-      .addCase(login.fulfilled, (s, a) => fulfilled(s, a.meta.requestId, a.payload))
-      .addCase(login.rejected, (s, a) => rejected(s, a.meta.requestId, a.error, a.meta.aborted))
-      .addCase(logout.pending, (s, a) => pending(s, a.meta.requestId))
-      .addCase(logout.fulfilled, (s, a) => fulfilled(s, a.meta.requestId, null))
-      .addCase(logout.rejected, (s, a) => rejected(s, a.meta.requestId, a.error, a.meta.aborted));
+      .addCase(checkSession.pending, (state, action) => {
+        state.activeRequestId = action.meta.requestId;
+        state.checkRevision = state.sessionRevision;
+        if (!state.user) state.status = "checking";
+        state.errorCategory = null;
+      })
+      .addCase(checkSession.fulfilled, (state, action) => {
+        if (state.activeRequestId !== action.meta.requestId || state.checkRevision !== state.sessionRevision) return;
+        state.activeRequestId = null;
+        state.user = action.payload;
+        state.status = action.payload ? "authenticated" : "guest";
+        state.errorCategory = null;
+      })
+      .addCase(checkSession.rejected, (state, action) => {
+        if (state.activeRequestId !== action.meta.requestId || state.checkRevision !== state.sessionRevision) return;
+        state.activeRequestId = null;
+        if (isAborted(action.error, action.meta.aborted)) return;
+        if (!state.user) {
+          state.status = "unavailable";
+          state.errorCategory = category(action.error);
+        }
+      })
+      // Login is an operation on the form. Its local submitting state owns the spinner;
+      // a rejected attempt does not change the currently known session.
+      .addCase(login.pending, (state, action) => { state.loginRequestId = action.meta.requestId; })
+      .addCase(login.fulfilled, (state, action) => {
+        if (state.loginRequestId !== action.meta.requestId) return;
+        state.loginRequestId = null;
+        state.sessionRevision += 1;
+        state.activeRequestId = null;
+        state.user = action.payload;
+        state.status = "authenticated";
+        state.errorCategory = null;
+      })
+      .addCase(login.rejected, (state, action) => {
+        if (state.loginRequestId !== action.meta.requestId) return;
+        state.loginRequestId = null;
+        if (isAborted(action.error, action.meta.aborted)) return;
+        if (isInvalidCredentials(action.error)) {
+          if (!state.user && state.status !== "checking") {
+            state.status = "guest";
+            state.errorCategory = null;
+          }
+          return;
+        }
+        if (state.user) return;
+        if (state.status !== "checking") {
+          state.status = "unavailable";
+          state.errorCategory = category(action.error);
+        }
+      })
+      .addCase(logout.pending, (state, action) => { state.logoutRequestId = action.meta.requestId; })
+      .addCase(logout.fulfilled, (state, action) => {
+        if (state.logoutRequestId !== action.meta.requestId) return;
+        state.logoutRequestId = null;
+        state.sessionRevision += 1;
+        state.activeRequestId = null;
+        state.user = null;
+        state.status = "guest";
+        state.errorCategory = null;
+      })
+      .addCase(logout.rejected, (state, action) => {
+        if (state.logoutRequestId !== action.meta.requestId) return;
+        state.logoutRequestId = null;
+        if (isAborted(action.error, action.meta.aborted) || state.user || state.status === "checking") return;
+        state.status = "unavailable";
+        state.errorCategory = category(action.error);
+      });
   },
 });
 export default authSlice.reducer;

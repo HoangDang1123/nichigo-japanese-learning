@@ -40,23 +40,9 @@
 
 .brand {
   display: flex;
+  width: 100%;
   align-items: center;
-  gap: var(--space-3);
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: -0.04em;
-}
-
-.brandMark {
-  display: grid;
-  width: 2.25rem;
-  height: 2.25rem;
-  place-items: center;
-  border: var(--border-width) solid var(--color-primary);
-  border-radius: var(--radius-md);
-  color: var(--color-primary);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-regular);
+  justify-content: center;
 }
 
 .sidebarNote,
@@ -140,6 +126,14 @@
   font-weight: var(--font-weight-semibold);
 }
 
+.headerActions {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
 /* Content fills the available workspace; individual sections own their surfaces. */
 .main {
   width: 100%;
@@ -157,8 +151,7 @@
 }
 
 .mobileLogo {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
+  display: inline-flex;
 }
 
 .menuButton,
@@ -175,6 +168,12 @@
 .menuButton:hover,
 .closeButton:hover {
   background: var(--color-surface-hover);
+}
+
+.menuButton:focus-visible,
+.closeButton:focus-visible {
+  outline: var(--border-width-thick) solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .mobileDialog {
@@ -258,6 +257,10 @@
     min-height: 3.75rem;
     gap: var(--space-2);
     padding: var(--space-2) var(--space-3);
+  }
+
+  .headerActions {
+    gap: var(--space-2);
   }
 
 }

@@ -30,7 +30,7 @@ RootLayout (ThemeProvider)
 
 | URL | Trạng thái |
 | --- | --- |
-| `/` | Homepage có intro, entry card đến `/learn` và `/skills`, lời nhắn |
+| `/` | Homepage có hero editorial, hai hướng khám phá đến `/learn` và `/skills`, lời nhắn |
 | `/learn` | Placeholder / EmptyState |
 | `/skills` | Placeholder / EmptyState |
 | `/progress` | Placeholder / EmptyState |
@@ -54,7 +54,7 @@ RootLayout (ThemeProvider)
 
 - Dưới **1024px**: ẩn sidebar desktop, hiện mobile brand + menu.
 - Dưới **481px**: thu padding/gaps shell và header.
-- Homepage: hero chuyển từ 2 cột sang 1 tại `720px`, entry cards thành 1 cột tại `520px`.
+- Homepage: hero chuyển từ 2 cột sang 1 tại `620px`, entry links thành 1 cột tại `620px`.
 
 Đây là breakpoint có trong CSS tại thời điểm viết, không phải cam kết không bao giờ thay đổi.
 
@@ -97,13 +97,20 @@ npm run build
 npm run dev
 ```
 
-Checklist thủ công: xem `/`, `/learn`, `/skills`, `/progress`; kiểm tra active item, viewport 1440/768/375/320px, dark/light/system, keyboard Tab/Escape, mobile menu focus, không có horizontal overflow. Sau `npm run build && npm run start`, hai route `/dev/...` cần 404.
+Checklist thủ công: xem `/`, `/learn`, `/skills`, `/progress`; kiểm tra active item, viewport 1440/768/375/320px, dark/light/system, keyboard Tab/Escape, mobile menu focus, không có horizontal overflow. Sau `npm run build && npm run start`, hai route `/dev/...` cần 404. Lượt UI mới nhất đã chạy lint/type-check/test/build; visual browser chưa chạy (xem cập nhật mục 9).
 
-**Chưa thực hiện lại lint/build hoặc kiểm tra browser trong lượt soạn tài liệu**; các lệnh trên là hướng dẫn verification, không phải kết quả PASS đã được xác nhận.
+Các lệnh trên là hướng dẫn verification; kết quả của lượt UI mới nhất được ghi ở mục 9.
 
 ## 8. Về sau
 
-- JPN-010B: login/register UI (không thuộc AppShell).
 - JPN-030: lộ trình học và skill directory thực tế.
 - JPN-034: spotlight onboarding.
 - JPN-041: progress/dashboard lấy dữ liệu thực tế.
+
+## 9. Cập nhật UI JPN-010B
+
+Homepage hiện tại được làm lại tại `nichigo_frontend/src/app/page.tsx` và `home.module.css`: hero editorial dùng headline “Tiếng Nhật, từng bước một.”, CTA lộ trình/kỹ năng, artwork CSS gợi hoa anh đào/cổng torii/mặt trời/đồi, entry points là hai hàng liên kết có đường viền đầu thay cho các card riêng biệt, và lời nhắn cuối không có khung card. Breakpoint hiện tại chuyển hero về một cột tại 620px, thu hẹp phân cấp chữ và xếp entry points một cột; khoảng trắng và kích thước scene cũng giảm trên mobile. Không có số liệu học tập hoặc nội dung bài học mới.
+
+Sidebar AppShell dùng BrandLogo transparent variants; mobile header dùng icon brand gọn. Header đặt ThemeSwitcher dạng icon vuông và AccountMenu dạng welcome pill riêng biệt; account pill thu gọn ở viewport hẹp. Login/register không dùng AppShell; chi tiết auth UI/CSRF ở JPN-010B.
+
+JPN-010B đã chạy lint, type-check, test và build pass. Visual browser test ở desktop/tablet/mobile và keyboard chưa được thực hiện trong lượt này; dùng checklist ở JPN-010B để kiểm tra khi có browser.

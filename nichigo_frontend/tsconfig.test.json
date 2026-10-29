@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "outDir": ".test-dist",
+    "rootDir": "src",
+    "baseUrl": "."
+  },
+  "include": [
+    "src/api/index.ts",
+    "src/api/auth.ts",
+    "src/api/auth.test.ts",
+    "src/store/index.ts",
+    "src/store/slices/auth-slice.ts",
+    "src/lib/auth/auth-validation.ts",
+    "src/components/theme-switcher-icons.tsx",
+    "src/components/theme-switcher-icons.test.tsx"
+  ]
+}

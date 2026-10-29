@@ -1,136 +1,84 @@
 "use client";
 
 import * as React from "react";
+import { Check, Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { usePopover } from "@/components/ui/use-popover";
+import { ThemeSwitcherIcons } from "./theme-switcher-icons";
 import styles from "./theme-switcher.module.css";
 
-const THEME_OPTIONS = [
-  {
-    value: "light",
-    label: "Sáng",
-    description: "Giao diện Sáng (Light)",
-    icon: (
-      <svg
-        className={styles.icon}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="12" cy="12" r="5" />
-        <line x1="12" y1="1" x2="12" y2="3" />
-        <line x1="12" y1="21" x2="12" y2="23" />
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-        <line x1="1" y1="12" x2="3" y2="12" />
-        <line x1="21" y1="12" x2="23" y2="12" />
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-      </svg>
-    ),
-  },
-  {
-    value: "dark",
-    label: "Tối",
-    description: "Giao diện Tối (Dark)",
-    icon: (
-      <svg
-        className={styles.icon}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-      </svg>
-    ),
-  },
-  {
-    value: "system",
-    label: "Hệ thống",
-    description: "Giao diện Hệ thống (System default)",
-    icon: (
-      <svg
-        className={styles.icon}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-        <line x1="8" y1="21" x2="16" y2="21" />
-        <line x1="12" y1="17" x2="12" y2="21" />
-      </svg>
-    ),
-  },
-] as const;
+type ThemeName = "light" | "dark" | "system";
 
-// Stable no-op subscription for useSyncExternalStore
+const options: Array<{ value: ThemeName; label: string; Icon: typeof Sun }> = [
+  { value: "light", label: "Sáng", Icon: Sun },
+  { value: "dark", label: "Tối", Icon: Moon },
+  { value: "system", label: "Hệ thống", Icon: Monitor },
+];
+
 const emptySubscribe = () => () => {};
 
 export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
-  const buttonRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
+  const { open, rootRef, triggerRef, toggle, close } = usePopover();
+  const mounted = React.useSyncExternalStore(emptySubscribe, () => true, () => false);
+  const optionRefs = React.useRef<Array<HTMLButtonElement | null>>([]);
+  const selected = mounted && (theme === "light" || theme === "dark" || theme === "system") ? theme : "system";
+  const selectedOption = options.find((option) => option.value === selected) ?? options[2];
+  const popoverId = React.useId();
 
-  // Idiomatic React 18/19 hydration detection without cascading renders
-  const mounted = React.useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false
-  );
+  const selectTheme = (value: ThemeName) => {
+    setTheme(value);
+    close(true);
+  };
 
-  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
-    let nextIndex = -1;
-    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-      nextIndex = (index + 1) % THEME_OPTIONS.length;
-    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-      nextIndex = (index - 1 + THEME_OPTIONS.length) % THEME_OPTIONS.length;
-    }
-    if (nextIndex !== -1) {
-      e.preventDefault();
-      buttonRefs.current[nextIndex]?.focus();
-      setTheme(THEME_OPTIONS[nextIndex].value);
-    }
+  const handleOptionKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+    let nextIndex = index;
+    if (event.key === "ArrowDown" || event.key === "ArrowRight") nextIndex = (index + 1) % options.length;
+    else if (event.key === "ArrowUp" || event.key === "ArrowLeft") nextIndex = (index - 1 + options.length) % options.length;
+    else if (event.key === "Home") nextIndex = 0;
+    else if (event.key === "End") nextIndex = options.length - 1;
+    else return;
+
+    event.preventDefault();
+    optionRefs.current[nextIndex]?.focus();
+    setTheme(options[nextIndex].value);
   };
 
   return (
-    <div
-      role="group"
-      aria-label="Chọn giao diện hiển thị"
-      className={styles.switcherContainer}
-    >
-      {THEME_OPTIONS.map((option, index) => {
-        // Before mounting on the client, match 'system' fallback
-        // to prevent SSR/client hydration mismatch.
-        const isActive = mounted ? theme === option.value : option.value === "system";
-
-        return (
-          <button
-            key={option.value}
-            ref={(el) => {
-              buttonRefs.current[index] = el;
-            }}
-            type="button"
-            aria-pressed={isActive}
-            aria-label={option.description}
-            className={`${styles.switcherButton} ${isActive ? styles.active : ""}`}
-            onClick={() => setTheme(option.value)}
-            onKeyDown={(e) => handleKeyDown(e, index)}
-          >
-            {option.icon}
-            <span>{option.label}</span>
-          </button>
-        );
-      })}
+    <div className={styles.root} ref={rootRef}>
+      <button
+        ref={triggerRef}
+        type="button"
+        className={styles.trigger}
+        aria-label={`Giao diện: ${selectedOption.label}`}
+        aria-expanded={open}
+        aria-controls={popoverId}
+        onClick={toggle}
+      >
+        <ThemeSwitcherIcons lightClass={styles.effectiveLight} darkClass={styles.effectiveDark} />
+      </button>
+      {open && (
+        <div id={popoverId} className={styles.popover} role="group" aria-label="Chọn giao diện">
+          {options.map(({ value, label, Icon }, index) => {
+            const active = selected === value;
+            return (
+              <button
+                ref={(element) => { optionRefs.current[index] = element; }}
+                key={value}
+                type="button"
+                className={`${styles.option} ${active ? styles.optionActive : ""}`}
+                aria-pressed={active}
+                onClick={() => selectTheme(value)}
+                onKeyDown={(event) => handleOptionKeyDown(event, index)}
+              >
+                <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
+                <span>{label}</span>
+                {active && <Check className={styles.check} size={18} strokeWidth={2} aria-hidden="true" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

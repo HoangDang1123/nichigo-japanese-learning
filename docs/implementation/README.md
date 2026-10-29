@@ -9,6 +9,7 @@ Tài liệu này mô tả **code đã triển khai** trong repository, khác v�
 | JPN-001 | Bootstrap monorepo, runtime, CI | [JPN-001-bootstrap.md](JPN-001-bootstrap.md) |
 | JPN-002 | PostgreSQL và Flyway baseline | [JPN-002-database-baseline.md](JPN-002-database-baseline.md) |
 | JPN-003 | App Shell, responsive navigation, UI states | [JPN-003-app-shell.md](JPN-003-app-shell.md) |
+| JPN-010B | Frontend authentication, session and CSRF integration | [JPN-010-frontend-auth.md](JPN-010-frontend-auth.md) |
 
 ## Quy ước từ JPN-010 trở đi
 

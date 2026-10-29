@@ -1,0 +1,38 @@
+.logo {
+  display: block;
+  flex: 0 0 auto;
+  width: 100%;
+}
+
+.auth {
+  align-self: center;
+  max-width: 17rem;
+}
+
+.sidebar {
+  align-self: center;
+  max-width: 12.5rem;
+}
+
+.mobile {
+  width: 2.5rem;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.dark {
+  display: none;
+}
+
+:global([data-theme="dark"]) .light {
+  display: none;
+}
+
+:global([data-theme="dark"]) .dark {
+  display: block;
+}

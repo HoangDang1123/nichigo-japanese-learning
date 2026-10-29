@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { Menu, X } from "lucide-react";
 import { navigationItems, isActivePath } from "./navigation";
 import styles from "./app-shell.module.css";
 
@@ -27,7 +28,7 @@ export function MobileNav({ pathname }: { pathname: string }) {
       <button ref={triggerRef} type="button" className={styles.menuButton}
         aria-label="Mở menu điều hướng" aria-haspopup="dialog" aria-expanded={open}
         aria-controls="nichigo-mobile-menu" onClick={openMenu}>
-        <span aria-hidden="true">☰</span>
+        <Menu size={21} strokeWidth={1.8} aria-hidden="true" />
       </button>
       <dialog id="nichigo-mobile-menu" ref={dialogRef} className={styles.mobileDialog}
         aria-label="Điều hướng Nichigo" onClose={onClosed}
@@ -35,7 +36,7 @@ export function MobileNav({ pathname }: { pathname: string }) {
         <div className={styles.mobileDialogContent}>
           <div className={styles.dialogTop}>
             <span className={styles.dialogBrand}>Nichigo</span>
-            <button type="button" className={styles.closeButton} onClick={closeMenu} aria-label="Đóng menu">✕</button>
+            <button type="button" className={styles.closeButton} onClick={closeMenu} aria-label="Đóng menu"><X size={20} strokeWidth={1.8} aria-hidden="true" /></button>
           </div>
           <nav aria-label="Điều hướng trên điện thoại" className={styles.mobileLinks}>
             {navigationItems.map((item, index) => (

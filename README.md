@@ -2,7 +2,7 @@
 
 A Vietnamese-first Japanese learning website for absolute beginners, built with a learn-by-building approach.
 
-> **Source status (2026-11-04):** Bootstrap, semantic themes, the original AppShell, PostgreSQL/Flyway V1–V3, and frontend/backend email-password authentication are merged in `origin/main`. The refined collapsible sidebar is implemented, tested and visually approved on pushed branch `003`, but is not merged into `origin/main`. Learning content, guest quota, progress and deployment are not evidenced in current source. None of these source states means a public release.
+> **Source status (2026-11-04, `origin/main` at `c1b254c`):** Bootstrap, semantic themes, PostgreSQL/Flyway V1–V3, frontend/backend email-password authentication, and the refined shared AppShell are merged. PR #13 merged sidebar commit `e2c8c08`, including collapse controls, centered icons and bottom Profile/Settings navigation. The sidebar appearance was owner-approved; that review and the recorded automated checks do not establish full JPN-003 acceptance or a public release. Learning content, guest quota, progress and deployment are not evidenced in current source.
 
 ---
 
@@ -138,4 +138,4 @@ See [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
 ## Feature status
 
-The [feature roadmap](docs/05-BACKLOG.md) maps historical JPN tickets to complete user-facing capabilities and separates implemented, tested, reviewed, merged and released states. JPN-001/JPN-002 foundations and JPN-010 auth source are merged; JPN-003's latest sidebar refinement remains on branch `003`. `/learn`, `/skills` and `/progress` are presentation placeholders. No lesson, quiz, spotlight tour, content import or deployment is evidenced by the current source.
+The [feature roadmap](docs/05-BACKLOG.md) maps historical JPN tickets to complete user-facing capabilities and separates implemented, tested, reviewed, merged and released states. JPN-001/JPN-002 foundations, JPN-010 auth source and JPN-003's latest sidebar refinement are merged in `origin/main` at `c1b254c`. `/learn`, `/skills` and `/progress` are presentation placeholders. No lesson, quiz, spotlight tour, content import or deployment is evidenced by the current source.

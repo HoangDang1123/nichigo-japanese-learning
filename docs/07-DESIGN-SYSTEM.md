@@ -27,7 +27,7 @@ These describe composition and interaction intent. Only the shared shell and exi
 | Profile | Identity, goals, achievements and learning activity backed by supported data. |
 | Settings | Theme, language and password/account controls only where behavior is supported. |
 
-The current source implements the shared AppShell, Light/Dark/System switcher and real NichiGo branding. The approved sidebar refinements are on branch `003` as of 2026-11-04 and are not in `origin/main`. `/learn`, `/skills`, and `/progress` are empty states; `/courses`, `/games`, `/profile`, and `/settings` are unavailable navigation proposals. The existing Home is an editorial entry screen, not the personalized Study Desk.
+The current source implements the shared AppShell, Light/Dark/System switcher and real NichiGo branding. The owner-reviewed sidebar refinements from `e2c8c08` are merged in `origin/main` at `c1b254c` via PR #13, verified on 2026-11-04. This records sidebar appearance approval and merge status, not full shell acceptance or release. `/learn`, `/skills`, and `/progress` are empty states; `/courses`, `/games`, `/profile`, and `/settings` are unavailable navigation proposals. The existing Home is an editorial entry screen, not the personalized Study Desk.
 
 ## Theme architecture
 - Centralize semantic color tokens in CSS (e.g. `src/styles/tokens.css` and `src/styles/themes.css`); use `:root`/light and `[data-theme="dark"]` or an equivalent documented selector.

@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import { BrandLogo } from "@/components/branding/brand-logo";
 import { navigationItems, isActivePath } from "./navigation";
 import styles from "./app-shell.module.css";
 
@@ -15,7 +16,7 @@ export function MobileNav({ pathname }: { pathname: string }) {
   const openMenu = () => {
     dialogRef.current?.showModal();
     setOpen(true);
-    firstLinkRef.current?.focus();
+    requestAnimationFrame(() => firstLinkRef.current?.focus());
   };
   const closeMenu = () => dialogRef.current?.close();
   const onClosed = () => {
@@ -31,22 +32,31 @@ export function MobileNav({ pathname }: { pathname: string }) {
         <Menu size={21} strokeWidth={1.8} aria-hidden="true" />
       </button>
       <dialog id="nichigo-mobile-menu" ref={dialogRef} className={styles.mobileDialog}
-        aria-label="Điều hướng Nichigo" onClose={onClosed}
+        aria-label="Điều hướng NichiGo" onClose={onClosed}
         onClick={(event) => { if (event.target === dialogRef.current) closeMenu(); }}>
         <div className={styles.mobileDialogContent}>
           <div className={styles.dialogTop}>
-            <span className={styles.dialogBrand}>Nichigo</span>
-            <button type="button" className={styles.closeButton} onClick={closeMenu} aria-label="Đóng menu"><X size={20} strokeWidth={1.8} aria-hidden="true" /></button>
+            <BrandLogo size="sidebar" className={styles.dialogLogo} />
+            <button type="button" className={styles.closeButton} onClick={closeMenu} aria-label="Đóng menu">
+              <X size={20} strokeWidth={1.8} aria-hidden="true" />
+            </button>
           </div>
           <nav aria-label="Điều hướng trên điện thoại" className={styles.mobileLinks}>
-            {navigationItems.map((item, index) => (
-              <Link key={item.href} ref={index === 0 ? firstLinkRef : undefined}
-                href={item.href} onClick={closeMenu}
-                aria-current={isActivePath(pathname, item.href) ? "page" : undefined}
-                className={isActivePath(pathname, item.href) ? styles.navActive : styles.navItem}>
-                {item.label}
-              </Link>
-            ))}
+            {navigationItems.map((item, index) => {
+              const active = isActivePath(pathname, item.href);
+              return item.available ? (
+                <Link key={item.label} ref={index === 0 ? firstLinkRef : undefined}
+                  href={item.href} onClick={closeMenu}
+                  aria-current={active ? "page" : undefined}
+                  className={`${styles.navItem} ${active ? styles.navActive : ""}`}>
+                  {item.label}
+                </Link>
+              ) : (
+                <span key={item.label} className={`${styles.navItem} ${styles.navUnavailable}`} aria-disabled="true">
+                  {item.label}<span className={styles.comingSoon}>Sắp ra mắt</span>
+                </span>
+              );
+            })}
           </nav>
           <p className={styles.mobileNote}>一歩ずつ · Từng bước một</p>
         </div>

@@ -28,6 +28,10 @@ RootLayout (ThemeProvider)
 
 `src/components/layout/navigation.ts` là danh sách link tập trung và `isActivePath(pathname, href)` phân biệt `/` với subroutes.
 
+The shared navigation now includes the eight approved labels. Existing destinations remain active: Trang chủ `/`, Lộ trình học `/learn`, Kỹ năng `/skills`, Tiến độ `/progress`. Proposed destinations without routes are shown as unavailable items and are not links: Khóa học `/courses`, Mini game `/games`, Hồ sơ `/profile`, Cài đặt `/settings`. These mappings reserve suggested paths only; no pages, APIs, or profile/settings behavior are implied.
+
+The shared client shell is composed from `AppShell`, `DesktopSidebar`, `AppHeader`, and `MobileNav`. Desktop collapse preference is stored in browser local storage. `AppShell` accepts `hideSidebar` for a focused lesson experience while retaining the shared header; existing routes keep the sidebar by default.
+
 | URL | Trạng thái |
 | --- | --- |
 | `/` | Homepage có hero editorial, hai hướng khám phá đến `/learn` và `/skills`, lời nhắn |

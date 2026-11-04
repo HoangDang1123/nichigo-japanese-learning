@@ -13,11 +13,13 @@
 | ADR-009 | APPROVED | Centralized CSS semantic theme tokens + Light/Dark/System | Default System, persist selection, avoid theme flash |
 | ADR-010 | APPROVED | Modern Japanese Learning Studio art direction | Japanese editorial + restrained calligraphy + education-first, avoid generic AI dashboards |
 | ADR-011 | APPROVED | Product name Nichigo | Final logo asset/domain remain separately reviewable |
+| ADR-012 | APPROVED | Deliver future work by end-to-end user-facing feature | Plan and verify only the FE, BE, API, DB, tests and docs a feature needs. Preserve legacy JPN ticket IDs/dependencies as traceability; follow the workflow in root `AGENTS.md`. |
+| ADR-013 | APPROVED CONCEPT | Screen composition direction in `docs/07-DESIGN-SYSTEM.md` | Shared shell, Study Desk, Railway Journey, Chapter Canvas, Notebook/Focus Lesson, Skills, game layouts, Profile and Settings are concepts. This does not approve every screen for MVP or mark it implemented. |
 
 ## PM proposals, not yet owner decisions
 - Guest quota default **2 unique lessons per day**, reset at 00:00 Asia/Ho_Chi_Minh.
 - Guest identity using server-issued opaque ID and secure cookie; account progress claim on signup.
-- Spring Boot 3.x / Java LTS, modular monolith, Flyway, OpenAPI.
+- Historical proposal: Spring Boot 3.x / Java LTS, modular monolith, Flyway, OpenAPI. Current backend source uses Spring Boot 4.1.0 and Java target 21; OpenAPI is not present in current source.
 - Import available via secured CLI/internal endpoint rather than public admin UI.
 - MVP first content release limited to reviewed Hiragana and a small set of introductory lessons; scope must be explicitly approved before public launch.
 
@@ -30,4 +32,4 @@
 6. Final public domain, final logo asset and any legal/trademark checks; **product name Nichigo is approved**.
 
 ## Change control
-Product Owner approves product decisions and spend. PM maintains PRD and backlog. Engineering may propose technical defaults but must flag material product/security/cost tradeoffs before implementation.
+Product Owner approves product decisions, feature acceptance, release scope and spend. PM maintains PRD and backlog. Engineering may propose technical defaults but must flag material product/security/cost tradeoffs before implementation. Apply the feature workflow in ADR-012 without silently resolving the open questions above.

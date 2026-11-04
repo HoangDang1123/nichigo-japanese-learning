@@ -1,7 +1,7 @@
 # JPN-002 — PostgreSQL & Flyway Database Baseline
 
 **Trạng thái:** Cấu hình JDBC + Flyway baseline đã có trên `main`.  
-**Phạm vi triển khai thực tế:** Kết nối PostgreSQL bằng biến môi trường; Flyway V1 là smoke-test no-op. **Chưa có business schema.**
+**Phạm vi JPN-002:** Kết nối PostgreSQL bằng biến môi trường; Flyway V1 là smoke-test no-op và không có business schema trong V1. **Hiện trạng repository:** JPN-010A sau đó đã thêm `users` ở V2 và Spring Session tables ở V3; bảng học tập/guest/progress vẫn chưa có.
 
 ## 1. Thành phần và vị trí
 
@@ -70,7 +70,7 @@ flowchart TD
 
 Flyway áp dụng script mới theo version và xác minh checksum; **không đồng bộ dữ liệu local sang Neon**.
 
-Đừng sửa nội dung `V1__baseline.sql` đã thực thi. Các bảng nghiệp vụ sẽ thêm bằng `V2__*.sql`, `V3__*.sql`...
+Đừng sửa nội dung `V1__baseline.sql` đã thực thi. JPN-010A đã thêm V2 `users` và V3 Spring Session; các bảng học tập tiếp theo cần migration version mới, không tái sử dụng V2/V3.
 
 ## 4. PostgreSQL schema permissions
 
@@ -94,9 +94,9 @@ CI DB là ephemeral: không liên quan database local hoặc Neon. Mật khẩu 
 
 - Trong lần thiết lập local, Flyway history đã được kiểm tra qua DBeaver và có record `V1__baseline.sql` success = true.
 - Tài liệu này được đối chiếu từ code trên `main`; **không chạy test hoặc truy cập DB trong lượt viết docs**.
-- `nichigo_backend/.env.example` hiện vẫn có placeholder `DATABASE_URL` của phiên bản cũ, trong khi runtime đọc **`DB_URL`**, `DB_USERNAME`, `DB_PASSWORD`. Cần đồng bộ file ví dụ ở PR cấu hình phù hợp.
+- `nichigo_backend/.env.example` hiện khai báo đúng **`DB_URL`**, `DB_USERNAME`, `DB_PASSWORD` và các biến session/CORS; Spring Boot vẫn không tự đọc file `.env`.
 - Không có bảng `users`, khóa ngoại, indexes học tập hay dữ liệu mẫu trong V1. Tránh gọi JPN-002 là “core schema hoàn chỉnh” nếu chưa có migration tương ứng.
 
 ## 7. Bước kế tiếp
 
-JPN-010A tạo bảng users trong **Flyway V2** và bổ sung Spring Security. Test auth cần DB riêng; không dùng Neon production.
+JPN-010A đã tạo bảng users trong **Flyway V2**, session tables trong **V3** và bổ sung Spring Security trên `origin/main`. Test auth cần DB riêng; không dùng Neon production.

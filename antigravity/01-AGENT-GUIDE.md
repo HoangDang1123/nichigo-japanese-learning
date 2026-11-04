@@ -1,45 +1,32 @@
 # Antigravity Agent Operating Guide
 
 ## Authority & working method
-Product Owner makes final product and spending decisions. PM supplies spec/backlog and reviews scope. Agent executes **one approved ticket at a time**, never broad autonomous implementation of the entire PRD.
+Product Owner makes final product, release and spending decisions. PM supplies requirements/backlog and reviews scope. This guide follows the repository-wide [`AGENTS.md`](../AGENTS.md). Execute **one approved user-facing feature at a time**, using the historical JPN tickets in the [feature roadmap](../docs/05-BACKLOG.md) as traceability. Do not implement the entire PRD autonomously.
 
 ## Rules
-1. Read PRD, decision log, architecture, API contract and assigned ticket.
+1. Read root `AGENTS.md`, the assigned feature and linked JPN tickets, PRD, decision log, relevant architecture/API contract, implementation notes and nested agent rules. Inspect source and Git state.
 2. State assumptions and unresolved choices before coding. Do not invent guest quota number, content copyright permissions, payment plans or public domain.
 3. Make smallest viable diff; use existing conventions and no surprise dependencies.
-4. Implement tests and migrations together with code.
-5. Run lint, typecheck, unit/integration tests and report exact commands/results.
+4. Plan the FE, BE, API, DB, tests and documentation impact; change only layers the feature needs. Integrate and verify across changed layers.
+5. Run relevant lint, typecheck, unit/integration tests and visual checks; report exact commands/results and any checks not performed.
 6. Include changed files, decisions, limitations, security implications and manual test steps.
 7. Never paste secrets or credentials in code, logs or answer.
-8. Follow `docs/07-DESIGN-SYSTEM.md` for all frontend work. CSS semantic tokens and Light/Dark/System are required; Japanese editorial/calligraphy accents must be restrained, typography readable, and avoid generic AI dashboard layouts. Do not invent the final logo/domain.
-9. Stop at approval gate; do not merge, deploy to production or purchase services without authorization.
+8. Follow `docs/07-DESIGN-SYSTEM.md` for frontend work. Preserve current semantic tokens and real brand assets; keep Light/Dark/System, responsive behavior and accessible typography. Approved screen concepts are not implemented features.
+9. Keep implemented, tested, reviewed, merged and released states separate. Do not commit, push, merge, deploy, delete branches or rewrite history without explicit owner authorization. Preserve uncommitted work and report unsafe separation.
+10. Follow the [root Git Branch Naming Convention](../AGENTS.md#git-branch-naming-convention) for future branches, using an existing JPN ticket and lowercase kebab-case slugs. Creating, renaming or switching branches also requires explicit owner authorization. Preserve historical branch names. Document FE/BE branch integration and joint verification; a completed frontend branch does not complete a feature. Stop to resolve scope if the task spans multiple features.
 
-## Copy/paste prompt — first ticket
-```
-You are implementing ticket JPN-001 from docs/05-BACKLOG.md.
-Read README.md, docs/01-PRD.md, docs/02-DECISIONS.md,
-docs/03-ARCHITECTURE.md, contracts/01-API-CONTRACT.md and this guide.
+## Feature kickoff
 
-Scope ONLY JPN-001: scaffold Next.js TypeScript and Java Spring Boot
-in a documented monorepo, basic CI checks, .env.example,
-local startup instructions and formatting/lint/test commands.
-Preserve Nichigo naming in user-visible metadata. Read docs/07-DESIGN-SYSTEM.md
-but do not implement JPN-UI-001/002 inside JPN-001; those are separate tasks.
-Do not implement authentication, database tables or lessons yet.
-Do not invent unapproved product choices or create paid services.
-
-Before coding: summarize plan and list unresolved blockers.
-After coding: report changed files, test results, run instructions,
-known limitations and acceptance-criteria checklist.
-Do not deploy or merge without explicit owner approval.
-```
+Before coding, identify the approved objective, legacy tickets, dependencies, acceptance criteria, proposed technical layers, and unresolved decisions. After implementation, report integration evidence, exact checks, manual visual review scope, docs updates, limitations and owner approval needed. Historical ticket estimates and old milestone order do not replace this feature plan.
 
 ## Review template
 - Ticket ID / scope match:
+- Feature objective / related legacy tickets:
 - Files changed:
 - Tests run and results:
 - Security/privacy review:
 - UX states / a11y:
 - Migration or API changes:
 - Open questions for owner:
+- Status (implemented / tested / reviewed / merged / released):
 - PM recommendation: accept / revise / block.

@@ -1,6 +1,6 @@
 # JPN-003 — Responsive Application Shell
 
-**Trạng thái:** Đã có trên `main` và được ghi tài liệu hồi tố theo source.  
+**Trạng thái (2026-11-04):** Shell ban đầu đã merge vào `origin/main`. Sidebar refinement ở commit `e2c8c08` trên branch `003` đã push và được owner duyệt **hình thức sidebar**, chưa merge vào `origin/main`; đó chưa phải nghiệm thu toàn bộ JPN-003.
 **Phạm vi:** Frontend navigation, layout desktop/mobile, placeholder routes, reusable UI states.  
 **Không bao gồm:** Auth, bài học thực tế, API progress, user profile.
 
@@ -15,9 +15,9 @@ RootLayout (ThemeProvider)
   └── Page
        └── AppShell
             ├── Skip-to-content link
-            ├── Desktop sidebar (brand + navigation)
+            ├── DesktopSidebar (brand, collapsible navigation, bottom account destinations)
             └── Workspace
-                 ├── Header (page title, mobile menu, ThemeSwitcher)
+                 ├── AppHeader (page title, MobileNav, ThemeSwitcher, AccountMenu)
                  └── Main #main-content
                       └── Route content
 ```
@@ -28,7 +28,7 @@ RootLayout (ThemeProvider)
 
 `src/components/layout/navigation.ts` là danh sách link tập trung và `isActivePath(pathname, href)` phân biệt `/` với subroutes.
 
-The shared navigation now includes the eight approved labels. Existing destinations remain active: Trang chủ `/`, Lộ trình học `/learn`, Kỹ năng `/skills`, Tiến độ `/progress`. Proposed destinations without routes are shown as unavailable items and are not links: Khóa học `/courses`, Mini game `/games`, Hồ sơ `/profile`, Cài đặt `/settings`. These mappings reserve suggested paths only; no pages, APIs, or profile/settings behavior are implied.
+The shared navigation on branch `003` includes the eight approved labels. Existing destinations remain active: Trang chủ `/`, Lộ trình học `/learn`, Kỹ năng `/skills`, Tiến độ `/progress`. Proposed destinations without routes are shown as unavailable items and are not links: Khóa học `/courses`, Mini game `/games`, Hồ sơ `/profile`, Cài đặt `/settings`. These mappings reserve suggested paths only; no pages, APIs, or profile/settings behavior are implied.
 
 The shared client shell is composed from `AppShell`, `DesktopSidebar`, `AppHeader`, and `MobileNav`. Desktop collapse preference is stored in browser local storage. `AppShell` accepts `hideSidebar` for a focused lesson experience while retaining the shared header; existing routes keep the sidebar by default.
 
@@ -47,9 +47,9 @@ The shared client shell is composed from `AppShell`, `DesktopSidebar`, `AppHeade
 
 `src/components/layout/app-shell.module.css`:
 
-- Outer shell: CSS grid `15.75rem minmax(0, 1fr)`, gap + padding `var(--space-4)`.
-- Desktop sidebar: sticky, bordered, rounded surface; top được căn theo outer margin.
-- Header: panel riêng, có border 1px/radius; ThemeSwitcher bên phải.
+- Outer shell trên branch `003`: CSS grid `16rem minmax(0, 1fr)` khi mở rộng, `5rem minmax(0, 1fr)` khi thu gọn; gap + padding `var(--space-4)`.
+- Desktop sidebar: sticky, bordered, rounded surface; `PanelLeftClose`/`PanelLeftOpen` có nhãn truy cập. Logo, toggle và icon dùng cùng trục căn giữa ở trạng thái gọn. Sáu mục chính nằm phía trên; Hồ sơ/Cài đặt ở nhóm dưới cùng. Sidebar cuộn theo chiều dọc khi màn hình thấp.
+- Header: panel riêng, có border 1px/radius; ThemeSwitcher và AccountMenu bên phải, tái sử dụng auth behavior đã có trên `main`.
 - **Main full width của phần workspace còn lại**: `width: 100%`, `padding: 0`, `background: transparent`, **không có border/radius bọc ngoài**.
 - Các khối trên homepage (`home.module.css`) tự quản lý border/radius/padding. Cách này tạo “floating panels” thay vì một panel lớn lồng các panel khác.
 - CSS dùng semantic vars từ `src/styles/tokens.css` và `src/styles/themes.css`; thay palette tại theme tokens, không hardcode màu từng component.
@@ -86,9 +86,9 @@ Các thành phần này chỉ là **UI presentation states**; không hàm ý đ�
 
 ## 6. Visual và product constraints
 
-Homepage được thiết kế theo hướng Japanese editorial: nhãn tiếng Nhật hỗ trợ, minh họa mặt trời/đồi/cửa sổ **vẽ bằng CSS** trong hero, entry cards có viền mảnh. Chưa có anime illustration asset thực tế trong phần hero được kiểm tra.
+Homepage hiện có hướng Japanese editorial: nhãn tiếng Nhật hỗ trợ, minh họa hoa anh đào/cổng torii/mặt trời/đồi **vẽ bằng CSS** trong hero, entry links có viền mảnh. Đây chưa phải Study Desk cá nhân hóa. Chưa có anime illustration asset thực tế trong phần hero được kiểm tra.
 
-Không tạo số liệu ảo (XP, streak, tỉ lệ hoàn thành); progress là placeholder. Light/Dark/System tồn tại qua ThemeProvider. Các thay đổi thử nghiệm theme trên branch riêng không được coi là đã vào `main` nếu chưa merge.
+Không tạo số liệu ảo (XP, streak, tỉ lệ hoàn thành); progress là placeholder. Light/Dark/System tồn tại qua ThemeProvider. Chỉ shell trước refinement đã có trong `origin/main`; branch `003` cần merge riêng.
 
 ## 7. Cách kiểm tra
 
@@ -101,7 +101,7 @@ npm run build
 npm run dev
 ```
 
-Checklist thủ công: xem `/`, `/learn`, `/skills`, `/progress`; kiểm tra active item, viewport 1440/768/375/320px, dark/light/system, keyboard Tab/Escape, mobile menu focus, không có horizontal overflow. Sau `npm run build && npm run start`, hai route `/dev/...` cần 404. Lượt UI mới nhất đã chạy lint/type-check/test/build; visual browser chưa chạy (xem cập nhật mục 9).
+Checklist thủ công: xem `/`, `/learn`, `/skills`, `/progress`; kiểm tra active item, viewport 1440/768/375/320px, dark/light/system, keyboard Tab/Escape, mobile menu focus, không có horizontal overflow. Sau `npm run build && npm run start`, hai route `/dev/...` cần 404. Branch `003` đã chạy `npm run lint`, `npm run type-check`, `npm run test` (hai test files đều pass) và `git diff --check` trước khi push. Owner đã duyệt hình thức sidebar; chưa có bằng chứng browser QA đầy đủ cho mọi viewport, route, keyboard và theme trên branch này.
 
 Các lệnh trên là hướng dẫn verification; kết quả của lượt UI mới nhất được ghi ở mục 9.
 
@@ -117,4 +117,4 @@ Homepage hiện tại được làm lại tại `nichigo_frontend/src/app/page.t
 
 Sidebar AppShell dùng BrandLogo transparent variants; mobile header dùng icon brand gọn. Header đặt ThemeSwitcher dạng icon vuông và AccountMenu dạng welcome pill riêng biệt; account pill thu gọn ở viewport hẹp. Login/register không dùng AppShell; chi tiết auth UI/CSRF ở JPN-010B.
 
-JPN-010B đã chạy lint, type-check, test và build pass. Visual browser test ở desktop/tablet/mobile và keyboard chưa được thực hiện trong lượt này; dùng checklist ở JPN-010B để kiểm tra khi có browser.
+Các lượt JPN-010B trước đây đã ghi lint, type-check, test và build pass trong note auth. Điều đó không thay thế browser QA của toàn bộ JPN-003 trên branch `003`; dùng checklist ở trên khi review đầy đủ.

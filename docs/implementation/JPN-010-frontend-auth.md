@@ -1,5 +1,7 @@
 # JPN-010B — Xác thực frontend
 
+**Source status (2026-11-04):** JPN-010B is merged in `origin/main`. This note includes historical test/diagnostic reports from several implementation rounds; later sections supersede earlier hypotheses. The documentation update did not rerun auth or browser tests and does not establish release status.
+
 ## 1. Mục tiêu và phạm vi
 
 Tích hợp giao diện đăng ký, đăng nhập và đăng xuất với API session của JPN-010A. Frontend dùng cookie `SESSION` do backend quản lý; không tạo JWT, không đọc hay lưu session ID, không thêm OAuth, khôi phục mật khẩu, xác minh email hoặc dữ liệu tiến độ học.
@@ -18,7 +20,7 @@ Trang `/`, `/learn`, `/skills` và `/progress` vẫn truy cập công khai. `/lo
 - `nichigo_frontend/src/app/login/page.tsx`, `src/app/register/page.tsx`: hai route xác thực dùng chung AuthLayout độc lập, không render AppShell học tập.
 - `nichigo_frontend/src/components/layout/app-shell.tsx` và `app-shell.module.css`: logo NichiGo gọn ở sidebar; điểm vào tài khoản ở header, email và đăng xuất khi đã xác thực.
 - `nichigo_frontend/src/app/layout.tsx`: đặt ReduxProvider bên trong ThemeProvider hiện có.
-- `nichigo_frontend/src/lib/auth/auth-api.test.ts`, `tsconfig.test.json` và script `test`: kiểm thử bằng Node Test Runner có sẵn, không thêm dependency.
+- `nichigo_frontend/src/api/auth.test.ts`, `src/components/theme-switcher-icons.test.tsx`, `tsconfig.test.json` và script `test`: kiểm thử bằng Node Test Runner có sẵn, không thêm dependency.
 
 Giao diện dùng component Input/Button, semantic color tokens và ThemeSwitcher hiện tại; CSS Module hỗ trợ màn hình nhỏ và Light/Dark/System.
 
@@ -48,7 +50,7 @@ Panel giới hạn rộng 27rem, dùng surface/border/radius/shadow theo semanti
 
 ## 5. Cookie session và CSRF
 
-Mọi request API dùng `credentials: "include"` và `cache: "no-store"`. Trình duyệt tự gửi cookie HttpOnly `SESSION`; JavaScript không đọc cookie. Client không lưu session ID, token xác thực, user flag hoặc mật khẩu vào localStorage/sessionStorage. User hiện tại và state nằm trong React Context; CSRF token chỉ nằm trong bộ nhớ của API client.
+Axios client dùng `withCredentials: true`; trình duyệt tự gửi cookie HttpOnly `SESSION`, JavaScript không đọc cookie. Client không lưu session ID, token xác thực, user flag hoặc mật khẩu vào localStorage/sessionStorage. User hiện tại và trạng thái auth nằm trong Redux Toolkit; CSRF token chỉ nằm trong bộ nhớ của API client.
 
 Trước mutation, client gọi `/csrf` nếu chưa có token hợp lệ, rồi gửi token bằng header name backend trả về. Các thao tác đồng thời dùng chung lần bootstrap đang chạy. Token được cache trong bộ nhớ để tránh bootstrap dư thừa.
 
@@ -64,13 +66,13 @@ Sau login thành công, API client xóa token anonymous và bootstrap token mớ
 
 ## 7. Cấu hình chạy local
 
-`nichigo_frontend/.env.example` đã khai báo:
+Frontend source đọc biến public sau; repository hiện **không có** `nichigo_frontend/.env.example`:
 
 ```env
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
 ```
 
-Sao chép thành `nichigo_frontend/.env.local` nếu cần cấu hình local khác (file env đã được ignore). Chạy backend tại URL đã cấu hình và đảm bảo `ALLOWED_ORIGINS` cho phép `http://localhost:3000`; mặc định backend JPN-010A đã cho phép origin này. Từ `nichigo_frontend`, chạy `npm run dev` rồi mở `http://localhost:3000`.
+Khai báo biến này trong file Next.js local được ignore hoặc trong môi trường chạy; `.env.example` không được Next.js nạp tự động. Chạy backend tại URL đã cấu hình và đảm bảo `ALLOWED_ORIGINS` cho phép origin frontend. Từ `nichigo_frontend`, chạy `npm run dev` rồi mở frontend local.
 
 ## 8. Kiểm thử
 
@@ -80,7 +82,7 @@ Sao chép thành `nichigo_frontend/.env.local` nếu cần cấu hình local kh�
 | --- | --- |
 | `npm run lint` | Pass |
 | `npm run type-check` | Pass |
-| `npm test` | Pass, 11 test |
+| `npm test` | Historical pass report from JPN-010B; current script targets two test files. On branch `003`, the two Node test groups passed on 2026-11-04. |
 | `npm run build` | Pass; Next.js tạo route `/login` và `/register` |
 
 Test Node dùng Axios adapter để kiểm tra endpoint, credentials + header CSRF, token refresh sau login, guest `/me` 401, lỗi mạng, trạng thái Redux, login/logout và ngăn request cũ ghi đè trạng thái mới. Validation mật khẩu/email và safe redirect vẫn có trong unit tests.

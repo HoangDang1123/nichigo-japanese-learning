@@ -13,6 +13,7 @@ nichigo-japanese-learning/
 ├── docs/                      # PRD, backlog, kiến trúc, design system
 ├── contracts/                 # API / import contracts (đặc tả, không đồng nghĩa đã code)
 ├── antigravity/               # Agent guide
+├── AGENTS.md                  # Repository-wide feature workflow (added later)
 └── .github/workflows/ci.yml   # GitHub Actions
 ```
 
@@ -60,12 +61,12 @@ CI chỉ **test/build**, chưa tự deploy. Trạng thái xanh/đỏ của một
 
 ## 4. Cần phân biệt
 
-- `README.md` gốc còn mô tả trạng thái bootstrap như “chưa có database/migrations”; một số nội dung đã **lỗi thời** so với hiện trạng JPN-002/003.
+- `README.md` từng mô tả trạng thái bootstrap như “chưa có database/migrations”. README đã được cập nhật theo source và Git history ngày 2026-11-04; ghi chú JPN-001 này vẫn giữ ranh giới bootstrap ban đầu.
 - `docs/implementation` ghi lại hệ thống hiện tại; không phải nguồn thay thế cho backlog.
-- Branch convention hiện dùng `features/<ticket>` cho tính năng; tài liệu riêng trên `docs/implementation`.
+- Lịch sử có branch `features/<ticket>` và branch `003`; tên branch không thay thế việc xác nhận merge trong Git. Tài liệu triển khai nằm ở `docs/implementation`.
 
 ## 5. Bổ sung sau
 
-- Đồng bộ lại README tổng quan khi đóng PR docs.
+- Giữ README tổng quan đồng bộ với source và trạng thái merge mỗi khi feature thay đổi.
 - Bổ sung test/report chứng minh health endpoint & startup nếu cần nghiệm thu tự động chi tiết.
 - Deployment Vercel/Render/Neon thuộc ticket sau, không thuộc bootstrap.

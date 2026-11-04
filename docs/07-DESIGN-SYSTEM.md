@@ -1,13 +1,33 @@
 # Nichigo — Visual Design System & Theme Specification (v1.2)
 
-**Status:** Product Owner approved visual direction and three theme modes. Technical implementation details below are PM recommendations, subject to engineering validation.
+**Status:** Product Owner approved the conceptual layouts below and Light/Dark/System modes. Layout concepts are design direction, not evidence of implemented screens or approval of their release scope. Source and verification status live in [the feature roadmap](05-BACKLOG.md) and [implementation notes](implementation/README.md).
 
 ## Identity and design intent
 - **Product name:** Nichigo. The name was selected by the Product Owner; domain availability and final logo assets are separate decisions.
 - **Art direction:** **Modern Japanese Learning Studio** — modern education first, Japanese editorial composition second, restrained shodō/calligraphy accents third.
 - **Visual priorities:** content-first lessons, readability of Vietnamese and Japanese, recognizable Japanese stationery/textbook aesthetics without cliché decoration.
-- **Initial palette:** muted sage green (#4F8F7B), warm cream (#FBFAF6), amber accent (#F4B860), dark ink text (#263238). These are editable defaults, **not immutable brand requirements**.
+- **Current palette:** Sakura Pink semantic light/dark tokens in `nichigo_frontend/src/styles/themes.css` (light background `#fff9fb`, primary `#983b62`; dark background `#17191c`, primary `#dda3bd`). The earlier sage/cream/amber proposal is historical, not the active palette. Change color values centrally rather than in component CSS.
 - **Light/Dark/System:** all three are mandatory; default to System.
+- **Branding:** reuse the existing assets in `nichigo_frontend/public/branding/`. Do not replace them or treat generated AI images as production-ready design specifications without owner review.
+
+## Approved conceptual layouts
+
+These describe composition and interaction intent. Only the shared shell and existing placeholder/entry routes are present in current source; the other screens need scoped feature work and acceptance review. See the roadmap before scheduling implementation.
+
+| Area | Direction |
+| --- | --- |
+| Shared AppShell | One consistent collapsible desktop sidebar, responsive mobile drawer, shared header and semantic theme states. Expanded/collapsed modes use a panel-style toggle, aligned icons, and Profile/Settings near the bottom. Focused lessons can hide the sidebar through the shell. |
+| Home | Minimal Study Desk with a clear next step; personalize from real progress only when authenticated data exists. |
+| Learning Path | Railway Journey showing ordered learning stages. |
+| Course | Chapter Canvas for a course's reviewed chapters and lessons. |
+| Lesson | Notebook-style reading interface with legible Vietnamese/Japanese content. |
+| Focus Lesson | Distraction-free writing practice using verified stroke or writing assets where available. |
+| Skills | Editorial learning library for free exploration of published content. |
+| Mini Games | Separate layouts suited to each game, including a town map, quiz and flashcards. Game release scope remains unapproved. |
+| Profile | Identity, goals, achievements and learning activity backed by supported data. |
+| Settings | Theme, language and password/account controls only where behavior is supported. |
+
+The current source implements the shared AppShell, Light/Dark/System switcher and real NichiGo branding. The approved sidebar refinements are on branch `003` as of 2026-11-04 and are not in `origin/main`. `/learn`, `/skills`, and `/progress` are empty states; `/courses`, `/games`, `/profile`, and `/settings` are unavailable navigation proposals. The existing Home is an editorial entry screen, not the personalized Study Desk.
 
 ## Theme architecture
 - Centralize semantic color tokens in CSS (e.g. `src/styles/tokens.css` and `src/styles/themes.css`); use `:root`/light and `[data-theme="dark"]` or an equivalent documented selector.
@@ -23,6 +43,7 @@
 - Chapter numbering, vertical rhythm, typographic hierarchy, subtle asymmetry and grid-aware composition can evoke Japanese books/stationery.
 - Brush strokes, a stamp/seal, or large Japanese glyphs are **selective accents** (e.g. section headers or kana intro), not UI navigation or body text.
 - Use legible typefaces with correct Vietnamese diacritics and Japanese glyph coverage. For kana/kanji study and stroke guidance, use unambiguous, verified glyphs/assets rather than decorative calligraphy.
+- Preserve intentional whitespace and keep decoration out of lesson reading and writing areas unless it aids orientation.
 - The heuristic **70% modern education / 20% Japanese editorial / 10% calligraphy** expresses visual balance, not a measurable acceptance criterion.
 
 ## Anti-generic-UI principles

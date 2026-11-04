@@ -2,7 +2,7 @@
 
 A Vietnamese-first Japanese learning website for absolute beginners, built with a learn-by-building approach.
 
-> **Status:** JPN-001 bootstrap complete. No user data, no deployment, no authentication yet.
+> **Source status (2026-11-04, `origin/main` at `c1b254c`):** Bootstrap, semantic themes, PostgreSQL/Flyway V1–V3, frontend/backend email-password authentication, and the refined shared AppShell are merged. PR #13 merged sidebar commit `e2c8c08`, including collapse controls, centered icons and bottom Profile/Settings navigation. The sidebar appearance was owner-approved; that review and the recorded automated checks do not establish full JPN-003 acceptance or a public release. Learning content, guest quota, progress and deployment are not evidenced in current source.
 
 ---
 
@@ -15,6 +15,7 @@ nichigo-japanese-learning/
 ├── docs/                  # Product, architecture and design documents
 ├── contracts/             # Proposed REST API and import schema contracts
 ├── antigravity/           # Agent operating guide
+├── AGENTS.md              # Repository-wide agent workflow
 ├── .github/workflows/     # GitHub Actions CI
 ├── .gitignore
 └── README.md
@@ -40,10 +41,11 @@ Maven is **not** required globally. The backend bundles `mvnw` / `mvnw.cmd`.
 
 ```bash
 cd nichigo_frontend
-cp .env.example .env.local   # first time only
 npm install
 npm run dev
 ```
+
+Set `NEXT_PUBLIC_API_BASE_URL` in an ignored local Next.js environment file or your development environment when connecting to the backend. The frontend currently has **no** `.env.example` file; Next.js does not load a sample file automatically. Do not place credentials in `NEXT_PUBLIC_*` variables.
 
 Open [http://localhost:3000](http://localhost:3000).
 
@@ -56,6 +58,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | `npm run start`     | Serve production build locally       |
 | `npm run lint`      | ESLint                               |
 | `npm run type-check`| TypeScript type check (no emit)      |
+| `npm test`          | Available auth/theme unit tests      |
 
 ---
 
@@ -65,10 +68,12 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ```bash
 cd nichigo_backend
-cp .env.example .env          # first time only (optional — defaults work locally)
+# Set DB_URL, DB_USERNAME and DB_PASSWORD in the shell or IDE first.
 ./mvnw spring-boot:run        # Linux / macOS
 mvnw.cmd spring-boot:run      # Windows
 ```
+
+`nichigo_backend/.env.example` lists the required variable names, but Spring Boot does not load `.env` automatically. A PostgreSQL database is required for Flyway and auth startup. Keep real values in local/managed environment settings.
 
 API base: [http://localhost:8080/api/v1](http://localhost:8080/api/v1)
 
@@ -87,18 +92,20 @@ Health check: `curl http://localhost:8080/api/v1/health`
 
 ## Environment variables
 
-### Frontend (`nichigo_frontend/.env.example`)
+### Frontend (local Next.js environment)
 
 | Variable                  | Default                    | Description                  |
 |---------------------------|----------------------------|------------------------------|
-| `NEXT_PUBLIC_API_BASE_URL` | `http://localhost:8080`   | Nichigo API base URL         |
+| `NEXT_PUBLIC_API_BASE_URL` | configured locally | Public origin for the backend API; required for browser auth requests |
 
 ### Backend (`nichigo_backend/.env.example`)
 
-| Variable          | Default                   | Description                        |
-|-------------------|---------------------------|------------------------------------|
-| `SERVER_PORT`     | `8080`                    | HTTP port                          |
-| `ALLOWED_ORIGINS` | `http://localhost:3000`   | Comma-separated CORS allowed origins |
+| Variable | Description |
+|---|---|
+| `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` | Required PostgreSQL JDBC connection |
+| `SERVER_PORT` | Optional HTTP port (default 8080) |
+| `ALLOWED_ORIGINS` | Exact browser origins allowed by CORS |
+| `SESSION_COOKIE_SECURE`, `SESSION_COOKIE_SAME_SITE` | Cookie policy; production settings require security review |
 
 ---
 
@@ -111,7 +118,9 @@ Health check: `curl http://localhost:8080/api/v1/health`
 | [`docs/03-ARCHITECTURE.md`](docs/03-ARCHITECTURE.md) | Technical architecture and data model |
 | [`docs/05-BACKLOG.md`](docs/05-BACKLOG.md) | Sequenced implementation tickets |
 | [`docs/07-DESIGN-SYSTEM.md`](docs/07-DESIGN-SYSTEM.md) | Approved visual direction and CSS theming |
+| [`docs/implementation/README.md`](docs/implementation/README.md) | Source-checked implementation notes and verification limits |
 | [`contracts/01-API-CONTRACT.md`](contracts/01-API-CONTRACT.md) | Proposed REST endpoints |
+| [`AGENTS.md`](AGENTS.md) | Standard feature workflow and agent rules |
 | [`antigravity/01-AGENT-GUIDE.md`](antigravity/01-AGENT-GUIDE.md) | Safe agent workflow |
 
 ---
@@ -127,12 +136,6 @@ See [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
 ---
 
-## Implemented tickets
+## Feature status
 
-| Ticket | Description |
-|--------|-------------|
-| JPN-001 | Repository bootstrap (this commit) |
-
-## Not yet implemented
-
-Authentication, database, migrations, lessons, quiz, spotlight tour, content import, deployment.
+The [feature roadmap](docs/05-BACKLOG.md) maps historical JPN tickets to complete user-facing capabilities and separates implemented, tested, reviewed, merged and released states. JPN-001/JPN-002 foundations, JPN-010 auth source and JPN-003's latest sidebar refinement are merged in `origin/main` at `c1b254c`. `/learn`, `/skills` and `/progress` are presentation placeholders. No lesson, quiz, spotlight tour, content import or deployment is evidenced by the current source.

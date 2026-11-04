@@ -3,9 +3,11 @@
 ## System topology
 `Browser → Vercel / Next.js → HTTPS → Render Free / Spring Boot → TLS PostgreSQL → Neon Free`
 
+This is the **target deployment topology**, not a deployed environment verified by this repository. Current source has a Next.js frontend, Spring Boot backend, PostgreSQL/Flyway configuration, and session auth. Hosting, learning content, quota, progress and import integration remain planned.
+
 - Next.js TypeScript frontend. Java Spring Boot modular monolith REST API.
 - Neon managed PostgreSQL; Flyway migration history in repository.
-- Backend modules: `identity`, `content`, `learning`, `practice`, `quota`, `contentimport`, `admin`, `common`.
+- Planned backend domains: `identity`, `content`, `learning`, `practice`, `quota`, `contentimport`, `admin`, `common`. Current source has `auth` and `common` packages; do not treat the planned list as implemented modules.
 - Prefer standard PostgreSQL, env-based config, and no vendor-specific business logic for portability.
 
 ## Repository structure (approved — JPN-001)
@@ -22,6 +24,7 @@ antigravity/              # Agent operating guide
 ```
 
 ## Data model (conceptual, adjust with migrations)
+The list below is a target model. Current Flyway source has V1 baseline, V2 `users` and V3 Spring Session tables; it does not have the learning, guest, content or progress tables below. See JPN-002 and JPN-010A implementation notes for the actual schema.
 - `users(id,email,password_hash,status,created_at)`; `auth_sessions(id,user_id,expires_at,revoked_at)`.
 - `guest_sessions(id,created_at,last_seen_at)`; `guest_claims(guest_id,user_id,claimed_at)`.
 - `learning_paths(id,slug,title,visibility)`; `path_lessons(path_id,lesson_id,sort_order)`; `levels(id,code)`.
@@ -35,6 +38,7 @@ antigravity/              # Agent operating guide
 Use canonical content references and a join table for lesson membership. Include uniqueness constraints for progress and import keys; enforce quotas atomically with transactions and locks/conditional upsert. Store timestamps in UTC; compute guest quota date in Asia/Ho_Chi_Minh.
 
 ## Auth and security decisions to implement carefully
+JPN-010 implements BCrypt, Spring Security sessions and CSRF for local/source behavior. Production cookie topology, rate limiting and deployment checks below remain open.
 - Password hashing Argon2id or bcrypt, never plain text; rate limit login/register.
 - Secure, HttpOnly cookies for sessions; cross-site cookie deployment needs explicit `SameSite=None; Secure`, CORS allowlist + credentials and CSRF protection, or use a same-site proxy/custom domain arrangement.
 - Never assume Vercel preview URLs are safe CORS origins by wildcard; whitelist approved origins.

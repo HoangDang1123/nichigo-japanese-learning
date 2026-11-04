@@ -1,5 +1,7 @@
 # JPN-010A — Xác thực backend bằng session
 
+**Source status (2026-11-04):** JPN-010A backend, V2/V3 migrations and related tests are merged in `origin/main`. The test counts below are historical implementation reports; this documentation update did not rerun Maven or verify deployment.
+
 ## 1. Tổng quan và phạm vi
 
 JPN-010A cung cấp đăng ký, đăng nhập, phiên đăng nhập phía máy chủ, truy vấn người dùng hiện tại, đăng xuất và token CSRF cho API Spring Boot. Backend lưu người dùng và session trong PostgreSQL. Mật khẩu được băm BCrypt; cookie session là HttpOnly. Phạm vi này không bao gồm giao diện frontend, cấu hình miền triển khai, BFF hay JWT.
@@ -191,11 +193,11 @@ Lỗi CSRF trả 403; lỗi đăng ký không hợp lệ trả 400 `invalid_requ
 - `./mvnw.cmd verify` — **thành công**, tạo Spring Boot artifact.
 - Tổng cộng **13 tests, 0 failures, 0 errors**.
 - Flyway kiểm tra cả ba migration V1/V2/V3; trong lần chạy đầu áp dụng V2/V3 với PostgreSQL local/test, sau đó schema được xác nhận cập nhật.
-- Chạy bằng **JDK 25**, với compiler `--release 21`. Chưa xác nhận runtime Java 21; cần GitHub Actions CI (Temurin 21) kiểm tra trước merge.
+- Lượt local được ghi ở đây chạy bằng **JDK 25**, với compiler `--release 21`. Source đã merge; tài liệu này không xác minh độc lập kết quả GitHub Actions trên Temurin 21.
 - Maven Wrapper 3.3.4 `only-script` trên Windows PowerShell 5.1 đã được sửa guard `.Target` null/empty trong `nichigo_backend/mvnw.cmd`. Test hết hạn session cũng được chỉnh theo `EXPIRY_TIME` và session ID giải mã từ cookie.
 - Trong môi trường agent, Maven cần quyền ghi user cache và sử dụng database PostgreSQL localhost đã cấu hình trong IntelliJ; **không chạy trên production database**.
 
-Đây là **kết quả test Codex báo cáo**, chưa phải kết quả CI được xác minh độc lập trong lượt cập nhật tài liệu. Trước khi merge cần kiểm tra GitHub Actions chạy thành công trên Java 21.
+Đây là **kết quả test Codex báo cáo**, chưa phải kết quả CI được xác minh độc lập trong lượt cập nhật tài liệu. Kiểm tra lịch sử GitHub Actions trên Java 21 trước khi dùng các kết quả này làm bằng chứng release.
 
 ## 15. Giới hạn bảo mật đã biết
 

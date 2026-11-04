@@ -17,11 +17,11 @@ A Vietnamese-first Japanese learning website for absolute beginners, with a grad
 ## 2A. Approved visual identity and theme requirements
 - **Product name:** Nichigo. Do not use “Japanese Learning Web” as the outward-facing brand label; logo/domain final assets remain separately reviewable.
 - **Visual direction:** “Modern Japanese Learning Studio”: modern education + Japanese editorial/bookish typography + restrained shodō/calligraphy accents. Content-first screens rather than generic AI/SaaS dashboards.
-- **Initial palette:** sage green / warm cream / dark ink / small amber accents; color palette must remain easy to change.
+- **Current palette:** Sakura Pink light/dark semantic tokens; color values remain centralized and easy to change. The earlier sage/cream/amber proposal is superseded as a visual palette, not as a product requirement.
 - **Theme system:** centralized semantic CSS color tokens; Light, Dark and System modes, default System; save preference locally; follow OS changes for System; avoid wrong-theme flash/hydration mismatch.
 - **All UI states:** navigation, lessons, quiz, inputs, modal, spotlight tour and feedback states must work in both effective light/dark themes, responsive and accessible.
 - **Design quality:** avoid excessive gradients, glass effects, large repeated rounded cards, shadows and decorative icons. Use Japanese-inspired editorial detail sparingly, never at the expense of legible kana/kanji glyphs.
-- **Reference:** `docs/07-DESIGN-SYSTEM.md` defines tokens, style principles and UI acceptance checks.
+- **Reference:** `docs/07-DESIGN-SYSTEM.md` records the approved conceptual layouts, tokens, style principles and UI acceptance checks. Concept approval does not mean every screen is implemented or in the MVP.
 
 ## 3. User journeys
 **Guest:** land on home → spotlight tour (or skip) → see default beginner path → open a published lesson → practice → see feedback and daily lesson allowance → sign up to retain progress.

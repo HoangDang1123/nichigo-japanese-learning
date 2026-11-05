@@ -34,7 +34,7 @@ The shared client shell is composed from `AppShell`, `DesktopSidebar`, `AppHeade
 
 | URL | Trạng thái |
 | --- | --- |
-| `/` | Homepage có hero editorial, hai hướng khám phá đến `/learn` và `/skills`, lời nhắn |
+| `/` | Tại mốc main `c1b254c`: homepage có hero editorial. Sau mốc này, JPN-041 thay nội dung Home bằng Study Desk presentation; xem [JPN-041-home-study-desk.md](JPN-041-home-study-desk.md). AppShell giữ nguyên. |
 | `/learn` | Placeholder / EmptyState |
 | `/skills` | Placeholder / EmptyState |
 | `/progress` | Placeholder / EmptyState |

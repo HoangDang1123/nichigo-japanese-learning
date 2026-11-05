@@ -12,7 +12,7 @@
 
 ## Approved conceptual layouts
 
-These describe composition and interaction intent. Only the shared shell and existing placeholder/entry routes are present in current source; the other screens need scoped feature work and acceptance review. See the roadmap before scheduling implementation.
+These describe composition and interaction intent. The shared shell and Home Study Desk presentation are present in current source; other planned screens and real learning progress need scoped feature work and acceptance review. See the roadmap before scheduling implementation.
 
 | Area | Direction |
 | --- | --- |
@@ -27,7 +27,7 @@ These describe composition and interaction intent. Only the shared shell and exi
 | Profile | Identity, goals, achievements and learning activity backed by supported data. |
 | Settings | Theme, language and password/account controls only where behavior is supported. |
 
-The current source implements the shared AppShell, Light/Dark/System switcher and real NichiGo branding. The owner-reviewed sidebar refinements from `e2c8c08` are merged in `origin/main` at `c1b254c` via PR #13, verified on 2026-11-04. This records sidebar appearance approval and merge status, not full shell acceptance or release. `/learn`, `/skills`, and `/progress` are empty states; `/courses`, `/games`, `/profile`, and `/settings` are unavailable navigation proposals. The existing Home is an editorial entry screen, not the personalized Study Desk.
+The current source implements the shared AppShell, Light/Dark/System switcher and real NichiGo branding. The owner-reviewed sidebar refinements from `e2c8c08` are merged in `origin/main` at `c1b254c` via PR #13, verified on 2026-11-04. This records sidebar appearance approval and merge status, not full shell acceptance or release. `/learn`, `/skills`, and `/progress` are empty states; `/courses`, `/games`, `/profile`, and `/settings` are unavailable navigation proposals. Home now presents the Study Desk layout with honest empty states; personalized resume, activity and goals still require real JPN-040/JPN-041 data.
 
 ## Theme architecture
 - Centralize semantic color tokens in CSS (e.g. `src/styles/tokens.css` and `src/styles/themes.css`); use `:root`/light and `[data-theme="dark"]` or an equivalent documented selector.

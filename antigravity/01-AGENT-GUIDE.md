@@ -14,6 +14,7 @@ Product Owner makes final product, release and spending decisions. PM supplies r
 8. Follow `docs/07-DESIGN-SYSTEM.md` for frontend work. Preserve current semantic tokens and real brand assets; keep Light/Dark/System, responsive behavior and accessible typography. Approved screen concepts are not implemented features.
 9. Keep implemented, tested, reviewed, merged and released states separate. Do not commit, push, merge, deploy, delete branches or rewrite history without explicit owner authorization. Preserve uncommitted work and report unsafe separation.
 10. Follow the [root Git Branch Naming Convention](../AGENTS.md#git-branch-naming-convention) for future branches, using an existing JPN ticket and lowercase kebab-case slugs. Creating, renaming or switching branches also requires explicit owner authorization. Preserve historical branch names. Document FE/BE branch integration and joint verification; a completed frontend branch does not complete a feature. Stop to resolve scope if the task spans multiple features.
+11. Follow the [single-workspace Git workflow](../AGENTS.md#single-workspace-git-workflow): use the primary checkout and ticket branches, preserve and push unfinished ticket work before switching, and do not create another worktree or duplicate project directory without explicit Product Owner authorization. Review and test each ticket diff before its PR; do not merge unfinished features.
 
 ## Feature kickoff
 

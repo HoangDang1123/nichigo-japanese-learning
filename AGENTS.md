@@ -17,6 +17,25 @@ Use existing patterns and reusable components; avoid unnecessary dependencies. D
 
 Do not commit, push, merge, deploy, delete branches, or rewrite Git history without explicit owner authorization. Preserve all uncommitted work. If feature changes cannot be separated safely, stop and report the conflict.
 
+## Single-workspace Git workflow
+
+Use one primary local checkout at `H:\Code\Projects\nichigo-japanese-learning` and work with Git branches in that directory. Do not create another Git worktree or a duplicate project directory unless the Product Owner explicitly authorizes an exception.
+
+### Starting a ticket
+
+1. Read the relevant project instructions and ticket requirements. Inspect `git status`, the current branch, and untracked files before switching tickets.
+2. If the current ticket has unfinished legitimate work, review it, then commit and push it to its appropriate ticket branch. Separate unrelated tickets into distinct commits and branches; never stage every changed file blindly.
+3. Never discard uncommitted or untracked work. If changes cannot be separated and preserved safely, stop and report the blocker instead of switching branches.
+4. Fetch the latest remote state and synchronize with `main` before creating the next ticket branch. Use the branch naming convention below and start only when the primary checkout is safe.
+
+### Completing a ticket
+
+1. Review the diff, run relevant checks and tests, and update implementation documentation.
+2. Commit one logical ticket-scoped change at a time using the Conventional Commits convention below; push the branch and open or update a PR targeting `main` for review.
+3. Merge only when the work is complete, verified, and explicitly authorized. Never merge an unfinished feature. After merge, synchronize the primary checkout with `main` before starting another independent ticket.
+
+Never use `git reset --hard`, `git clean -fd`, force-push, or destructive checkout to resolve a branch switch. Do not delete or overwrite unfinished work or rewrite historical commits to satisfy a newer convention. If a Git operation could lose work or rewrite history, stop and report the risk.
+
 ## Git Branch Naming Convention
 
 Use the following convention for all future NichiGo development branches.

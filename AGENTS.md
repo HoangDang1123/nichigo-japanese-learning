@@ -52,6 +52,32 @@ Examples:
 9. If a task spans multiple features, stop and identify the correct scope before implementation.
 10. Keep this convention recorded here and referenced in relevant project workflow documentation.
 
+## Git Commit Message Convention
+
+Use Conventional Commits for new commits. The required subject format is:
+
+```text
+<type>(<ticket-id>): <short-description>
+```
+
+Examples:
+
+```text
+feat(jpn-030): implement railway journey UI
+fix(jpn-030): correct station hover behavior
+style(jpn-ui-002): standardize global typography
+docs(jpn-030): update learning path documentation
+test(jpn-032): add quiz grading tests
+```
+
+Allowed types: `feat`, `fix`, `style`, `refactor`, `docs`, `test`, `chore`, `perf`, `build`, `ci`.
+
+1. Use a lowercase type and ticket ID. Reference an existing JPN ticket and preserve its identifier, including numeric padding and categories such as `jpn-ui-002`.
+2. Write the description in English imperative form, preferably keeping the subject within 72 characters. Do not end it with a period.
+3. Put one logical change in each commit. Do not combine unrelated tickets in one commit.
+4. Mark breaking changes with Conventional Commits syntax: `!` after the scope (for example, `feat(jpn-003)!: change shell contract`) and/or a `BREAKING CHANGE:` footer explaining the impact.
+5. Apply this convention only to new commits. Do not rename or rewrite historical commits solely to conform to it.
+
 ## Completion language
 
 - **Implemented:** source exists for the stated scope; integration may still be incomplete.

@@ -25,6 +25,8 @@ antigravity/              # Agent operating guide
 
 ## Data model (conceptual, adjust with migrations)
 The list below is a target model. Current Flyway source has V1 baseline, V2 `users` and V3 Spring Session tables; it does not have the learning, guest, content or progress tables below. See JPN-002 and JPN-010A implementation notes for the actual schema.
+The [Nichigo Hybrid curriculum proposal](04-CONTENT-AND-LEARNING.md) adds a conceptual Learning Path → Stage → Chapter → Lesson hierarchy, independent Skills/Practice entry points, and separate lesson-completion versus item-mastery concerns. JPN-020 must evaluate how to represent these in the content model; the hierarchy does not imply one database table per level, and the Railway station granularity is still open.
+
 - `users(id,email,password_hash,status,created_at)`; `auth_sessions(id,user_id,expires_at,revoked_at)`.
 - `guest_sessions(id,created_at,last_seen_at)`; `guest_claims(guest_id,user_id,claimed_at)`.
 - `learning_paths(id,slug,title,visibility)`; `path_lessons(path_id,lesson_id,sort_order)`; `levels(id,code)`.

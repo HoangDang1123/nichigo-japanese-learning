@@ -18,7 +18,7 @@ These describe composition and interaction intent. The shared shell and Home Stu
 | --- | --- |
 | Shared AppShell | One consistent collapsible desktop sidebar, responsive mobile drawer, shared header and semantic theme states. Expanded/collapsed modes use a panel-style toggle, aligned icons, and Profile/Settings near the bottom. Focused lessons can hide the sidebar through the shell. |
 | Home | Minimal Study Desk with a clear next step; personalize from real progress only when authenticated data exists. |
-| Learning Path | Railway Journey showing ordered learning stages. |
+| Learning Path | Railway Journey showing ordered learning stages. The `/learn` route now has a presentation preview; station labels and state variants are explicitly illustrative until real content and progress are integrated. |
 | Course | Chapter Canvas for a course's reviewed chapters and lessons. |
 | Lesson | Notebook-style reading interface with legible Vietnamese/Japanese content. |
 | Focus Lesson | Distraction-free writing practice using verified stroke or writing assets where available. |
@@ -27,7 +27,7 @@ These describe composition and interaction intent. The shared shell and Home Stu
 | Profile | Identity, goals, achievements and learning activity backed by supported data. |
 | Settings | Theme, language and password/account controls only where behavior is supported. |
 
-The current source implements the shared AppShell, Light/Dark/System switcher and real NichiGo branding. The owner-reviewed sidebar refinements from `e2c8c08` are merged in `origin/main` at `c1b254c` via PR #13, verified on 2026-11-04. This records sidebar appearance approval and merge status, not full shell acceptance or release. `/learn`, `/skills`, and `/progress` are empty states; `/courses`, `/games`, `/profile`, and `/settings` are unavailable navigation proposals. Home now presents the Study Desk layout with honest empty states; personalized resume, activity and goals still require real JPN-040/JPN-041 data.
+The current source implements the shared AppShell, Light/Dark/System switcher and real NichiGo branding. The owner-reviewed sidebar refinements from `e2c8c08` are merged in `origin/main` at `c1b254c` via PR #13, verified on 2026-11-04. This records sidebar appearance approval and merge status, not full shell acceptance or release. `/learn` has a railway presentation preview without published lessons or progress; `/skills` and `/progress` remain empty states. `/courses`, `/games`, `/profile`, and `/settings` are unavailable navigation proposals. Home presents the Study Desk layout with honest empty states; personalized resume, activity and goals still require real JPN-040/JPN-041 data.
 
 ## Theme architecture
 - Centralize semantic color tokens in CSS (e.g. `src/styles/tokens.css` and `src/styles/themes.css`); use `:root`/light and `[data-theme="dark"]` or an equivalent documented selector.

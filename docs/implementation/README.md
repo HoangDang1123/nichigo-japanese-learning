@@ -11,6 +11,7 @@ Tài liệu này mô tả **code đã triển khai** trong repository, khác v�
 | JPN-003 | App Shell, responsive navigation, UI states | [JPN-003-app-shell.md](JPN-003-app-shell.md) |
 | JPN-010A | Backend authentication, session, CSRF and V2/V3 migrations | [JPN-010-auth-backend.md](JPN-010-auth-backend.md) |
 | JPN-010B | Frontend authentication, session and CSRF integration | [JPN-010-frontend-auth.md](JPN-010-frontend-auth.md) |
+| JPN-030 | Learning Path railway frontend preview; content and progress integration pending | [JPN-030-learning-path.md](JPN-030-learning-path.md) |
 | JPN-041 | Home Study Desk frontend presentation; progress integration pending | [JPN-041-home-study-desk.md](JPN-041-home-study-desk.md) |
 
 ## Workflow và mức độ xác nhận

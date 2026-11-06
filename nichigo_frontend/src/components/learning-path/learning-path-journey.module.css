@@ -1,0 +1,68 @@
+.page { min-width: 0; color: var(--color-text); font-family: var(--font-body); }
+.hero { position: relative; min-width: 0; overflow: hidden; padding: clamp(1.5rem, 3vw, 3rem) clamp(1.25rem, 3vw, 3rem) var(--space-4); border: var(--border-width) solid var(--color-border); border-radius: var(--radius-xl); background: var(--color-surface); }
+.heroTop { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-5); }
+.eyebrow { margin-bottom: var(--space-2); color: var(--color-primary); font-family: var(--font-japanese-serif); font-size: var(--font-size-sm); letter-spacing: .13em; }
+.hero h1 { font-family: var(--font-heading); font-size: clamp(var(--font-size-3xl), 3.6vw, var(--font-size-5xl)); font-weight: var(--font-weight-semibold); line-height: 1.12; letter-spacing: -.025em; text-wrap: balance; }
+.pathIdentity { display: inline-flex; align-items: center; gap: var(--space-3); margin-top: var(--space-3); padding: 0; border: 0; background: transparent; color: var(--color-text); font-size: clamp(1.1rem, 1.8vw, 1.55rem); cursor: not-allowed; }
+.pathIdentity svg { color: var(--color-primary); }
+.levelBadge { flex: 0 0 auto; padding: var(--space-2) var(--space-4); border: var(--border-width) solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); font-size: var(--font-size-sm); }
+.previewNotice { position: relative; z-index: 2; width: fit-content; max-width: 44rem; margin-top: var(--space-6); padding: var(--space-2) var(--space-3); border-left: 3px solid var(--color-primary); background: var(--color-primary-subtle); color: var(--color-text-muted); font-size: var(--font-size-sm); }
+.landscape { position: absolute; inset: 0 0 auto 33%; height: 18rem; overflow: hidden; opacity: .72; pointer-events: none; }
+.sun { position: absolute; top: 3.5rem; right: 32%; width: 5.5rem; aspect-ratio: 1; border-radius: 50%; background: var(--color-primary-subtle); }
+.mountainBack, .mountainFront { position: absolute; right: 8%; bottom: 0; width: 70%; height: 78%; background: var(--color-surface-raised); clip-path: polygon(0 100%, 19% 70%, 31% 76%, 56% 12%, 82% 78%, 100% 100%); }
+.mountainFront { right: 0; bottom: -2rem; width: 90%; height: 53%; background: var(--color-primary-subtle); clip-path: polygon(0 100%, 22% 56%, 44% 77%, 67% 32%, 100% 100%); }
+.landscapeText { position: absolute; right: 4%; top: 4rem; color: var(--color-primary); font-family: var(--font-japanese-serif); font-size: 2rem; writing-mode: vertical-rl; letter-spacing: .25em; }
+.railViewport { position: relative; z-index: 2; max-width: 100%; margin-top: var(--space-5); overflow-x: auto; overflow-y: hidden; scrollbar-color: var(--color-border-hover) transparent; }
+.railViewport:focus-visible { outline: var(--border-width-thick) solid var(--color-focus); outline-offset: -2px; }
+.railCanvas { position: relative; min-width: 42rem; min-height: 9.5rem; }
+.noStations { position: relative; padding: var(--space-12) var(--space-5); color: var(--color-text-muted); text-align: center; }
+.railLine { position: absolute; top: 0; left: 0; width: 100%; height: 6rem; overflow: visible; fill: none; stroke: var(--color-primary); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; opacity: .6; }
+.stations { position: relative; display: grid; list-style: none; }
+.station { min-width: 0; text-align: center; }
+.stationButton { display: flex; width: min(100%, 10.5rem); min-height: 9rem; flex-direction: column; align-items: center; gap: var(--space-2); margin-inline: auto; padding: var(--space-2); border: 0; background: transparent; color: var(--color-text); text-align: center; cursor: pointer; }
+.stationButton:disabled { cursor: not-allowed; }
+.stationButton:focus-visible { outline: none; }
+.stationNode { display: grid; width: 3.75rem; height: 3.75rem; flex: 0 0 auto; place-items: center; border: var(--border-width-thick) solid var(--color-border-hover); border-radius: 50%; background: var(--color-surface); color: var(--color-primary); box-shadow: 0 0 0 5px var(--color-surface); transition: border-color var(--duration-fast) var(--easing-default), background-color var(--duration-fast) var(--easing-default), box-shadow var(--duration-fast) var(--easing-default); }
+.station:not(.locked) .stationButton:not([aria-pressed="true"]):not(:disabled):hover .stationNode { border-color: var(--color-primary); box-shadow: 0 0 0 5px var(--color-surface), 0 0 0 8px var(--color-primary-subtle); }
+.stationButton[aria-pressed="true"] .stationNode { box-shadow: 0 0 0 5px var(--color-surface), 0 0 0 9px var(--color-primary); }
+.stationButton[aria-pressed="true"] .stationNumber { color: var(--color-primary); }
+.stationButton:focus-visible .stationNode { outline: 3px solid var(--color-focus); outline-offset: 11px; }
+.completed .stationNode, .current .stationNode { border-color: var(--color-primary); background: var(--color-primary); color: var(--color-on-primary); }
+.current .stationButton:not([aria-pressed="true"]) .stationNode { box-shadow: 0 0 0 5px var(--color-surface), 0 0 0 7px var(--color-accent); }
+.locked .stationNode { background: var(--color-surface-hover); color: var(--color-text-muted); }
+.stationNumber { font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); line-height: var(--line-height-normal); }
+.stationName { max-width: 100%; padding: var(--space-1) var(--space-2); border-radius: var(--radius-md); font-size: var(--font-size-sm); line-height: var(--line-height-normal); }
+.railHint { position: relative; z-index: 2; color: var(--color-text-subtle); font-size: var(--font-size-xs); }
+.detailGrid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(16rem, .9fr); gap: var(--space-5); margin-top: var(--space-5); }
+.lessonPanel, .smallPanel { position: relative; min-width: 0; overflow: hidden; border: var(--border-width) solid var(--color-border); border-radius: var(--radius-xl); background: var(--color-surface); }
+.lessonPanel { padding: clamp(1.5rem, 3vw, 2.25rem); }
+.panelTopline { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); }
+.sectionTag { display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-3); border-radius: var(--radius-md); background: var(--color-primary-subtle); color: var(--color-primary); font-size: var(--font-size-sm); }
+.lessonNumber { color: var(--color-text-muted); font-size: var(--font-size-sm); }
+.lessonPanel h2 { margin-top: var(--space-4); font-family: var(--font-heading); font-size: clamp(var(--font-size-2xl), 2.7vw, var(--font-size-3xl)); font-weight: var(--font-weight-semibold); line-height: var(--line-height-tight); }
+.lessonDescription { margin-top: var(--space-2); color: var(--color-text-muted); }
+.sectionDivider { height: 1px; margin-block: var(--space-5); background: var(--color-border); }
+.lessonPanel h3 { font-family: var(--font-heading); font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); line-height: var(--line-height-tight); }
+.lessonSections { margin-top: var(--space-3); list-style: none; }
+.lessonSections li { display: flex; align-items: center; gap: var(--space-3); min-width: 0; padding: var(--space-3); border-bottom: var(--border-width) solid var(--color-border); }
+.lessonSections li svg:first-child { color: var(--color-primary); }
+.lessonSections li small { margin-left: auto; color: var(--color-text-muted); }
+.lessonEmpty { display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-3); padding-block: var(--space-2); color: var(--color-text-muted); }
+.lessonEmpty svg { flex: 0 0 auto; color: var(--color-primary); }
+.sidePanels { display: grid; align-content: start; gap: var(--space-4); }
+.smallPanel { min-height: 8rem; padding: var(--space-5); }
+.sideTitle { display: flex; align-items: center; gap: var(--space-3); }
+.sideTitle svg { color: var(--color-primary); }
+.sideTitle h2 { font-family: var(--font-heading); font-size: clamp(var(--font-size-xl), 1.8vw, var(--font-size-2xl)); font-weight: var(--font-weight-semibold); line-height: var(--line-height-tight); }
+.sideEmpty { max-width: 17rem; margin-top: var(--space-3); color: var(--color-text-muted); }
+.streakValue { margin-top: var(--space-3); }
+.streakValue strong { color: var(--color-primary); font-family: var(--font-heading); font-size: 3rem; }
+.panelDecoration { position: absolute; right: var(--space-6); bottom: var(--space-3); color: var(--color-primary-subtle); font-size: 5rem; line-height: 1; pointer-events: none; }
+.reviewList { display: grid; gap: var(--space-2); margin-top: var(--space-4); list-style: none; }
+.reviewList li { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); border: var(--border-width) solid var(--color-border); border-radius: var(--radius-md); }
+.reviewList li > span { display: grid; width: 1.25rem; height: 1.25rem; place-items: center; color: var(--color-primary); }
+.reviewDot { width: .8rem; height: .8rem; border: var(--border-width) solid var(--color-border-hover); border-radius: 50%; }
+@media (max-width: 800px) { .detailGrid { grid-template-columns: 1fr; } .sidePanels { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .hero { padding: var(--space-5) var(--space-4); } .heroTop { flex-direction: column; gap: var(--space-3); } .levelBadge { align-self: flex-start; } .landscape { inset-inline-start: 15%; opacity: .4; } .railViewport { margin-top: var(--space-4); } .sidePanels { grid-template-columns: 1fr; gap: var(--space-3); } .smallPanel { min-height: 0; } .detailGrid { gap: var(--space-3); margin-top: var(--space-3); } }
+@media (max-width: 480px) { .hero h1 { font-size: clamp(var(--font-size-3xl), 9vw, var(--font-size-4xl)); } }
+@media (prefers-reduced-motion: reduce) { .stationNode { transition: none; } }

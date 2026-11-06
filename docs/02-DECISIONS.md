@@ -15,6 +15,7 @@
 | ADR-011 | APPROVED | Product name Nichigo | Final logo asset/domain remain separately reviewable |
 | ADR-012 | APPROVED | Deliver future work by end-to-end user-facing feature | Plan and verify only the FE, BE, API, DB, tests and docs a feature needs. Preserve legacy JPN ticket IDs/dependencies as traceability; follow the workflow in root `AGENTS.md`. |
 | ADR-013 | APPROVED CONCEPT | Screen composition direction in `docs/07-DESIGN-SYSTEM.md` | Shared shell, Study Desk, Railway Journey, Chapter Canvas, Notebook/Focus Lesson, Skills, game layouts, Profile and Settings are concepts. This does not approve every screen for MVP or mark it implemented. |
+| ADR-014 | APPROVED | Nichigo Hybrid learning direction | Balance practical communication inspired by Irodori with systematic Japanese knowledge/JLPT preparation informed by Minna no Nihongo. Both are reference frameworks, not content to copy. The hierarchy, syllabus and Railway station granularity in `docs/04-CONTENT-AND-LEARNING.md` remain proposals or open decisions. |
 
 ## PM proposals, not yet owner decisions
 - Guest quota default **2 unique lessons per day**, reset at 00:00 Asia/Ho_Chi_Minh.

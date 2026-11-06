@@ -1,7 +1,29 @@
 import type { Metadata } from "next";
+import { Be_Vietnam_Pro, Noto_Sans_JP, Noto_Serif_JP } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ReduxProvider } from "@/components/providers/redux-provider";
 import "./globals.css";
+
+const beVietnamPro = Be_Vietnam_Pro({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin", "vietnamese"],
+  display: "swap",
+  variable: "--font-be-vietnam-pro",
+});
+
+const notoSansJp = Noto_Sans_JP({
+  weight: "variable",
+  display: "swap",
+  preload: false,
+  variable: "--font-noto-sans-jp",
+});
+
+const notoSerifJp = Noto_Serif_JP({
+  weight: "variable",
+  display: "swap",
+  preload: false,
+  variable: "--font-noto-serif-jp",
+});
 
 export const metadata: Metadata = {
   title: "Nichigo — Học tiếng Nhật cho người Việt",
@@ -17,7 +39,7 @@ export default function RootLayout({
   return (
     // suppressHydrationWarning is required on <html> when using next-themes
     // to prevent hydration warnings from the theme script setting data-theme.
-    <html lang="vi" suppressHydrationWarning>
+    <html lang="vi" suppressHydrationWarning className={`${beVietnamPro.variable} ${notoSansJp.variable} ${notoSerifJp.variable}`}>
       <body>
         <ThemeProvider
           attribute="data-theme"

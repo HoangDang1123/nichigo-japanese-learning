@@ -36,6 +36,10 @@ Use one primary local checkout at `H:\Code\Projects\nichigo-japanese-learning` a
 
 Never use `git reset --hard`, `git clean -fd`, force-push, or destructive checkout to resolve a branch switch. Do not delete or overwrite unfinished work or rewrite historical commits to satisfy a newer convention. If a Git operation could lose work or rewrite history, stop and report the risk.
 
+## Typography Rule
+
+Use Be Vietnam Pro for Vietnamese and general UI, Noto Sans JP for Japanese learning content, and Noto Serif JP only for decorative Japanese accents. Reuse the centralized typography tokens in `nichigo_frontend/src/styles/tokens.css`; never add another UI font without Product Owner approval or apply Japanese serif to Vietnamese headings or body text. Preserve the typography scale and Light/Dark/System compatibility, and verify Vietnamese diacritics and Japanese glyphs. See [the design system](docs/07-DESIGN-SYSTEM.md#approved-typography) for usage and loading details.
+
 ## Git Branch Naming Convention
 
 Use the following convention for all future NichiGo development branches.

@@ -186,7 +186,7 @@
 .quickCard::before { position: absolute; top: 0; left: var(--space-5); width: 2.5rem; height: var(--border-width-thick); border-radius: var(--radius-full); background: var(--color-primary); content: ""; opacity: 0.55; }
 .quickCard:nth-child(odd) { background: var(--color-primary-subtle); }
 .quickCard:hover { border-color: var(--color-border-hover); background: var(--color-surface-hover); transform: translateY(-2px); }
-.quickEyebrow { position: absolute; top: var(--space-4); right: var(--space-4); color: var(--color-text-subtle); font-family: var(--font-mono); font-size: 0.625rem; letter-spacing: 0.06em; }
+.quickEyebrow { position: absolute; top: var(--space-4); right: var(--space-4); color: var(--color-text-subtle); font-family: var(--font-body); font-size: 0.625rem; letter-spacing: 0.06em; }
 .quickIcon { margin-bottom: var(--space-3); color: var(--color-primary); }
 .quickCard strong { color: var(--color-text); font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); line-height: var(--line-height-tight); }
 .quickSubtitle { color: var(--color-text-muted); font-size: var(--font-size-xs); line-height: var(--line-height-normal); }

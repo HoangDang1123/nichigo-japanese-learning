@@ -10,6 +10,21 @@
 - **Light/Dark/System:** all three are mandatory; default to System.
 - **Branding:** reuse the existing assets in `nichigo_frontend/public/branding/`. Do not replace them or treat generated AI images as production-ready design specifications without owner review.
 
+## Approved typography
+
+The Product Owner approved **Be Vietnam Pro** for all Vietnamese and general interface text, **Noto Sans JP** for Japanese learning content, and **Noto Serif JP** only for decorative Japanese editorial accents. This is a project-wide rule, independent of the status of any individual screen.
+
+| Semantic token | Font | Use |
+| --- | --- | --- |
+| `--font-body` | Be Vietnam Pro | UI copy, navigation, forms, buttons, cards, labels and Vietnamese explanations. |
+| `--font-heading` | Be Vietnam Pro | Page, section and lesson headings, including Learning Path. |
+| `--font-japanese` | Noto Sans JP | Kana, kanji, vocabulary, examples, furigana and ordinary Japanese learning text. |
+| `--font-japanese-serif` | Noto Serif JP | Short decorative Japanese labels and editorial accents only. |
+
+Load fonts once in the root layout with `next/font/google` and CSS variables; use `display: swap` and local system fallbacks. Preload only the Latin and Vietnamese Be Vietnam Pro subsets used by the interface. Japanese font files load on demand through their Unicode ranges, without preloading every CJK subset. Production builds fetch these font assets; CI needs build-time access to Google Fonts or a separately reviewed local-font fallback. Keep the existing size, weight and line-height tokens in `src/styles/tokens.css`: body text starts at `--font-size-base` with `--line-height-normal`; headings use the existing scale and clear semibold hierarchy. Choose only weights the interface uses. Do not apply Japanese serif to Vietnamese text or ordinary learning content. For mixed-language labels, style the Japanese span separately and mark it `lang="ja"`.
+
+Check Vietnamese diacritics and Japanese glyphs in both Light and Dark at desktop and mobile widths. Keep a legible line height, visible focus states and wrapping without horizontal text overflow. Font choices must remain the same in System mode as the resolved theme changes.
+
 ## Approved conceptual layouts
 
 These describe composition and interaction intent. The shared shell and Home Study Desk presentation are present in current source; other planned screens and real learning progress need scoped feature work and acceptance review. See the roadmap before scheduling implementation.

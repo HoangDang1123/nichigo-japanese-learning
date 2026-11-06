@@ -17,6 +17,12 @@ Use existing patterns and reusable components; avoid unnecessary dependencies. D
 
 Do not commit, push, merge, deploy, delete branches, or rewrite Git history without explicit owner authorization. Preserve all uncommitted work. If feature changes cannot be separated safely, stop and report the conflict.
 
+## Typography Rule
+
+Use Be Vietnam Pro for Vietnamese and general UI, Noto Sans JP for Japanese learning content, and Noto Serif JP only for decorative Japanese accents. Reuse the centralized typography tokens in `nichigo_frontend/src/styles/tokens.css`; never add another UI font without Product Owner approval or apply Japanese serif to Vietnamese headings or body text. Preserve the typography scale and Light/Dark/System compatibility, and verify Vietnamese diacritics and Japanese glyphs. See [the design system](docs/07-DESIGN-SYSTEM.md#approved-typography) for usage and loading details.
+
+Do not commit, push, merge, deploy, delete branches, or rewrite Git history without explicit owner authorization. Preserve all uncommitted work. If feature changes cannot be separated safely, stop and report the conflict.
+
 ## Git Branch Naming Convention
 
 Use the following convention for all future NichiGo development branches.

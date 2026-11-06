@@ -77,7 +77,7 @@ export function DesktopSidebar({ collapsed, onToggle, pathname }: { collapsed: b
           })}
         </nav>
       </div>
-      <p className={styles.sidebarFooter}>一歩ずつ · Từng bước một</p>
+      <p className={styles.sidebarFooter}><span lang="ja">一歩ずつ</span> · Từng bước một</p>
     </aside>
   );
 }

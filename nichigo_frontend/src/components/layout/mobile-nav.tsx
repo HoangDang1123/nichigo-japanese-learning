@@ -58,7 +58,7 @@ export function MobileNav({ pathname }: { pathname: string }) {
               );
             })}
           </nav>
-          <p className={styles.mobileNote}>一歩ずつ · Từng bước một</p>
+          <p className={styles.mobileNote}><span lang="ja">一歩ずつ</span> · Từng bước một</p>
         </div>
       </dialog>
     </div>

@@ -16,10 +16,10 @@
 
 :root {
   /* ── Typography Scales ─────────────────────────────────────────────────── */
-  --font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
-  --font-heading: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
-  --font-japanese: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", system-ui, sans-serif;
-  --font-japanese-serif: "Hiragino Mincho ProN", "Yu Mincho", "MS PMincho", "Noto Serif JP", serif;
+  --font-body: var(--font-be-vietnam-pro, "Be Vietnam Pro"), system-ui, "Segoe UI", sans-serif;
+  --font-heading: var(--font-be-vietnam-pro, "Be Vietnam Pro"), system-ui, "Segoe UI", sans-serif;
+  --font-japanese: var(--font-noto-sans-jp, "Noto Sans JP"), "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+  --font-japanese-serif: var(--font-noto-serif-jp, "Noto Serif JP"), "Yu Mincho", "MS PMincho", serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
   --font-size-xs: 0.75rem;    /* 12px */

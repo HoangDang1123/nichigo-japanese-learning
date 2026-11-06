@@ -181,7 +181,7 @@
   }
 
   .label {
-    max-width: 4.5rem;
+    max-width: 5.5rem;
     font-size: var(--font-size-xs);
   }
 }

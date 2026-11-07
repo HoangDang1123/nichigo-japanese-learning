@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "packageKey": "original-intro-sample",
+  "packageVersion": "1.0.0",
+  "locale": "vi",
+  "files": [
+    {"path": "rights.csv", "type": "rights"},
+    {"path": "items.csv", "type": "items"},
+    {"path": "lessons.json", "type": "lessons"},
+    {"path": "paths.json", "type": "paths"}
+  ]
+}

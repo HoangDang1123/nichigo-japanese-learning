@@ -1,6 +1,6 @@
 # REST API Contract — implemented auth and proposed learning endpoints
 
-**Base:** `/api/v1`; JSON UTF-8; authenticated identity from server session cookie, not request body. Auth endpoints are merged in `origin/main`. The five public learning-content GET routes are implemented on the JPN-020 backend branch but are not merged or deployed. All other learning routes below remain proposals. Content errors use the existing flat `{ "code", "message" }` shape.
+**Base:** `/api/v1`; JSON UTF-8; authenticated identity from server session cookie, not request body. Auth and the five JPN-020 public learning-content GET routes are merged in `origin/main`; deployment is not evidenced. JPN-021 supplies an offline local validation CLI, **not an HTTP endpoint**. Other learning routes below, including JPN-022 operator import/publish routes, remain proposals. Content errors use the existing flat `{ "code", "message" }` shape. The implemented package format is specified in [the JPN-021 content package contract](02-CONTENT-PACKAGE-CONTRACT.md).
 
 | Method | Route | Auth | Description |
 |---|---|---|---|
@@ -20,9 +20,9 @@
 | GET | `/guest/quota` | Guest | Current day allowance and usage |
 | GET | `/tour/status` | Guest/User | Tour state |
 | PUT | `/tour/status` | Guest/User | Mark skipped/completed/in-progress |
-| POST | `/internal/import/validate` | Operator | Dry-run import |
-| POST | `/internal/import/batches` | Operator | Import validated content |
-| POST | `/internal/import/batches/{id}/publish` | Operator | Publish reviewed content |
+| POST | `/internal/import/validate` | Operator | **Proposed JPN-022** authenticated dry-run transport; JPN-021 has a local CLI only |
+| POST | `/internal/import/batches` | Operator | **Proposed JPN-022** import validated content |
+| POST | `/internal/import/batches/{id}/publish` | Operator | **Proposed JPN-022** publish reviewed content |
 
 **Proposed learning typed error (not the current auth error shape)**
 ```json
@@ -32,7 +32,7 @@ HTTP: 400 invalid payload; 401 unauthenticated; 403 unauthorized; 404 unpublishe
 
 The implemented auth API uses `{ "code": "...", "message": "..." }` for its errors, not the proposed nested learning error above. See `docs/implementation/JPN-010-auth-backend.md` and `JPN-010-frontend-auth.md` for verified auth behavior and tests. No guest identity is returned by `/auth/me` today.
 
-### JPN-020 public content reads (implemented on the feature branch)
+### JPN-020 public content reads (merged in `origin/main`)
 
 - `GET /learning-paths?limit=20&after=<slug>` returns `{ "paths": [{ "id", "slug", "title", "revision" }], "nextCursor": string|null }`. `limit` is 1–50. Results are sorted by stable slug.
 - `GET /learning-paths/{slug}` returns `{ id, slug, title, description, revision, stages: [{ id, position, title, description, chapters: [{ id, position, title, description, lessons: [{ id, placementId, slug, position, revision, title, summary }] }] }] }`. Each level has deterministic position ordering. The pinned Lesson revision is included; the response contains no learner-specific station status.
@@ -48,4 +48,4 @@ Until detail pagination is designed, the backend refuses a Path larger than 100 
 
 **Tour:** `status = not_started | in_progress | completed | skipped`; `tourVersion` and `lastStep` allow future updates. Guest persistence best effort until retention policy approved.
 
-**Open:** session cookie/domain topology, password reset/verification, exact guest quota, merge semantics, import transport (CLI vs internal endpoint), API response envelope.
+**Open:** session cookie/domain topology, password reset/verification, exact guest quota, merge semantics, JPN-022 operator transport and authorization, API response envelope. The JPN-021 offline CLI does not settle an HTTP transport decision.

@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0",
+  "paths": [{
+    "key": "intro-path",
+    "titleVi": "Lộ trình minh họa",
+    "rightsKey": "original-sample",
+    "stages": [{
+      "key": "foundation", "position": 1, "titleVi": "Nền tảng", "rightsKey": "original-sample",
+      "chapters": [{
+        "key": "first-script", "position": 1, "titleVi": "Chữ đầu tiên", "rightsKey": "original-sample",
+        "lessons": [{"key": "first-kana", "position": 1, "lessonKey": "intro-kana-a"}]
+      }]
+    }]
+  }]
+}

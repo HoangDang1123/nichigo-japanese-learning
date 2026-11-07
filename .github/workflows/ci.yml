@@ -42,7 +42,6 @@ jobs:
     name: Backend (Spring Boot)
     runs-on: ubuntu-latest
     env:
-      DB_URL: jdbc:postgresql://localhost:5432/nichigo
       DB_USERNAME: nichigo_ci
       DB_PASSWORD: nichigo_ci_test_only
     services:
@@ -74,8 +73,27 @@ jobs:
           cache: maven
           cache-dependency-path: nichigo_backend/pom.xml
 
+      - name: Create isolated test schema
+        run: |
+          schema="jpn021_ci_${GITHUB_RUN_ID}_${GITHUB_RUN_ATTEMPT}"
+          docker exec -e PGPASSWORD="$DB_PASSWORD" "${{ job.services.postgres.id }}" \
+            psql -h 127.0.0.1 -U "$DB_USERNAME" -d nichigo -v ON_ERROR_STOP=1 \
+            -c "CREATE SCHEMA \"$schema\""
+          echo "JPN021_TEST_SCHEMA=$schema" >> "$GITHUB_ENV"
+          echo "DB_URL=jdbc:postgresql://localhost:5432/nichigo?currentSchema=$schema" >> "$GITHUB_ENV"
+
       - name: Run tests
         run: bash ./mvnw test --no-transfer-progress
 
       - name: Verify build
         run: bash ./mvnw verify -DskipTests --no-transfer-progress
+
+      - name: Drop isolated test schema
+        if: always()
+        run: |
+          schema="jpn021_ci_${GITHUB_RUN_ID}_${GITHUB_RUN_ATTEMPT}"
+          if [[ "${JPN021_TEST_SCHEMA:-}" == "$schema" ]]; then
+            docker exec -e PGPASSWORD="$DB_PASSWORD" "${{ job.services.postgres.id }}" \
+              psql -h 127.0.0.1 -U "$DB_USERNAME" -d nichigo -v ON_ERROR_STOP=1 \
+              -c "DROP SCHEMA \"$schema\" CASCADE"
+          fi

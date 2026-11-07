@@ -2,7 +2,7 @@
 
 ## Scope and status
 
-This frontend infrastructure branch adds a shared skeleton primitive, one currently mounted Home composition, and reusable Railway/Skills compositions for future real data loaders. It updates no backend, auth contract or progress source. JPN-UI-003 is distinct from JPN-003's shared shell and generic loading/error states. Source and tests are implemented on `jpn-ui-003/features/frontend-skeleton-system`; owner visual review, merge and release remain separate.
+The JPN-UI-003 branch added a shared skeleton primitive, one currently mounted Home composition, and reusable Railway/Skills compositions for future real data loaders. It updated no backend, auth contract or progress source. JPN-UI-003 is distinct from JPN-003's shared shell and generic loading/error states. Source and tests merged into `origin/main` via PR #23; no release is evidenced. The recorded owner visual review remains scoped to the behavior described below.
 
 ## Loading audit
 

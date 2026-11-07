@@ -2,6 +2,8 @@
 
 This document describes the implemented authoring and offline validation format. The exact field types, maximum lengths, enums, required fields and closed-field lists are in [`content/schemas/v1`](../content/schemas/v1). The Java validator enforces the schema subset used there plus the cross-record rules below. No format validity or dry-run result grants publication clearance. JPN-022 import and operator HTTP contracts remain proposed.
 
+`ContentSchemaValidator` enforces the schema keywords used by these files: `type` (object, array, string, integer), `required`, `properties`, `additionalProperties: false`, `items`, `minItems`, `maxItems`, `maxLength`, `pattern`, `enum`, and `minimum`. `$schema` and `title` are annotations. This is a checked-in JSON Schema subset, not a general Draft 2020-12 validator; adding another keyword requires implementation and tests before relying on it.
+
 ## Package and files
 
 A package is one flat directory with `manifest.json` and one to five declared data files. The manifest requires `schemaVersion: "1.0"`, `packageKey`, semantic `packageVersion` (three nonnegative dotted integers), `locale: "vi"`, and `files: [{"path":"items.csv","type":"items"}, ...]`; `author` is optional. Only schema version `1.0` is accepted. Each type appears at most once. Types `rights`, `media`, `items` use `.csv`; `lessons`, `paths` use `.json`. Every declared file must exist, and undeclared files are rejected. File names are flat ASCII lowercase names matching `[a-z][a-z0-9-]*.(csv|json)`, at most 80 characters. No directory paths, `..`, symlinks or URLs are followed by the CLI.

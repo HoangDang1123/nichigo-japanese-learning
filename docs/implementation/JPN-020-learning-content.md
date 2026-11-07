@@ -1,0 +1,77 @@
+# JPN-020 — Learning content foundation
+
+## Scope and status
+
+This branch implements the PostgreSQL content model and published-only backend reads. It contains no production curriculum, authoring endpoint, importer, publisher, progress calculation, or frontend integration. Source is **implemented** and PostgreSQL integration tests were **run**; the technical decision in ADR-015 awaits owner review. This branch is neither merged nor released.
+
+## Architecture and relationships
+
+The approved Hybrid direction in ADR-014 is independent of the technical model. Stable editorial identities (`learning_paths`, `path_stages`, `stage_chapters`, `lessons`, `content_items`, `media_assets`) can be edited, while public APIs read only sealed revisions. `chapter_lessons` permits lesson reuse. `lesson_sections` and `lesson_items` organize optional content; `lesson_objectives` has ordered `can_do` and `knowledge` types. Canonical items have one of six kinds: kana, vocabulary, grammar, kanji, example, dialogue. Tags separate JLPT, communication level, knowledge domain, language skill, and other controlled metadata. Practice modes and assessments are not content kinds.
+
+Flyway `V4__learning_content_foundation.sql` follows V3 without altering prior migrations. Its 27 tables are:
+
+- Rights: `content_rights`.
+- Editorial path: `learning_paths`, `path_stages`, `stage_chapters`, `chapter_lessons`.
+- Editorial lesson: `lessons`, `lesson_prerequisites`, `lesson_objectives`, `lesson_sections`, `lesson_items`.
+- Editorial reusable content: `content_items`, `content_item_tags`, `content_item_media`, `media_assets`.
+- Published roots: `path_revisions`, `lesson_revisions`, `content_item_revisions`, `media_asset_revisions`.
+- Published path edges: `path_revision_stages`, `path_revision_chapters`, `path_revision_lessons`.
+- Published lesson edges: `lesson_revision_objectives`, `lesson_revision_sections`, `lesson_revision_items`, `lesson_revision_prerequisites`.
+- Published item edges: `content_item_revision_tags`, `content_item_revision_media`.
+
+The published root pointer is a composite foreign key `(identity, published_revision)` to the same subject. Pinned edges use composite foreign keys to exact revisions. `path_revision_lessons` also verifies the stable placement, chapter, and lesson identity. Positive revision/position checks, unique sibling positions, stable-key uniqueness, JSONB object checks, controlled enum-like `CHECK`s, and restrictive foreign keys reject malformed relationships. Indexes cover tags, reverse dependencies, item kind, and pagination keys. Published JSONB is used only for kind-specific payload; identity, order, level tags, relationships, rights, and media keys are relational.
+
+## Publication boundary and lifecycle
+
+The intended JPN-022 transaction is: edit working identities with `edit_version` compare-and-swap; validate kind-specific payloads, taxonomy, cycle freedom, provenance, and all rights; insert revision root and pinned children; seal root; advance the identity pointer conditionally; commit. Each root starts unsealed and can only change once to set `sealed_at`. Child rows can be inserted only while the root is unsealed and cannot subsequently be updated or deleted. Row locks on the parent serialize child insertion with sealing. A pointer can target only a sealed revision of that identity and can only advance. JPN-022 must supply operator authorization, idempotency keys, candidate validation, and multi-root transaction orchestration.
+
+An existing Lesson may have published v1 while its editorial title, objectives, sections, order, and references change. Public reads still resolve v1. Publishing v2 stores a new lesson root and edge rows pinned to the selected item revisions; the pointer advances to v2 in one transaction. Historical v1 rows remain for a future authorized quiz audit. A current API never accepts an arbitrary historical revision. A withdrawn identity (`withdrawn_at`) or revoked right makes current and historical public reads unavailable, while retained audit identities remain in the database.
+
+Sealing checks root rights and referenced dependencies. Public eligibility functions recheck live root, nested item/media rights, withdrawal, and sealed status. One unavailable required dependency hides the entire Path or Lesson; public APIs do not return a partial lesson. Rights records store source, attribution, permission basis and optional private evidence. A revoked record cannot be silently reapproved; a new review record and publication revision are required. Published media storage keys are immutable and are never included in the public DTO. Actual media delivery still requires private object storage and short-lived signed URLs or a rights-checking proxy; public CDN URLs cannot be recalled by this schema.
+
+## Backend read architecture and contract
+
+`PublicContentController` exposes `GET /api/v1/learning-paths`, `GET /api/v1/learning-paths/{slug}`, `GET /api/v1/learning-paths/{pathSlug}/placements/{placementId}/lesson`, `GET /api/v1/lessons/{slug}`, and `GET /api/v1/skills/{type}/items`. `PublicContentRepository` uses ordered Spring JDBC queries; `PublicContentService` assembles responses in repeatable-read transactions. Normal Path and Lesson requests use four and five SQL reads respectively, independent of their number of children. Skills are independently browsable by canonical kind. The two listing APIs use keyset pagination, default 20 and maximum 50. Details are bounded to 100 stages/chapters, 1,000 placements, 100 sections, 1,000 items, 1,000 objectives and 5,000 media references; an oversized candidate returns generic 503 until JPN-022 enforces publish-time limits or a detail pagination contract exists. These limits are transport protections, not approved curriculum quantities.
+
+Independent Lesson access selects the root's **current published** revision. Path-contextual access checks the **current eligible Path** and placement, then assembles the Lesson revision pinned by that placement using the same DTO. A Lesson root may advance to v2 while a Path still serves its pinned v1; updating the Path revision's pin changes that result. The caller cannot supply arbitrary historical revision IDs. Unknown or malformed placement IDs, unrelated Paths, and revoked dependencies return 404. Authorized historical audit access is deferred to JPN-022/JPN-032 and must not reuse this public context as an unrestricted revision lookup.
+
+Draft, reviewed-but-unpublished, withdrawn, rights-invalid, and missing details return 404. Invalid type/page parameters return 400. Infrastructure/read failures return a generic 503 with no SQL text. Response shapes are in `contracts/01-API-CONTRACT.md`. They expose no progress, locked/current/completed state, private rights evidence, or media storage key. A present `payload` is published kind-specific JSONB; JPN-021 must validate its allowed fields so editorial data cannot contain private values.
+
+## Test execution and acceptance coverage
+
+The integration suite uses real local PostgreSQL 17; H2 is not used. Set `DB_URL` to a test database/schema, set `DB_USERNAME`/`DB_PASSWORD`, set `JAVA_HOME` to a JDK 21+ installation, then run `nichigo_backend/mvnw.cmd verify`. Never run tests against production data. The PR #22 review run on 2026-11-07 used both the existing integration schema and newly empty `nichigo_jpn020_review_fresh_20261107`: Flyway applied V1–V4 to the fresh schema; 25 tests passed (13 existing auth/health/context tests and 12 JPN-020 tests), zero failures or errors. The fixture methods publish only inside tests. No JPN-022 production publishing command exists.
+
+| IDs | Integration test or verification | Result | Evidence or remaining responsibility |
+| --- | --- | --- | --- |
+| PUB-01–02, API-03 | `draftsAndReviewedLessonsAreNeverPublic` | PASS | Draft and reviewed-but-unpublished return 404. |
+| PUB-03–07, PUB-09–10 | `publishedRevisionSurvivesDraftEditsAndNewRevision` | PASS | v1 survives edits to draft title, objectives, sections, item membership and order; v2 becomes current; root mutation/deletion rejected; Item v1 reused. |
+| PUB-08, CON-01–02 | `conditionalPointerRaceAndRollbackKeepPublicationAtomic` | PASS (primitives) | Duplicate revision rejected; one conditional pointer update wins; failed transaction rolls back before pointer switch. |
+| INT-01–03, INT-05–07, INT-09 | `databaseRejectsWrongIdentityAndDuplicateOrder` | PASS | Unique/FK/self-reference/pointer and restrictive deletion checks. |
+| INT-04, RGT-02–03, RGT-06–08, API-05 | `oneCanonicalItemCanBeReusedAndRightsRevocationBlocksEveryConsumer` | PASS | Three Lessons reuse one Item; revocation blocks each Lesson and Skills. |
+| RGT-01, API-06–07, API-09–10 | `unverifiedRightsCannotReachPublicAndApiErrorsAreBounded` | PASS | Uncleared sealing fails; 400/404, no private evidence. |
+| API-01, API-08 | `pathPreservesHierarchyAndBecomesUnavailableWhenChildRightsRevoked`; `pathOrdersMultipleStagesChaptersAndPlacements` | PASS | Out-of-order inserts yield Stage, Chapter and Lesson placement position order; revoked dependency blocks Path. |
+| Contextual pin, API-04 | `pathPlacementReadsItsPinnedLessonRevision` | PASS | Independent v2 versus Path-pinned v1; Path republish switches pin to v2; wrong/malformed placement or Path 404; query-supplied revision cannot select history; revoked rights block both routes. |
+| RGT-04, API-07 | `mediaRightsRevocationBlocksLessonWithoutExposingStorageKey` | PASS | Media revocation blocks Lesson; storage key omitted. |
+| API-02 | `lessonOrdersMultipleSectionsItemsAndObjectives` | PASS | Multiple sections, items and objectives return in position order. |
+| CON-07 | `publicReaderCannotSeeUncommittedPublication` | PASS | Public GET stays 404 until fixture transaction commits. |
+| INT-08, CON-03–06, CON-08 | JPN-022 publication validation/workflow | DEFERRED | Graph cycle, multi-root publish, concurrent rights race, editorial conflict, ambiguous retry and rollback after child-edge insertion need a production publisher and dedicated tests. |
+| INT-10 | Relational revision schema review | PASS (design) | Pinned edges are the single published representation; there is no separate frozen document. |
+| RGT-05 | DB trigger and future rights workflow | PARTIAL | Revoked-to-cleared update is rejected; authorized re-review remains JPN-022 work. |
+
+## Performance observations
+
+`nichigo_backend/src/test/resources/jpn020-benchmark-fixture.sql` is synthetic and must run only in an empty isolated PostgreSQL schema after V4. It creates 5 paths, 50 stages, 500 chapters, 5,000 lessons and 50,000 reusable items (10 items per lesson); it is not a production migration. Execute it with `psql -v ON_ERROR_STOP=1 -f ...` and then `ANALYZE` its tables before timing. Local machine: AMD Ryzen 5 5600H (12 logical processors), 7.3 GiB RAM, PostgreSQL 17, Windows. Fixture load: 18.3 seconds. Warm `EXPLAIN (ANALYZE, BUFFERS)` for a Path with 100 chapters and 1,000 lessons: 672.9 ms for the root eligibility query; this includes traversing 10,000 item dependencies and uses 107,937 shared-buffer hits. The same Skills first-page query after statistics collection: 4.18 ms for 51 rows; a later keyset page: 3.39 ms for 51 rows, using `content_items_stable_key_key` and `ix_item_revisions_kind`. Before `ANALYZE`, the planner chose a poor scan and took 1.71 seconds; fresh import/seed deployments must collect statistics.
+
+Twenty sequential warm local HTTP GETs per endpoint (PowerShell `Invoke-WebRequest`, one client, no network hop) measured: Path `bench-path-1` p50 703.5 ms, p95 755.3 ms, 209,838 UTF-8 bytes, four fixed SQL reads; Lesson `bench-lesson-1` with 10 items p50 18.1 ms, p95 20.0 ms, 2,777 bytes, five fixed reads; Skills first 50 items p50 21.1 ms, p95 22.4 ms, 7,294 bytes. These are local observations, not a production SLO. The Path cost is dominated by full dependency rights traversal, and should be remeasured on representative deployed hardware and real content before release.
+
+PR #22 review repeated warm `EXPLAIN (ANALYZE, BUFFERS)` on the same synthetic schema: scanning 1,000 Path placements without eligibility took 8.1 ms and 12 shared-buffer hits; checking those placements with `lesson_revision_public` took 585.3 ms and 107,791 hits; evaluating `path_revision_public` took 542.0 ms and 107,371 hits. A single 10-Item Lesson dependency check took 0.49 ms. The large Path cost is therefore repeated nested eligibility/function calls across 1,000 Lessons and about 10,000 Items, not the placement index scan. No SQL-function rewrite is included in this review: a set-based replacement needs its own equivalence tests for withdrawal, all rights layers and concurrent revocation, followed by a measured before/after run. The existing conservative check remains authoritative.
+
+To reproduce the plan comparison after loading the fixture and running `ANALYZE`, execute these queries in that isolated schema, with `EXPLAIN (ANALYZE, BUFFERS)` prefixed to each: `SELECT count(*) FROM path_revision_lessons WHERE path_id=benchmark_uuid('path',1) AND path_revision=1`; `SELECT count(*) FROM path_revision_lessons pl WHERE pl.path_id=benchmark_uuid('path',1) AND pl.path_revision=1 AND NOT lesson_revision_public(pl.lesson_id,pl.lesson_revision)`; `SELECT path_revision_public(benchmark_uuid('path',1),1)`. Query timings vary with cache, statistics and hardware.
+
+PERF-01 has local HTTP p50/p95 and fixed four-query read path. PERF-02 has only a 10-item baseline; the requested 100-item case remains deferred. PERF-03 has indexed 50,000-item SQL plans and HTTP pagination timing. PERF-04 (500 affected lessons), PERF-05 (repeated large publication), PERF-06 (100 concurrent reads), and PERF-07 (100 revision audit) remain deferred to JPN-022/JPN-023 benchmark work. No massive synthetic dataset is committed as a migration or seed.
+
+## Security, limitations, and handoff
+
+The public SecurityConfig permits GET only for the five routes. Existing authentication endpoints retain their rules and regression tests. The contextual endpoint is covered by the existing `/api/v1/learning-paths/**` GET matcher; it cannot resolve arbitrary historical revisions because it joins through the current published Path and a matching placement ID. The app database role can edit tables directly; JPN-022 must isolate an operator writer role or authenticated internal service from public read credentials before production content authoring is enabled. SQL functions give live rights eligibility but do not themselves revoke already issued object URLs. Historical audit access must be authenticated, authorized, and rights-aware. Slug stability after publishing and approved taxonomy values need editorial policy. No public content is seeded in V4; all reads return empty listings/404 until JPN-023 publishes rights-reviewed original content.
+
+JPN-021 owns per-kind JSON schemas, allowed public fields, canonical source validation, taxonomy/cycle validation. JPN-022 owns idempotent import, review, multi-root atomic publish, withdraw, edit-version conflict detection, rights re-review, signed media delivery, and publish-time size checks. JPN-023 owns rights-reviewed content. JPN-030 and JPN-031 integrate Path and Lesson reads. JPN-032 stores exact revision keys in attempts. JPN-040 stores learner progress separately. The syllabus, lesson count, Railway station granularity, mandatory unlocking and JLPT equivalence remain open product decisions.

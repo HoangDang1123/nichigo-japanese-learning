@@ -10,9 +10,11 @@
     "types": ["node"],
     "outDir": ".test-dist",
     "rootDir": "src",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": { "@/*": ["src/*"] }
   },
   "include": [
+    "test/css-modules.d.ts",
     "src/api/index.ts",
     "src/api/auth.ts",
     "src/api/auth.test.ts",
@@ -20,6 +22,11 @@
     "src/store/slices/auth-slice.ts",
     "src/lib/auth/auth-validation.ts",
     "src/components/theme-switcher-icons.tsx",
-    "src/components/theme-switcher-icons.test.tsx"
+    "src/components/theme-switcher-icons.test.tsx",
+    "src/components/ui/skeleton.tsx",
+    "src/components/ui/skeleton.test.tsx",
+    "src/components/home/home-loading.ts",
+    "src/components/home/home-skeleton.tsx",
+    "src/components/home/home-study-desk.tsx"
   ]
 }

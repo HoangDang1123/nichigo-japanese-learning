@@ -14,6 +14,8 @@
 - [ ] CORS/cookies/CSRF verified across Vercel and Render origins.
 - [ ] Secrets not in Git or client bundle.
 - [ ] Database migration from clean state and repeat migration verified.
+- [ ] V4 content migration applied to the target PostgreSQL release database; published-only API, rights revocation, and migration rollback/restore plan checked before serving content.
+- [ ] Published media uses private objects or short-lived authorized URLs; revocation is tested against the actual delivery path, not only the metadata API.
 - [ ] Concurrent guest completions do not bypass quota.
 - [ ] Import dry-run, idempotency, publication gate, provenance tested.
 - [ ] Database export performed and restore tested on separate database.

@@ -132,4 +132,3 @@ public class PublishedContentPublicationBoundary {
 
     private record Version(long editVersion, Integer publishedRevision) {}
 }
-

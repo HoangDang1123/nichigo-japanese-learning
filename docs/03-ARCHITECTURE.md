@@ -5,6 +5,8 @@
 
 This is the **target deployment topology**, not a deployed environment verified by this repository. Current source has a Next.js frontend, Spring Boot backend, PostgreSQL/Flyway configuration, session auth, JPN-020 public content reads, and JPN-021 validation merged in `origin/main`. JPN-ARCH-002 hardening is on a review branch. Hosting, quota, progress and production import remain planned.
 
+JPN-ARCH-003 is stacked on the JPN-ARCH-002 review branch. Its V8/V9 hybrid published model stores Lesson objectives/Section layout and Path Stage/Chapter display hierarchy in sealed revision JSONB. Stable identities, Stage/Chapter Rights and exact Path→Lesson→Item→Media revision pins stay relational. See [the implementation note](implementation/JPN-ARCH-003-hybrid-published-content.md) for migration and validation boundaries. This is not a production publisher.
+
 - Next.js TypeScript frontend. Java Spring Boot modular monolith REST API.
 - Neon managed PostgreSQL; Flyway migration history in repository.
 - Planned backend domains: `identity`, `content`, `learning`, `practice`, `quota`, `contentimport`, `admin`, `common`. Current source has `auth`, `common`, `content`, and a JPN-021 `contentimport` validation package; the other domains remain planned.

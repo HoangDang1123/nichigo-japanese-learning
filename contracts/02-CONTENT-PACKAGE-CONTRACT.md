@@ -39,6 +39,8 @@ Rights rows require `key`, `originKind`, `sourceLabel`, `attribution`, `permissi
 
 V6 database hardening preserves the reviewed provenance of a cleared Rights record and records clearance transitions in an internal append-only event table. A changed reviewed source, permission basis or evidence reference needs a new Rights record and an explicitly republished revision. Package validation still cannot authorize review, clear Rights, or grant media delivery; those are JPN-022 and later operator responsibilities.
 
+JPN-ARCH-003 adds closed, versioned internal presentation documents to published Lesson and Path revisions. These are generated from reconciled editorial keys at publication; the package files and offline JPN-021 dry-run contract remain unchanged. Exact revision pins and Stage/Chapter Rights remain relational. JPN-022 must validate and reconcile the package in one authorized transaction before sealing and moving a publication pointer.
+
 ## Limits and diagnostics
 
 The validator rejects files over 4 MiB, packages over 10 MiB, more than five data files, more than 5,000 total records or 20,000 references. JSON parsing allows at most 40 nesting levels, 4,000 characters per parsed string and 100 digits per number. At most 200 diagnostics are returned; `truncated: true` makes the report invalid. Invalid UTF-8 and duplicate JSON properties are rejected. Schema objects reject unknown fields; Unicode surrogate validity, Kana script and Kanji glyph checks are applied where relevant.

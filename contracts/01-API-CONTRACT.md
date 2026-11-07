@@ -34,6 +34,8 @@ The implemented auth API uses `{ "code": "...", "message": "..." }` for its erro
 
 ### JPN-020 public content reads (merged in `origin/main`)
 
+JPN-ARCH-003 preserves these DTOs and routes while deriving presentation from sealed versioned JSONB and exact content references from relational revision pins. The internal JSONB format is not a public API or an import package format.
+
 - `GET /learning-paths?limit=20&after=<slug>` returns `{ "paths": [{ "id", "slug", "title", "revision" }], "nextCursor": string|null }`. `limit` is 1–50. Results are sorted by stable slug.
 - `GET /learning-paths/{slug}` returns `{ id, slug, title, description, revision, stages: [{ id, position, title, description, chapters: [{ id, position, title, description, lessons: [{ id, placementId, slug, position, revision, title, summary }] }] }] }`. Each level has deterministic position ordering. The pinned Lesson revision is included; the response contains no learner-specific station status.
 - `GET /learning-paths/{pathSlug}/placements/{placementId}/lesson` returns the same Lesson DTO as `/lessons/{slug}`, resolved from the **current published and eligible Path revision** and its matching placement. The placement's pinned Lesson revision and all its dependencies must remain eligible. Unknown Path, absent/malformed placement, withdrawn identity or revoked required right returns 404. The client cannot choose a Path or Lesson revision; a `revision` query parameter does not override the resolution.

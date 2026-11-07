@@ -56,6 +56,20 @@ class PublicContentIntegrationTest {
                 .andExpect(status().isOk()).andExpect(jsonPath("$.title").value("Bản đầu"))
                 .andExpect(jsonPath("$.sections[0].items[0].position").value(1));
 
+        Item draftItem = item(rights);
+        UUID draftSection = section(lesson.id(), 2);
+        jdbc.update("UPDATE lesson_sections SET title_vi='Bản sửa nháp' WHERE id=?", section);
+        jdbc.update("INSERT INTO lesson_objectives(id,lesson_id,position,kind,text_vi) " +
+                "VALUES(?,?,1,'knowledge','Mục tiêu nháp')", UUID.randomUUID(), lesson.id());
+        jdbc.update("DELETE FROM lesson_items WHERE section_id=?", section);
+        jdbc.update("INSERT INTO lesson_items(id,section_id,item_id,position) VALUES(?,?,?,1)",
+                UUID.randomUUID(), draftSection, draftItem.id());
+        mvc.perform(get("/api/v1/lessons/" + lesson.slug()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.title").value("Bản đầu"))
+                .andExpect(jsonPath("$.objectives[0].text").value("Nhận biết âm đã học"))
+                .andExpect(jsonPath("$.sections[0].items[0].content.key").value(item.key()))
+                .andExpect(jsonPath("$.sections[1]").doesNotExist());
+
         publishLesson(lesson, rights, item, 1, 2, "Bản mới", section);
         mvc.perform(get("/api/v1/lessons/" + lesson.slug()))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.revision").value(2))
@@ -78,7 +92,7 @@ class PublicContentIntegrationTest {
     }
 
     @Test
-    void databaseRejectsWrongIdentityAndDuplicateOrder() { // INT-01,02,03,05,06,07,08
+    void databaseRejectsWrongIdentityAndDuplicateOrder() { // INT-01,02,03,05,06,07
         UUID rights = rights("cleared");
         Item item = item(rights);
         assertThrows(DataAccessException.class, () -> jdbc.update(
@@ -150,7 +164,7 @@ class PublicContentIntegrationTest {
     }
 
     @Test
-    void pathPreservesHierarchyAndBecomesUnavailableWhenChildRightsRevoked() throws Exception { // API-01,02,08
+    void pathPreservesHierarchyAndBecomesUnavailableWhenChildRightsRevoked() throws Exception { // API-01,08
         UUID pathRights = rights("cleared");
         UUID itemRights = rights("cleared");
         Item item = item(itemRights);
@@ -183,6 +197,104 @@ class PublicContentIntegrationTest {
                 .andExpect(jsonPath("$.stages[0].chapters[0].lessons[0].title").value("Bài học"));
         jdbc.update("UPDATE content_rights SET clearance_status='revoked' WHERE id=?", itemRights);
         mvc.perform(get("/api/v1/learning-paths/" + slug)).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void pathPlacementReadsItsPinnedLessonRevision() throws Exception {
+        UUID pathRights = rights("cleared"), itemRights = rights("cleared");
+        Item item = item(itemRights);
+        publishItem(item, itemRights, 1, "あ");
+        Lesson lesson = lesson(pathRights);
+        UUID section = section(lesson.id(), 1);
+        publishLesson(lesson, pathRights, item, 1, 1, "Bài v1", section);
+        PathFixture path = pathFixture(pathRights, lesson);
+        publishPathRevision(path, pathRights, lesson, 1, 1);
+
+        publishLesson(lesson, pathRights, item, 1, 2, "Bài v2", section);
+        mvc.perform(get("/api/v1/lessons/" + lesson.slug()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.revision").value(2))
+                .andExpect(jsonPath("$.title").value("Bài v2"));
+        String contextualUrl = "/api/v1/learning-paths/" + path.slug()
+                + "/placements/" + path.placement() + "/lesson";
+        mvc.perform(get(contextualUrl)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.revision").value(1))
+                .andExpect(jsonPath("$.title").value("Bài v1"));
+        mvc.perform(get("/api/v1/learning-paths/" + path.slug() + "/placements/"
+                + UUID.randomUUID() + "/lesson")).andExpect(status().isNotFound());
+        mvc.perform(get("/api/v1/learning-paths/" + path.slug() + "/placements/not-a-uuid/lesson"))
+                .andExpect(status().isNotFound());
+        mvc.perform(get("/api/v1/learning-paths/missing/placements/" + path.placement() + "/lesson"))
+                .andExpect(status().isNotFound());
+
+        publishPathRevision(path, pathRights, lesson, 2, 2);
+        mvc.perform(get(contextualUrl)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.revision").value(2))
+                .andExpect(jsonPath("$.title").value("Bài v2"));
+        mvc.perform(get(contextualUrl + "?revision=1")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.revision").value(2));
+        mvc.perform(get("/api/v1/lessons/" + lesson.slug() + "?revision=1"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.revision").value(2));
+        jdbc.update("UPDATE content_rights SET clearance_status='revoked' WHERE id=?", itemRights);
+        mvc.perform(get(contextualUrl)).andExpect(status().isNotFound());
+        mvc.perform(get("/api/v1/lessons/" + lesson.slug())).andExpect(status().isNotFound());
+        mvc.perform(get("/api/v1/learning-paths/" + path.slug())).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void pathOrdersMultipleStagesChaptersAndPlacements() throws Exception { // API-01
+        UUID rights = rights("cleared");
+        Item item = item(rights);
+        publishItem(item, rights, 1, "あ");
+        Lesson first = lesson(rights), second = lesson(rights), third = lesson(rights);
+        publishLesson(first, rights, item, 1, 1, "Bài đầu", section(first.id(), 1));
+        publishLesson(second, rights, item, 1, 1, "Bài giữa", section(second.id(), 1));
+        publishLesson(third, rights, item, 1, 1, "Bài cuối", section(third.id(), 1));
+
+        UUID path = UUID.randomUUID(), stageOne = UUID.randomUUID(), stageTwo = UUID.randomUUID();
+        UUID chapterOne = UUID.randomUUID(), chapterTwo = UUID.randomUUID(), chapterThree = UUID.randomUUID();
+        UUID placementOne = UUID.randomUUID(), placementTwo = UUID.randomUUID();
+        UUID placementThree = UUID.randomUUID(), placementFour = UUID.randomUUID();
+        String slug = "path-" + UUID.randomUUID();
+        jdbc.update("INSERT INTO learning_paths(id,slug,title_vi,rights_id) VALUES(?,?,'Lộ trình',?)",
+                path, slug, rights);
+        jdbc.update("INSERT INTO path_stages(id,path_id,stable_key,position,title_vi,rights_id) " +
+                "VALUES(?,?,?,2,'Stage 2',?),(?,?,?,1,'Stage 1',?)",
+                stageTwo, path, "stage-" + stageTwo, rights, stageOne, path, "stage-" + stageOne, rights);
+        jdbc.update("INSERT INTO stage_chapters(id,stage_id,stable_key,position,title_vi,rights_id) " +
+                "VALUES(?,?,?,1,'Chapter 3',?),(?,?,?,2,'Chapter 2',?),(?,?,?,1,'Chapter 1',?)",
+                chapterThree, stageTwo, "chapter-" + chapterThree, rights,
+                chapterTwo, stageOne, "chapter-" + chapterTwo, rights,
+                chapterOne, stageOne, "chapter-" + chapterOne, rights);
+        jdbc.update("INSERT INTO chapter_lessons(id,chapter_id,lesson_id,position) " +
+                "VALUES(?,?,?,2),(?,?,?,1),(?,?,?,1),(?,?,?,1)",
+                placementTwo, chapterOne, second.id(), placementOne, chapterOne, first.id(),
+                placementThree, chapterTwo, third.id(), placementFour, chapterThree, first.id());
+
+        jdbc.update("INSERT INTO path_revisions(path_id,revision,title_vi,rights_id) VALUES(?,1,'Lộ trình',?)",
+                path, rights);
+        jdbc.update("INSERT INTO path_revision_stages(path_id,path_revision,stage_id,position,title_vi,rights_id) " +
+                "VALUES(?,1,?,2,'Stage 2',?),(?,1,?,1,'Stage 1',?)",
+                path, stageTwo, rights, path, stageOne, rights);
+        jdbc.update("INSERT INTO path_revision_chapters(path_id,path_revision,stage_id,chapter_id,position,title_vi,rights_id) " +
+                "VALUES(?,1,?,?,1,'Chapter 3',?),(?,1,?,?,2,'Chapter 2',?),(?,1,?,?,1,'Chapter 1',?)",
+                path, stageTwo, chapterThree, rights, path, stageOne, chapterTwo, rights,
+                path, stageOne, chapterOne, rights);
+        jdbc.update("INSERT INTO path_revision_lessons(path_id,path_revision,chapter_id,position,placement_id,lesson_id,lesson_revision) " +
+                "VALUES(?,1,?,2,?,?,1),(?,1,?,1,?,?,1),(?,1,?,1,?,?,1),(?,1,?,1,?,?,1)",
+                path, chapterOne, placementTwo, second.id(), path, chapterOne, placementOne, first.id(),
+                path, chapterTwo, placementThree, third.id(), path, chapterThree, placementFour, first.id());
+        jdbc.update("UPDATE path_revisions SET sealed_at=now() WHERE path_id=? AND revision=1", path);
+        jdbc.update("UPDATE learning_paths SET published_revision=1 WHERE id=?", path);
+
+        mvc.perform(get("/api/v1/learning-paths/" + slug)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.stages[0].title").value("Stage 1"))
+                .andExpect(jsonPath("$.stages[0].chapters[0].title").value("Chapter 1"))
+                .andExpect(jsonPath("$.stages[0].chapters[0].lessons[0].title").value("Bài đầu"))
+                .andExpect(jsonPath("$.stages[0].chapters[0].lessons[1].title").value("Bài giữa"))
+                .andExpect(jsonPath("$.stages[0].chapters[1].title").value("Chapter 2"))
+                .andExpect(jsonPath("$.stages[0].chapters[1].lessons[0].title").value("Bài cuối"))
+                .andExpect(jsonPath("$.stages[1].title").value("Stage 2"))
+                .andExpect(jsonPath("$.stages[1].chapters[0].title").value("Chapter 3"));
     }
 
     @Test
@@ -244,7 +356,7 @@ class PublicContentIntegrationTest {
     }
 
     @Test
-    void conditionalPointerRaceAndRollbackKeepPublicationAtomic() throws Exception { // CON-01,02,06,08, PUB-08
+    void conditionalPointerRaceAndRollbackKeepPublicationAtomic() throws Exception { // CON-01,02, PUB-08
         UUID rights = rights("cleared");
         Item item = item(rights);
         publishItem(item, rights, 1, "あ");
@@ -381,6 +493,36 @@ class PublicContentIntegrationTest {
         jdbc.update("UPDATE lessons SET published_revision=? WHERE id=?", revision, lesson.id());
     }
 
+    private PathFixture pathFixture(UUID rights, Lesson lesson) {
+        PathFixture path = new PathFixture(UUID.randomUUID(), "path-" + UUID.randomUUID(),
+                UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
+        jdbc.update("INSERT INTO learning_paths(id,slug,title_vi,rights_id) VALUES(?,?,'Lộ trình',?)",
+                path.id(), path.slug(), rights);
+        jdbc.update("INSERT INTO path_stages(id,path_id,stable_key,position,title_vi,rights_id) " +
+                "VALUES(?,?,?,1,'Giai đoạn',?)", path.stage(), path.id(), "stage-" + path.stage(), rights);
+        jdbc.update("INSERT INTO stage_chapters(id,stage_id,stable_key,position,title_vi,rights_id) " +
+                "VALUES(?,?,?,1,'Chương',?)", path.chapter(), path.stage(), "chapter-" + path.chapter(), rights);
+        jdbc.update("INSERT INTO chapter_lessons(id,chapter_id,lesson_id,position) VALUES(?,?,?,1)",
+                path.placement(), path.chapter(), lesson.id());
+        return path;
+    }
+
+    private void publishPathRevision(PathFixture path, UUID rights, Lesson lesson,
+                                     int revision, int lessonRevision) {
+        jdbc.update("INSERT INTO path_revisions(path_id,revision,title_vi,rights_id) VALUES(?,?,?,?)",
+                path.id(), revision, "Lộ trình " + revision, rights);
+        jdbc.update("INSERT INTO path_revision_stages(path_id,path_revision,stage_id,position,title_vi,rights_id) " +
+                "VALUES(?,?,?,1,'Giai đoạn',?)", path.id(), revision, path.stage(), rights);
+        jdbc.update("INSERT INTO path_revision_chapters(path_id,path_revision,stage_id,chapter_id,position,title_vi,rights_id) " +
+                "VALUES(?,?,?,?,1,'Chương',?)", path.id(), revision, path.stage(), path.chapter(), rights);
+        jdbc.update("INSERT INTO path_revision_lessons(path_id,path_revision,chapter_id,position,placement_id,lesson_id,lesson_revision) " +
+                "VALUES(?,?,?,1,?,?,?)", path.id(), revision, path.chapter(), path.placement(),
+                lesson.id(), lessonRevision);
+        jdbc.update("UPDATE path_revisions SET sealed_at=now() WHERE path_id=? AND revision=?", path.id(), revision);
+        jdbc.update("UPDATE learning_paths SET published_revision=? WHERE id=?", revision, path.id());
+    }
+
     private record Item(UUID id, String key) {}
     private record Lesson(UUID id, String slug) {}
+    private record PathFixture(UUID id, String slug, UUID stage, UUID chapter, UUID placement) {}
 }

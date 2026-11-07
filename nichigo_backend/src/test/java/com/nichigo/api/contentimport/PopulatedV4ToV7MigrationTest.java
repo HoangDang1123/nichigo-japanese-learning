@@ -13,8 +13,8 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 /** Upgrade test creates and removes only its own PostgreSQL schema. */
-class PopulatedV4ToV5MigrationTest {
-    @Test void populatedV4UpgradesWithoutChangingIdentitiesOrderOrPublication() throws Exception {
+class PopulatedV4ToV7MigrationTest {
+    @Test void populatedV4UpgradesThroughV7WithoutChangingIdentitiesOrderOrPublication() throws Exception {
         String baseUrl = System.getenv("DB_URL");
         assertNotNull(baseUrl, "Use an isolated PostgreSQL test schema");
         assertTrue(baseUrl.matches("jdbc:postgresql://(?:localhost|127\\.0\\.0\\.1)(?::[0-9]+)?/[a-zA-Z0-9_]+\\?currentSchema=jpn021_[a-zA-Z0-9_]+"),
@@ -81,6 +81,18 @@ class PopulatedV4ToV5MigrationTest {
                     assertThrows(SQLException.class, () -> execute(db,
                             "UPDATE lesson_sections SET stable_key='Bad Key' WHERE id='" + section + "'"));
                     assertEquals(5, scalar(db, "SELECT count(*) FROM flyway_schema_history WHERE success"));
+                }
+                Flyway throughV7 = flyway(url, user, password, schema, "7");
+                throughV7.migrate();
+                throughV7.validate();
+                try (Connection db = DriverManager.getConnection(url, user, password)) {
+                    assertEquals(1, scalar(db, "SELECT count(*) FROM content_rights_events WHERE rights_id='" + rights + "' AND clearance_status='cleared'"));
+                    assertEquals(1, scalar(db, "SELECT published_revision FROM content_items WHERE id='" + item + "'"));
+                    assertEquals(1, scalar(db, "SELECT position FROM chapter_lessons WHERE id='" + placement + "'"));
+                    assertEquals(1, scalar(db, "SELECT count(*) FROM content_item_revisions WHERE item_id='" + item + "' AND sealed_at IS NOT NULL"));
+                    assertThrows(SQLException.class, () -> execute(db,
+                            "UPDATE content_rights SET source_label='Changed' WHERE id='" + rights + "'"));
+                    assertEquals(7, scalar(db, "SELECT count(*) FROM flyway_schema_history WHERE success"));
                 }
             } finally {
                 execute(admin, "DROP SCHEMA " + schema + " CASCADE");

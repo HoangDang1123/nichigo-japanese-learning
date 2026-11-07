@@ -438,6 +438,8 @@ class PublicContentIntegrationTest {
         assertThrows(DataAccessException.class, () -> jdbc.update(
                 "UPDATE content_rights SET source_label='Rewritten' WHERE id=?", right));
         assertThrows(DataAccessException.class, () -> jdbc.update(
+                "UPDATE content_rights SET stable_key='rewritten-right' WHERE id=?", right));
+        assertThrows(DataAccessException.class, () -> jdbc.update(
                 "UPDATE content_rights SET clearance_status='unverified' WHERE id=?", right));
         jdbc.update("UPDATE content_rights SET clearance_status='revoked' WHERE id=?", right);
         assertEquals(3, jdbc.queryForObject(
@@ -522,9 +524,6 @@ class PublicContentIntegrationTest {
             UUID[] rights = {pathRight, stageRight, chapterRight, lessonRight, itemRight, mediaRight};
             jdbc.update("UPDATE content_rights SET clearance_status='revoked' WHERE id=?", rights[layer]);
             assertFalse(jdbc.queryForObject("SELECT path_revision_public(?,1)", Boolean.class, path.id()));
-            assertThrows(DataAccessException.class, () -> jdbc.update(
-                    "INSERT INTO path_revision_stages(path_id,path_revision,stage_id,position,title_vi,rights_id) " +
-                    "VALUES(?,2,?,1,'Invalid',NULL)", path.id(), path.stage()));
         }
         UUID right = rights("cleared");
         Item item = item(right);
@@ -532,6 +531,58 @@ class PublicContentIntegrationTest {
         assertTrue(jdbc.queryForObject("SELECT item_revision_public(?,1)", Boolean.class, item.id()));
         jdbc.update("UPDATE content_items SET withdrawn_at=now() WHERE id=?", item.id());
         assertFalse(jdbc.queryForObject("SELECT item_revision_public(?,1)", Boolean.class, item.id()));
+    }
+
+    @Test
+    void publishedPathRejectsNullRightsAndMissingPinnedLessons() {
+        UUID right = rights("cleared");
+        Lesson lesson = lesson(right);
+        PathFixture path = pathFixture(right, lesson);
+        jdbc.update("INSERT INTO path_revisions(path_id,revision,title_vi,rights_id) VALUES(?,1,'Path',?)", path.id(), right);
+        assertThrows(DataAccessException.class, () -> jdbc.update(
+                "INSERT INTO path_revision_stages(path_id,path_revision,stage_id,position,title_vi,rights_id) " +
+                "VALUES(?,1,?,1,'Stage',NULL)", path.id(), path.stage()));
+        jdbc.update("INSERT INTO path_revision_stages(path_id,path_revision,stage_id,position,title_vi,rights_id) " +
+                "VALUES(?,1,?,1,'Stage',?)", path.id(), path.stage(), right);
+        assertThrows(DataAccessException.class, () -> jdbc.update(
+                "INSERT INTO path_revision_chapters(path_id,path_revision,stage_id,chapter_id,position,title_vi,rights_id) " +
+                "VALUES(?,1,?,?,1,'Chapter',NULL)", path.id(), path.stage(), path.chapter()));
+        jdbc.update("INSERT INTO path_revision_chapters(path_id,path_revision,stage_id,chapter_id,position,title_vi,rights_id) " +
+                "VALUES(?,1,?,?,1,'Chapter',?)", path.id(), path.stage(), path.chapter(), right);
+        assertThrows(DataAccessException.class, () -> jdbc.update(
+                "INSERT INTO path_revision_lessons(path_id,path_revision,chapter_id,position,placement_id,lesson_id,lesson_revision) " +
+                "VALUES(?,1,?,1,?,?,1)", path.id(), path.chapter(), path.placement(), lesson.id()));
+    }
+
+    @Test
+    void withdrawnMediaLessonAndPathAreIneligible() {
+        UUID right = rights("cleared");
+        UUID media = UUID.randomUUID();
+        jdbc.update("INSERT INTO media_assets(id,stable_key,media_kind,storage_key,checksum_sha256,mime_type,rights_id) " +
+                "VALUES(?,?,'audio',?,'test-checksum','audio/mpeg',?)",
+                media, "media-" + media, "private-object-" + media, right);
+        jdbc.update("INSERT INTO media_asset_revisions(media_id,revision,media_kind,storage_key,checksum_sha256,mime_type,rights_id) " +
+                "VALUES(?,1,'audio',?,'test-checksum','audio/mpeg',?)", media, "private-object-" + media, right);
+        jdbc.update("UPDATE media_asset_revisions SET sealed_at=now() WHERE media_id=? AND revision=1", media);
+        assertTrue(jdbc.queryForObject("SELECT media_revision_public(?,1)", Boolean.class, media));
+        jdbc.update("UPDATE media_assets SET withdrawn_at=now() WHERE id=?", media);
+        assertFalse(jdbc.queryForObject("SELECT media_revision_public(?,1)", Boolean.class, media));
+
+        Lesson lesson = lesson(right);
+        jdbc.update("INSERT INTO lesson_revisions(lesson_id,revision,title_vi,rights_id) VALUES(?,1,'Lesson',?)", lesson.id(), right);
+        jdbc.update("UPDATE lesson_revisions SET sealed_at=now() WHERE lesson_id=? AND revision=1", lesson.id());
+        assertTrue(jdbc.queryForObject("SELECT lesson_revision_public(?,1)", Boolean.class, lesson.id()));
+        jdbc.update("UPDATE lessons SET withdrawn_at=now() WHERE id=?", lesson.id());
+        assertFalse(jdbc.queryForObject("SELECT lesson_revision_public(?,1)", Boolean.class, lesson.id()));
+
+        UUID path = UUID.randomUUID();
+        jdbc.update("INSERT INTO learning_paths(id,slug,title_vi,rights_id) VALUES(?,?,?,?)",
+                path, "path-" + path, "Path", right);
+        jdbc.update("INSERT INTO path_revisions(path_id,revision,title_vi,rights_id) VALUES(?,1,'Path',?)", path, right);
+        jdbc.update("UPDATE path_revisions SET sealed_at=now() WHERE path_id=? AND revision=1", path);
+        assertTrue(jdbc.queryForObject("SELECT path_revision_public(?,1)", Boolean.class, path));
+        jdbc.update("UPDATE learning_paths SET withdrawn_at=now() WHERE id=?", path);
+        assertFalse(jdbc.queryForObject("SELECT path_revision_public(?,1)", Boolean.class, path));
     }
 
     private int racePointer(UUID lessonId, int revision, CountDownLatch ready, CountDownLatch go) {

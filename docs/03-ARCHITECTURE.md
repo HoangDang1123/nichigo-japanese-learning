@@ -10,6 +10,10 @@ This is the **target deployment topology**, not a deployed environment verified 
 - Planned backend domains: `identity`, `content`, `learning`, `practice`, `quota`, `contentimport`, `admin`, `common`. Current source has `auth` and `common` packages; do not treat the planned list as implemented modules.
 - Prefer standard PostgreSQL, env-based config, and no vendor-specific business logic for portability.
 
+### Frontend loading boundary
+
+The shared `Skeleton` and `SkeletonRegion` in `nichigo_frontend/src/components/ui/` provide decorative shapes and one accessible loading announcement for genuine initial data requests. Feature compositions preserve the proportions of their eventual content. The current Home state adapter uses a Study Desk skeleton only while Redux checks the existing auth session; guest, authenticated-empty and unavailable states use their established content. Railway and Skills compositions are exported for future data adapters but are not mounted on their current static preview/empty routes. Short auth form submissions retain their button pending state. No `loading.tsx` route boundary is added while these routes have no server-side content load; future data integrations should place Suspense boundaries at the data-backed region and keep the AppShell stable. See the [design rules](07-DESIGN-SYSTEM.md#skeleton-loading-system).
+
 ## Repository structure (approved — JPN-001)
 ```
 nichigo_frontend/         # Next.js frontend (App Router, TypeScript)

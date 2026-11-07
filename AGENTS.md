@@ -40,6 +40,12 @@ Never use `git reset --hard`, `git clean -fd`, force-push, or destructive checko
 
 Use Be Vietnam Pro for Vietnamese and general UI, Noto Sans JP for Japanese learning content, and Noto Serif JP only for decorative Japanese accents. Reuse the centralized typography tokens in `nichigo_frontend/src/styles/tokens.css`; never add another UI font without Product Owner approval or apply Japanese serif to Vietnamese headings or body text. Preserve the typography scale and Light/Dark/System compatibility, and verify Vietnamese diacritics and Japanese glyphs. See [the design system](docs/07-DESIGN-SYSTEM.md#approved-typography) for usage and loading details.
 
+## UI Loading States and Skeleton Policy
+
+For every future frontend task, identify actual asynchronous data dependencies and loading boundaries before implementation. Design initial loading, success, empty, error, and relevant refreshing states together. Use the shared `Skeleton` primitive for initial loading of data-backed regions, with a feature-specific composition when the loaded layout is substantial. Approximate the real content's dimensions and responsive structure; use semantic Light/Dark/System tokens, accessible busy announcements, noninteractive decorative shapes, and reduced-motion handling. Keep valid content visible during background refresh where possible. Never substitute a skeleton for confirmed empty, error, or unavailable content, invent placeholder business data, or add artificial loading delays. Add or update tests for loading-to-content and loading-to-error/empty transitions, and verify desktop/mobile appearance in Light and Dark. Include applicable loading coverage in the feature's Definition of Done. Purely synchronous components need no individual skeleton.
+
+See [the design system](docs/07-DESIGN-SYSTEM.md#skeleton-loading-system), [shared implementation](nichigo_frontend/src/components/ui/skeleton.tsx), and the [JPN-UI-003 note](docs/implementation/JPN-UI-003-skeleton-system.md).
+
 ## Git Branch Naming Convention
 
 Use the following convention for all future NichiGo development branches.

@@ -53,6 +53,14 @@ The current source implements the shared AppShell, Light/Dark/System switcher an
 - Theme switcher must be keyboard and screen-reader accessible. Respect `prefers-reduced-motion` and ensure readable contrast in both effective modes.
 - The spotlight tour, dialogs, tooltips, forms, lesson pages, writing grids, feedback/error states and navigation must follow the active theme.
 
+## Skeleton Loading System
+
+Skeletons represent **initial loading of a real data-backed region**, not a confirmed empty result, error, static preview, or brief button submission. The shared `Skeleton` primitive in `nichigo_frontend/src/components/ui/skeleton.tsx` offers `line`, `circle`, and `block` shapes with optional width and height. A `SkeletonRegion` gives one nonvisual status announcement and marks the corresponding content region busy; every decorative shape is hidden from assistive technology and cannot receive focus.
+
+Use `--color-skeleton-base` and `--color-skeleton-highlight` from the centralized Light/Dark/System theme definitions and `--duration-skeleton` from motion tokens. The pulse is subtle, has no bright moving gradient, and stops under `prefers-reduced-motion: reduce`. Skeletons use the same radii, spacing, responsive grids and panel proportions as the content they precede. Avoid fixed white highlights, arbitrary progress percentages, fake learner data, and animated placeholders with no pending request.
+
+The Home Study Desk composition follows its welcome, resume, activity, recommendations, goal and quick-access layout during the existing auth session check. Railway and Skills compositions are available for future published-content loading, but their current static preview/empty routes do not mount them. Stable AppShell branding and navigation remain visible. When initial loading resolves, render actual content, a confirmed empty state or a distinct unavailable/error state. During background refresh, retain valid content with a small pending indicator where possible. See [JPN-UI-003 implementation notes](implementation/JPN-UI-003-skeleton-system.md) and the [root agent policy](../AGENTS.md#ui-loading-states-and-skeleton-policy).
+
 ## Japanese editorial / calligraphy usage
 - A restrained paper/washi feel through warm backgrounds and fine dividers; no heavy faux textures that hurt readability.
 - Chapter numbering, vertical rhythm, typographic hierarchy, subtle asymmetry and grid-aware composition can evoke Japanese books/stationery.

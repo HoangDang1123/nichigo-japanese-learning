@@ -11,8 +11,9 @@ Tài liệu này mô tả **code đã triển khai** trong repository, khác v�
 | JPN-003 | App Shell, responsive navigation, UI states | [JPN-003-app-shell.md](JPN-003-app-shell.md) |
 | JPN-010A | Backend authentication, session, CSRF and V2/V3 migrations | [JPN-010-auth-backend.md](JPN-010-auth-backend.md) |
 | JPN-010B | Frontend authentication, session and CSRF integration | [JPN-010-frontend-auth.md](JPN-010-frontend-auth.md) |
-| JPN-UI-003 | Shared skeleton primitive, Home auth-loading composition and future data-loader layouts (feature branch; review pending) | [JPN-UI-003-skeleton-system.md](JPN-UI-003-skeleton-system.md) |
-| JPN-020 | Learning content schema, immutable revisions and published-only read API (feature branch; review pending) | [JPN-020-learning-content.md](JPN-020-learning-content.md) |
+| JPN-UI-003 | Shared skeleton primitive, Home auth-loading composition and future data-loader layouts (merged; release not evidenced) | [JPN-UI-003-skeleton-system.md](JPN-UI-003-skeleton-system.md) |
+| JPN-020 | Learning content schema, immutable revisions and published-only read API (merged; ADR-015 still proposed) | [JPN-020-learning-content.md](JPN-020-learning-content.md) |
+| JPN-021 | CSV/JSON validation, PostgreSQL reference checks and offline dry-run CLI (feature branch; review pending) | [JPN-021-content-validation.md](JPN-021-content-validation.md) |
 | JPN-030 | Learning Path railway frontend preview; content and progress integration pending | [JPN-030-learning-path.md](JPN-030-learning-path.md) |
 | JPN-041 | Home Study Desk frontend presentation; progress integration pending | [JPN-041-home-study-desk.md](JPN-041-home-study-desk.md) |
 

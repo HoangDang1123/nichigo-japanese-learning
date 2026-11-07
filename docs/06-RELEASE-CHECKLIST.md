@@ -15,6 +15,7 @@
 - [ ] Secrets not in Git or client bundle.
 - [ ] Database migration from clean state and repeat migration verified.
 - [ ] V4 content migration applied to the target PostgreSQL release database; published-only API, rights revocation, and migration rollback/restore plan checked before serving content.
+- [ ] V5 nullable authoring-key migration checked against a populated backup; existing content identities, order and published pointers remain intact.
 - [ ] Published media uses private objects or short-lived authorized URLs; revocation is tested against the actual delivery path, not only the metadata API.
 - [ ] Concurrent guest completions do not bypass quota.
 - [ ] Import dry-run, idempotency, publication gate, provenance tested.

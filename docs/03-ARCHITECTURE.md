@@ -3,11 +3,11 @@
 ## System topology
 `Browser → Vercel / Next.js → HTTPS → Render Free / Spring Boot → TLS PostgreSQL → Neon Free`
 
-This is the **target deployment topology**, not a deployed environment verified by this repository. Current source has a Next.js frontend, Spring Boot backend, PostgreSQL/Flyway configuration, and session auth. Hosting, learning content, quota, progress and import integration remain planned.
+This is the **target deployment topology**, not a deployed environment verified by this repository. Current source has a Next.js frontend, Spring Boot backend, PostgreSQL/Flyway configuration, session auth, JPN-020 public content reads, and JPN-021 validation on this feature branch. Hosting, quota, progress and production import remain planned.
 
 - Next.js TypeScript frontend. Java Spring Boot modular monolith REST API.
 - Neon managed PostgreSQL; Flyway migration history in repository.
-- Planned backend domains: `identity`, `content`, `learning`, `practice`, `quota`, `contentimport`, `admin`, `common`. Current source has `auth` and `common` packages; do not treat the planned list as implemented modules.
+- Planned backend domains: `identity`, `content`, `learning`, `practice`, `quota`, `contentimport`, `admin`, `common`. Current source has `auth`, `common`, `content`, and a JPN-021 `contentimport` validation package; the other domains remain planned.
 - Prefer standard PostgreSQL, env-based config, and no vendor-specific business logic for portability.
 
 ### Frontend loading boundary
@@ -28,7 +28,7 @@ antigravity/              # Agent operating guide
 ```
 
 ## Data model (conceptual, adjust with migrations)
-The list below is the historical target sketch, not a table-by-table description of current migrations. `origin/main` has V1 baseline, V2 `users` and V3 Spring Session tables. The JPN-020 implementation branch adds V4 learning-content tables described below; guest, quiz and progress tables remain absent. See JPN-002 and JPN-010A implementation notes for the earlier schema.
+The list below is the historical target sketch, not a table-by-table description of current migrations. `origin/main` has V1 baseline, V2 `users`, V3 Spring Session, and V4 learning-content tables described below. JPN-021 adds V5 authoring keys on this feature branch; guest, quiz and progress tables remain absent. See JPN-002 and JPN-010A implementation notes for the earlier schema.
 The [Nichigo Hybrid curriculum proposal](04-CONTENT-AND-LEARNING.md) adds a conceptual Learning Path → Stage → Chapter → Lesson hierarchy, independent Skills/Practice entry points, and separate lesson-completion versus item-mastery concerns. The JPN-020 branch represents the hierarchy with identified tables; the Railway station granularity remains open.
 
 - `users(id,email,password_hash,status,created_at)`; `auth_sessions(id,user_id,expires_at,revoked_at)`.
@@ -43,7 +43,7 @@ The [Nichigo Hybrid curriculum proposal](04-CONTENT-AND-LEARNING.md) adds a conc
 
 Use canonical content references and a join table for lesson membership. Include uniqueness constraints for progress and import keys; enforce quotas atomically with transactions and locks/conditional upsert. Store timestamps in UTC; compute guest quota date in Asia/Ho_Chi_Minh.
 
-## JPN-020 learning content foundation (implementation branch, not yet merged)
+## JPN-020 learning content foundation (merged in `origin/main`)
 
 Flyway V4 adds relational editorial identities and sealed public revisions. The conceptual Hybrid hierarchy is represented as `learning_paths → path_stages → stage_chapters → chapter_lessons → lessons`. Stage and Chapter are independently identified and ordered; a Lesson may be placed in more than one Chapter, subject to a later progress-semantics decision. Skills reads published canonical Items independently of path placements. A Course entity, learner progress, assessment attempts and unlock rules are absent.
 
@@ -77,7 +77,13 @@ Path, Lesson, Item and Media draft roots each carry a nullable `published_revisi
 
 The independent `/api/v1/lessons/{slug}` read resolves the Lesson root's current published revision. The contextual `/api/v1/learning-paths/{pathSlug}/placements/{placementId}/lesson` read first resolves the current eligible Path revision, verifies the placement belongs to it, checks the pinned Lesson and dependencies, then assembles that exact Lesson revision using the same DTO and ordered queries. Neither route accepts a client-selected revision. A Path may therefore remain pinned to Lesson v1 after the independent Lesson root advances to v2; republishing the Path with a v2 pin changes the contextual result. Historical audit requires a separate authorized internal contract and is not exposed here.
 
-Kind-specific Item fields are JSONB with a DB object check; kind-specific shape validation belongs to JPN-021. JPN-022 owns import and production publication/withdrawal operations. JPN-023 owns reviewed content. JPN-030 and JPN-031 consume published reads. JPN-032 records graded attempts with pinned revision keys, while JPN-040 owns lesson completion and item mastery separately. Neither JF/CEFR nor JLPT equivalence is inferred by the schema.
+Kind-specific Item fields are JSONB with a DB object check; JPN-021 validates their kind-specific shapes before authoring. JPN-022 owns import and production publication/withdrawal operations. JPN-023 owns reviewed content. JPN-030 and JPN-031 consume published reads. JPN-032 records graded attempts with pinned revision keys, while JPN-040 owns lesson completion and item mastery separately. Neither JF/CEFR nor JLPT equivalence is inferred by the schema.
+
+## JPN-021 package validation and authoring boundary (feature branch)
+
+The offline CLI reads a flat directory of bounded UTF-8 files. `ContentPackageValidator` validates the versioned manifest, parses strict CSV for Rights/Items/Media and JSON arrays for Lessons/Paths, then passes normalized `CanonicalRecord` values to `CanonicalContentValidator`. The latter applies closed-field schemas, kind-specific payload rules, duplicate/order checks, reference and prerequisite-cycle checks, and rights/media checks. A future CMS or JPN-022 operator can call this same normalized-record validator without parsing package files. `ContentSchemaValidator` reads the checked-in schema subset and operates on `JsonNode` values; it is not a general-purpose JSON Schema implementation.
+
+`ContentReferenceResolver` is an optional read-only boundary for resolving existing editorial keys. The JDBC implementation batches parameterized lookups and follows existing Lesson prerequisites by frontier. Without a resolver, unresolved external keys are warnings and `publicationReady` remains false. Package-local keys resolve first, but an Item key already in the database with another kind is a conflict; local Rights declarations always require authorized review even when a matching database key is cleared. V5 adds nullable stable authoring keys to Rights, Lesson Sections and Chapter placements, unique in their respective global, Lesson and Chapter namespaces. Existing UUIDs, order and published pointers are unchanged. JPN-022 must define authenticated operator transport, idempotent reconciliation of matching keys, authorized rights review, locked revalidation, revision sealing, atomic publication and audit. No dry-run report authorizes publication.
 
 ## Auth and security decisions to implement carefully
 JPN-010 implements BCrypt, Spring Security sessions and CSRF for local/source behavior. Production cookie topology, rate limiting and deployment checks below remain open.

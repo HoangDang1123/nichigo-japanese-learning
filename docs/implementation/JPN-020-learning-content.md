@@ -2,7 +2,7 @@
 
 ## Scope and status
 
-This branch implements the PostgreSQL content model and published-only backend reads. It contains no production curriculum, authoring endpoint, importer, publisher, progress calculation, or frontend integration. Source is **implemented** and PostgreSQL integration tests were **run**; the technical decision in ADR-015 awaits owner review. This branch is neither merged nor released.
+The JPN-020 branch implemented the PostgreSQL content model and published-only backend reads, merged into `origin/main` via PR #22. It contains no production curriculum, authoring endpoint, importer, publisher, progress calculation, or frontend integration. Source is **implemented**, PostgreSQL integration tests were **run**, and the technical decision in ADR-015 still awaits owner review. No release is evidenced.
 
 ## Architecture and relationships
 

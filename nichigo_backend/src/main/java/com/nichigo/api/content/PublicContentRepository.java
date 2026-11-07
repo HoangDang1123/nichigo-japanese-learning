@@ -14,12 +14,14 @@ public class PublicContentRepository {
 
     public PublicContentRepository(JdbcTemplate jdbc) { this.jdbc = jdbc; }
 
-    public record PathHead(UUID id, String slug, int revision, String title, String description) {}
+    public record PathHead(UUID id, String slug, int revision, String title, String description,
+                           String presentation) {}
     public record StageRow(UUID id, int position, String title, String description) {}
     public record ChapterRow(UUID id, UUID stageId, int position, String title, String description) {}
     public record PlacementRow(UUID chapterId, UUID placementId, UUID lessonId, String lessonSlug,
                                int position, int lessonRevision, String title, String summary) {}
-    public record LessonHead(UUID id, String slug, int revision, String title, String summary) {}
+    public record LessonHead(UUID id, String slug, int revision, String title, String summary,
+                             String presentation) {}
     public record ObjectiveRow(int position, String kind, String text) {}
     public record SectionRow(UUID id, int position, String title) {}
     public record ItemRow(UUID sectionId, int position, UUID itemId, String stableKey,
@@ -33,7 +35,8 @@ public class PublicContentRepository {
 
     public List<PathHead> publishedPaths(String after, int fetchSize) {
         return jdbc.query("""
-                SELECT p.id, p.slug, pr.revision, pr.title_vi, pr.description_vi
+                SELECT p.id, p.slug, pr.revision, pr.title_vi, pr.description_vi,
+                       NULL::text AS presentation
                 FROM learning_paths p JOIN path_revisions pr
                   ON pr.path_id = p.id AND pr.revision = p.published_revision
                 WHERE p.slug > ? AND path_revision_public(p.id, pr.revision)
@@ -43,7 +46,8 @@ public class PublicContentRepository {
 
     public Optional<PathHead> publishedPath(String slug) {
         return jdbc.query("""
-                SELECT p.id, p.slug, pr.revision, pr.title_vi, pr.description_vi
+                SELECT p.id, p.slug, pr.revision, pr.title_vi, pr.description_vi,
+                       pr.presentation::text AS presentation
                 FROM learning_paths p JOIN path_revisions pr
                   ON pr.path_id = p.id AND pr.revision = p.published_revision
                 WHERE p.slug = ? AND path_revision_public(p.id, pr.revision)
@@ -52,13 +56,20 @@ public class PublicContentRepository {
 
     private PathHead pathHead(java.sql.ResultSet rs) throws java.sql.SQLException {
         return new PathHead(rs.getObject("id", UUID.class), rs.getString("slug"),
-                rs.getInt("revision"), rs.getString("title_vi"), rs.getString("description_vi"));
+                rs.getInt("revision"), rs.getString("title_vi"), rs.getString("description_vi"),
+                rs.getString("presentation"));
     }
 
     public List<StageRow> stages(UUID pathId, int revision) {
         return jdbc.query("""
-                SELECT stage_id, position, title_vi, description_vi FROM path_revision_stages
-                WHERE path_id = ? AND path_revision = ? ORDER BY position LIMIT 101
+                SELECT (stage->>'id')::uuid AS stage_id,
+                       (stage->>'position')::int AS position,
+                       stage->>'titleVi' AS title_vi,
+                       stage->>'descriptionVi' AS description_vi
+                FROM path_revisions pr
+                CROSS JOIN LATERAL jsonb_array_elements(pr.presentation->'stages') stage
+                WHERE pr.path_id = ? AND pr.revision = ?
+                ORDER BY position LIMIT 101
                 """, (rs, n) -> new StageRow(rs.getObject("stage_id", UUID.class),
                 rs.getInt("position"), rs.getString("title_vi"), rs.getString("description_vi")),
                 pathId, revision);
@@ -66,8 +77,15 @@ public class PublicContentRepository {
 
     public List<ChapterRow> chapters(UUID pathId, int revision) {
         return jdbc.query("""
-                SELECT chapter_id, stage_id, position, title_vi, description_vi
-                FROM path_revision_chapters WHERE path_id = ? AND path_revision = ?
+                SELECT (chapter->>'id')::uuid AS chapter_id,
+                       (stage->>'id')::uuid AS stage_id,
+                       (chapter->>'position')::int AS position,
+                       chapter->>'titleVi' AS title_vi,
+                       chapter->>'descriptionVi' AS description_vi
+                FROM path_revisions pr
+                CROSS JOIN LATERAL jsonb_array_elements(pr.presentation->'stages') stage
+                CROSS JOIN LATERAL jsonb_array_elements(stage->'chapters') chapter
+                WHERE pr.path_id = ? AND pr.revision = ?
                 ORDER BY stage_id, position LIMIT 101
                 """, (rs, n) -> new ChapterRow(rs.getObject("chapter_id", UUID.class),
                 rs.getObject("stage_id", UUID.class), rs.getInt("position"),
@@ -91,18 +109,21 @@ public class PublicContentRepository {
 
     public Optional<LessonHead> publishedLesson(String slug) {
         return jdbc.query("""
-                SELECT l.id, l.slug, lr.revision, lr.title_vi, lr.summary_vi
+                SELECT l.id, l.slug, lr.revision, lr.title_vi, lr.summary_vi,
+                       lr.presentation::text AS presentation
                 FROM lessons l JOIN lesson_revisions lr
                   ON lr.lesson_id = l.id AND lr.revision = l.published_revision
                 WHERE l.slug = ? AND lesson_revision_public(l.id, lr.revision)
                 """, (rs, n) -> new LessonHead(rs.getObject("id", UUID.class), rs.getString("slug"),
-                rs.getInt("revision"), rs.getString("title_vi"), rs.getString("summary_vi")),
+                rs.getInt("revision"), rs.getString("title_vi"), rs.getString("summary_vi"),
+                rs.getString("presentation")),
                 slug).stream().findFirst();
     }
 
     public Optional<LessonHead> lessonAtPublishedPlacement(String pathSlug, UUID placementId) {
         return jdbc.query("""
-                SELECT l.id, l.slug, lr.revision, lr.title_vi, lr.summary_vi
+                SELECT l.id, l.slug, lr.revision, lr.title_vi, lr.summary_vi,
+                       lr.presentation::text AS presentation
                 FROM learning_paths p
                 JOIN path_revision_lessons pl
                   ON pl.path_id = p.id AND pl.path_revision = p.published_revision
@@ -113,22 +134,30 @@ public class PublicContentRepository {
                   AND path_revision_public(p.id, p.published_revision)
                   AND lesson_revision_public(l.id, lr.revision)
                 """, (rs, n) -> new LessonHead(rs.getObject("id", UUID.class), rs.getString("slug"),
-                rs.getInt("revision"), rs.getString("title_vi"), rs.getString("summary_vi")),
+                rs.getInt("revision"), rs.getString("title_vi"), rs.getString("summary_vi"),
+                rs.getString("presentation")),
                 pathSlug, placementId).stream().findFirst();
     }
 
     public List<ObjectiveRow> objectives(UUID lessonId, int revision) {
         return jdbc.query("""
-                SELECT position, kind, text_vi FROM lesson_revision_objectives
-                WHERE lesson_id = ? AND lesson_revision = ? ORDER BY position LIMIT 1001
+                SELECT (objective->>'position')::int AS position,
+                       objective->>'kind' AS kind, objective->>'textVi' AS text_vi
+                FROM lesson_revisions lr
+                CROSS JOIN LATERAL jsonb_array_elements(lr.presentation->'objectives') objective
+                WHERE lr.lesson_id = ? AND lr.revision = ? ORDER BY position LIMIT 1001
                 """, (rs, n) -> new ObjectiveRow(rs.getInt("position"), rs.getString("kind"),
                 rs.getString("text_vi")), lessonId, revision);
     }
 
     public List<SectionRow> sections(UUID lessonId, int revision) {
         return jdbc.query("""
-                SELECT section_id, position, title_vi FROM lesson_revision_sections
-                WHERE lesson_id = ? AND lesson_revision = ? ORDER BY position LIMIT 101
+                SELECT (section->>'id')::uuid AS section_id,
+                       (section->>'position')::int AS position,
+                       section->>'titleVi' AS title_vi
+                FROM lesson_revisions lr
+                CROSS JOIN LATERAL jsonb_array_elements(lr.presentation->'sections') section
+                WHERE lr.lesson_id = ? AND lr.revision = ? ORDER BY position LIMIT 101
                 """, (rs, n) -> new SectionRow(rs.getObject("section_id", UUID.class),
                 rs.getInt("position"), rs.getString("title_vi")), lessonId, revision);
     }

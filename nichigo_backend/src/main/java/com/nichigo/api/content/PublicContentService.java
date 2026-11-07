@@ -1,6 +1,7 @@
 package com.nichigo.api.content;
 
 import com.nichigo.api.content.dto.PublicContentDtos;
+import com.nichigo.api.contentimport.CanonicalContentValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.UUID;
 
 /** Every response is assembled from one repeatable PostgreSQL snapshot. */
@@ -21,10 +23,12 @@ public class PublicContentService {
             "kana", "vocabulary", "grammar", "kanji", "example", "dialogue");
     private final PublicContentRepository repository;
     private final ObjectMapper objectMapper;
+    private final CanonicalContentValidator contentValidator;
 
     public PublicContentService(PublicContentRepository repository, ObjectMapper objectMapper) {
         this.repository = repository;
         this.objectMapper = objectMapper;
+        this.contentValidator = new CanonicalContentValidator(objectMapper);
     }
 
     @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
@@ -41,13 +45,19 @@ public class PublicContentService {
     @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
     public PublicContentDtos.Path path(String slug) {
         var root = repository.publishedPath(slug).orElseThrow(ContentNotFoundException::new);
+        contentValidator.validatePublishedPathPresentation(root.presentation());
         var chapterRows = repository.chapters(root.id(), root.revision());
         var placementRows = repository.placements(root.id(), root.revision());
         if (chapterRows.size() > 100 || placementRows.size() > 1000) {
             throw new IllegalStateException("Published path exceeds the bounded response contract.");
         }
         Map<UUID, List<PublicContentDtos.LessonSummary>> lessonsByChapter = new HashMap<>();
+        Set<UUID> chapterIds = new HashSet<>();
+        for (var row : chapterRows) chapterIds.add(row.id());
         for (var row : placementRows) {
+            if (!chapterIds.contains(row.chapterId())) {
+                throw new IllegalStateException("Published Path placement has no layout Chapter.");
+            }
             lessonsByChapter.computeIfAbsent(row.chapterId(), key -> new ArrayList<>())
                     .add(new PublicContentDtos.LessonSummary(row.lessonId(), row.placementId(),
                             row.lessonSlug(), row.position(), row.lessonRevision(),
@@ -92,6 +102,7 @@ public class PublicContentService {
     }
 
     private PublicContentDtos.Lesson assembleLesson(PublicContentRepository.LessonHead root) {
+        contentValidator.validatePublishedLessonPresentation(root.presentation());
         var sectionRows = repository.sections(root.id(), root.revision());
         var itemRows = repository.lessonItems(root.id(), root.revision());
         if (sectionRows.size() > 100 || itemRows.size() > 1000) {
@@ -109,7 +120,12 @@ public class PublicContentService {
                     row.altTextVi(), row.transcriptVi()));
         }
         Map<UUID, List<PublicContentDtos.LessonItem>> itemsBySection = new HashMap<>();
+        Set<UUID> sectionIds = new HashSet<>();
+        for (var section : sectionRows) sectionIds.add(section.id());
         for (var row : itemRows) {
+            if (!sectionIds.contains(row.sectionId())) {
+                throw new IllegalStateException("Published Item pin has no layout Section.");
+            }
             var media = mediaByItem.getOrDefault(new ItemPosition(row.sectionId(), row.position()), List.of());
             var item = new PublicContentDtos.Item(row.itemId(), row.stableKey(), row.itemRevision(),
                     row.kind(), row.displayJa(), row.displayVi(), parsePayload(row.payload()),

@@ -13,8 +13,8 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 /** Upgrade test creates and removes only its own PostgreSQL schema. */
-class PopulatedV4ToV7MigrationTest {
-    @Test void populatedV4UpgradesThroughV7WithoutChangingIdentitiesOrderOrPublication() throws Exception {
+class PopulatedV4ToV9MigrationTest {
+    @Test void populatedV4UpgradesThroughV9WithoutChangingIdentitiesOrderOrPublication() throws Exception {
         String baseUrl = System.getenv("DB_URL");
         assertNotNull(baseUrl, "Use an isolated PostgreSQL test schema");
         assertTrue(baseUrl.matches("jdbc:postgresql://(?:localhost|127\\.0\\.0\\.1)(?::[0-9]+)?/[a-zA-Z0-9_]+\\?currentSchema=jpn021_[a-zA-Z0-9_]+"),
@@ -44,6 +44,18 @@ class PopulatedV4ToV7MigrationTest {
                     execute(db, "INSERT INTO content_item_revisions(item_id,revision,kind,payload,rights_id) VALUES('" + item + "',1,'kana','{}'::jsonb,'" + rights + "')");
                     execute(db, "UPDATE content_item_revisions SET sealed_at=now() WHERE item_id='" + item + "' AND revision=1");
                     execute(db, "UPDATE content_items SET published_revision=1 WHERE id='" + item + "'");
+                    execute(db, "INSERT INTO lesson_revisions(lesson_id,revision,title_vi,rights_id) VALUES('" + lesson + "',1,'Published Lesson','" + rights + "')");
+                    execute(db, "INSERT INTO lesson_revision_objectives(lesson_id,lesson_revision,position,kind,text_vi) VALUES('" + lesson + "',1,1,'can_do','Read kana')");
+                    execute(db, "INSERT INTO lesson_revision_sections(lesson_id,lesson_revision,section_id,position,title_vi) VALUES('" + lesson + "',1,'" + section + "',1,'Published Section')");
+                    execute(db, "INSERT INTO lesson_revision_items(lesson_id,lesson_revision,section_id,position,item_id,item_revision) VALUES('" + lesson + "',1,'" + section + "',1,'" + item + "',1)");
+                    execute(db, "UPDATE lesson_revisions SET sealed_at=now() WHERE lesson_id='" + lesson + "' AND revision=1");
+                    execute(db, "UPDATE lessons SET published_revision=1 WHERE id='" + lesson + "'");
+                    execute(db, "INSERT INTO path_revisions(path_id,revision,title_vi,rights_id) VALUES('" + path + "',1,'Published Path','" + rights + "')");
+                    execute(db, "INSERT INTO path_revision_stages(path_id,path_revision,stage_id,position,title_vi,rights_id) VALUES('" + path + "',1,'" + stage + "',1,'Published Stage','" + rights + "')");
+                    execute(db, "INSERT INTO path_revision_chapters(path_id,path_revision,stage_id,chapter_id,position,title_vi,rights_id) VALUES('" + path + "',1,'" + stage + "','" + chapter + "',1,'Published Chapter','" + rights + "')");
+                    execute(db, "INSERT INTO path_revision_lessons(path_id,path_revision,chapter_id,position,placement_id,lesson_id,lesson_revision) VALUES('" + path + "',1,'" + chapter + "',1,'" + placement + "','" + lesson + "',1)");
+                    execute(db, "UPDATE path_revisions SET sealed_at=now() WHERE path_id='" + path + "' AND revision=1");
+                    execute(db, "UPDATE learning_paths SET published_revision=1 WHERE id='" + path + "'");
                     assertEquals(1, scalar(db, "SELECT published_revision FROM content_items WHERE id='" + item + "'"));
                 }
                 Flyway throughV5 = flyway(url, user, password, schema, "5");
@@ -93,6 +105,20 @@ class PopulatedV4ToV7MigrationTest {
                     assertThrows(SQLException.class, () -> execute(db,
                             "UPDATE content_rights SET source_label='Changed' WHERE id='" + rights + "'"));
                     assertEquals(7, scalar(db, "SELECT count(*) FROM flyway_schema_history WHERE success"));
+                }
+                Flyway throughV9 = flyway(url, user, password, schema, "9");
+                throughV9.migrate();
+                throughV9.validate();
+                try (Connection db = DriverManager.getConnection(url, user, password)) {
+                    assertEquals(1, scalar(db, "SELECT published_revision FROM learning_paths WHERE id='" + path + "'"));
+                    assertEquals(1, scalar(db, "SELECT published_revision FROM lessons WHERE id='" + lesson + "'"));
+                    assertEquals(1, scalar(db, "SELECT count(*) FROM path_revision_lessons WHERE path_id='" + path + "' AND lesson_id='" + lesson + "' AND lesson_revision=1"));
+                    assertEquals(1, scalar(db, "SELECT count(*) FROM lesson_revision_items WHERE lesson_id='" + lesson + "' AND item_id='" + item + "' AND item_revision=1"));
+                    assertEquals(1, scalar(db, "SELECT count(*) FROM lesson_revisions WHERE lesson_id='" + lesson + "' AND presentation->'objectives'->0->>'textVi'='Read kana' AND presentation->'sections'->0->>'titleVi'='Published Section'"));
+                    assertEquals(1, scalar(db, "SELECT count(*) FROM path_revisions WHERE path_id='" + path + "' AND presentation->'stages'->0->>'titleVi'='Published Stage' AND presentation->'stages'->0->'chapters'->0->>'titleVi'='Published Chapter'"));
+                    assertEquals(1, scalar(db, "SELECT count(*) FROM path_revisions WHERE path_id='" + path + "' AND path_revision_public(path_id,revision)"));
+                    assertEquals(1, scalar(db, "SELECT count(*) FROM lesson_revisions WHERE lesson_id='" + lesson + "' AND lesson_revision_public(lesson_id,revision)"));
+                    assertEquals(9, scalar(db, "SELECT count(*) FROM flyway_schema_history WHERE success"));
                 }
             } finally {
                 execute(admin, "DROP SCHEMA " + schema + " CASCADE");

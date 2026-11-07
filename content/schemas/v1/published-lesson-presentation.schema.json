@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Published Lesson presentation v1",
+  "type": "object",
+  "required": ["schemaVersion", "objectives", "sections"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {"type": "string", "enum": ["1.0"]},
+    "objectives": {"type": "array", "maxItems": 1000, "items": {
+      "type": "object", "required": ["position", "kind", "textVi"], "additionalProperties": false,
+      "properties": {
+        "position": {"type": "integer", "minimum": 1, "maximum": 2147483647},
+        "kind": {"type": "string", "enum": ["can_do", "knowledge"]},
+        "textVi": {"type": "string", "maxLength": 4000}
+      }
+    }},
+    "sections": {"type": "array", "maxItems": 100, "items": {
+      "type": "object", "required": ["id", "position"], "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"},
+        "position": {"type": "integer", "minimum": 1, "maximum": 2147483647},
+        "titleVi": {"type": "string", "maxLength": 4000}
+      }
+    }}
+  }
+}

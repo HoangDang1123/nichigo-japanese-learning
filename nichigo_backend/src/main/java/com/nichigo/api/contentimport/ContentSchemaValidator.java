@@ -16,7 +16,8 @@ public final class ContentSchemaValidator {
 
     public ContentSchemaValidator(ObjectMapper mapper) {
         for (String name : new String[]{"manifest", "item", "rights", "media", "lesson", "path",
-                "kana", "vocabulary", "grammar", "kanji", "example", "dialogue"}) {
+                "kana", "vocabulary", "grammar", "kanji", "example", "dialogue",
+                "published-lesson-presentation", "published-path-presentation"}) {
             String resource = "content/schemas/v1/" + name + ".schema.json";
             try (InputStream input = getClass().getClassLoader().getResourceAsStream(resource)) {
                 if (input == null) throw new IllegalStateException("Missing schema: " + resource);

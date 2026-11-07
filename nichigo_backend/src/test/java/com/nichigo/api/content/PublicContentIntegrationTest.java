@@ -26,6 +26,21 @@ class PublicContentIntegrationTest {
     @Autowired JdbcTemplate jdbc;
     @Autowired MockMvc mvc;
     @Autowired PlatformTransactionManager transactions;
+    @Autowired PublishedContentPublicationBoundary publicationBoundary;
+
+    @Test
+    void publicationBoundaryAcceptsLockedCurrentCandidateAndRejectsStaleVersion() {
+        UUID rights = rights("cleared");
+        Lesson lesson = lesson(rights);
+        String presentation = "{\"schemaVersion\":\"1.0\",\"objectives\":[],\"sections\":[]}";
+        jdbc.update("INSERT INTO lesson_revisions(lesson_id,revision,title_vi,rights_id,presentation) " +
+                "VALUES(?,1,'Draft',?,?::jsonb)", lesson.id(), rights, presentation);
+        TransactionTemplate transaction = new TransactionTemplate(transactions);
+        transaction.executeWithoutResult(status ->
+                publicationBoundary.validateLesson(lesson.id(), 1, 1, presentation));
+        assertThrows(IllegalStateException.class, () -> transaction.executeWithoutResult(status ->
+                publicationBoundary.validateLesson(lesson.id(), 1, 2, presentation)));
+    }
 
     @Test
     void draftsAndReviewedLessonsAreNeverPublic() throws Exception { // PUB-01, PUB-02, API-03
@@ -84,8 +99,7 @@ class PublicContentIntegrationTest {
         assertThrows(DataAccessException.class, () -> jdbc.update(
                 "DELETE FROM lesson_revisions WHERE lesson_id=? AND revision=1", lesson.id()));
         assertThrows(DataAccessException.class, () -> jdbc.update(
-                "INSERT INTO lesson_revision_objectives(lesson_id,lesson_revision,position,kind,text_vi) " +
-                        "VALUES(?,1,1,'knowledge','late')", lesson.id()));
+                "UPDATE lesson_revisions SET presentation='{}'::jsonb WHERE lesson_id=? AND revision=1", lesson.id()));
         jdbc.update("UPDATE content_rights SET clearance_status='revoked' WHERE id=?", rights);
         assertEquals(false, jdbc.queryForObject("SELECT lesson_revision_public(?,1)", Boolean.class, lesson.id()));
         assertEquals(false, jdbc.queryForObject("SELECT lesson_revision_public(?,2)", Boolean.class, lesson.id()));
@@ -185,12 +199,13 @@ class PublicContentIntegrationTest {
                 placement, chapter, lesson.id());
         jdbc.update("INSERT INTO path_revisions(path_id,revision,title_vi,rights_id) VALUES(?,1,?,?)",
                 path, "Lộ trình", pathRights);
-        jdbc.update("INSERT INTO path_revision_stages(path_id,path_revision,stage_id,position,title_vi,rights_id) " +
-                "VALUES(?,1,?,1,?,?)", path, stage, "Giai đoạn", pathRights);
-        jdbc.update("INSERT INTO path_revision_chapters(path_id,path_revision,stage_id,chapter_id,position,title_vi,rights_id) " +
-                "VALUES(?,1,?,?,1,?,?)", path, stage, chapter, "Chương", pathRights);
+        jdbc.update("INSERT INTO path_revision_stages(path_id,path_revision,stage_id,rights_id) " +
+                "VALUES(?,1,?,?)", path, stage, pathRights);
+        jdbc.update("INSERT INTO path_revision_chapters(path_id,path_revision,stage_id,chapter_id,rights_id) " +
+                "VALUES(?,1,?,?,?)", path, stage, chapter, pathRights);
         jdbc.update("INSERT INTO path_revision_lessons(path_id,path_revision,chapter_id,position,placement_id,lesson_id,lesson_revision) " +
                 "VALUES(?,1,?,1,?,?,1)", path, chapter, placement, lesson.id());
+        setPathPresentation(path, 1);
         jdbc.update("UPDATE path_revisions SET sealed_at=now() WHERE path_id=? AND revision=1", path);
         jdbc.update("UPDATE learning_paths SET published_revision=1 WHERE id=?", path);
         mvc.perform(get("/api/v1/learning-paths/" + slug)).andExpect(status().isOk())
@@ -272,17 +287,18 @@ class PublicContentIntegrationTest {
 
         jdbc.update("INSERT INTO path_revisions(path_id,revision,title_vi,rights_id) VALUES(?,1,'Lộ trình',?)",
                 path, rights);
-        jdbc.update("INSERT INTO path_revision_stages(path_id,path_revision,stage_id,position,title_vi,rights_id) " +
-                "VALUES(?,1,?,2,'Stage 2',?),(?,1,?,1,'Stage 1',?)",
+        jdbc.update("INSERT INTO path_revision_stages(path_id,path_revision,stage_id,rights_id) " +
+                "VALUES(?,1,?,?),(?,1,?,?)",
                 path, stageTwo, rights, path, stageOne, rights);
-        jdbc.update("INSERT INTO path_revision_chapters(path_id,path_revision,stage_id,chapter_id,position,title_vi,rights_id) " +
-                "VALUES(?,1,?,?,1,'Chapter 3',?),(?,1,?,?,2,'Chapter 2',?),(?,1,?,?,1,'Chapter 1',?)",
+        jdbc.update("INSERT INTO path_revision_chapters(path_id,path_revision,stage_id,chapter_id,rights_id) " +
+                "VALUES(?,1,?,?,?),(?,1,?,?,?),(?,1,?,?,?)",
                 path, stageTwo, chapterThree, rights, path, stageOne, chapterTwo, rights,
                 path, stageOne, chapterOne, rights);
         jdbc.update("INSERT INTO path_revision_lessons(path_id,path_revision,chapter_id,position,placement_id,lesson_id,lesson_revision) " +
                 "VALUES(?,1,?,2,?,?,1),(?,1,?,1,?,?,1),(?,1,?,1,?,?,1),(?,1,?,1,?,?,1)",
                 path, chapterOne, placementTwo, second.id(), path, chapterOne, placementOne, first.id(),
                 path, chapterTwo, placementThree, third.id(), path, chapterThree, placementFour, first.id());
+        setPathPresentation(path, 1);
         jdbc.update("UPDATE path_revisions SET sealed_at=now() WHERE path_id=? AND revision=1", path);
         jdbc.update("UPDATE learning_paths SET published_revision=1 WHERE id=?", path);
 
@@ -337,14 +353,21 @@ class PublicContentIntegrationTest {
         UUID sectionOne = section(lesson.id(), 1), sectionTwo = section(lesson.id(), 2);
         jdbc.update("INSERT INTO lesson_revisions(lesson_id,revision,title_vi,rights_id) VALUES(?,1,'Thứ tự',?)",
                 lesson.id(), rights);
-        jdbc.update("INSERT INTO lesson_revision_objectives(lesson_id,lesson_revision,position,kind,text_vi) " +
-                "VALUES(?,1,2,'knowledge','Second'),(?,1,1,'can_do','First')", lesson.id(), lesson.id());
-        jdbc.update("INSERT INTO lesson_revision_sections(lesson_id,lesson_revision,section_id,position) " +
-                "VALUES(?,1,?,2),(?,1,?,1)", lesson.id(), sectionTwo, lesson.id(), sectionOne);
         jdbc.update("INSERT INTO lesson_revision_items(lesson_id,lesson_revision,section_id,position,item_id,item_revision) " +
                 "VALUES(?,1,?,2,?,1),(?,1,?,1,?,1),(?,1,?,1,?,1)",
                 lesson.id(), sectionOne, second.id(), lesson.id(), sectionOne, first.id(),
                 lesson.id(), sectionTwo, second.id());
+        jdbc.update("""
+                UPDATE lesson_revisions SET presentation=jsonb_build_object(
+                  'schemaVersion','1.0',
+                  'objectives',jsonb_build_array(
+                    jsonb_build_object('position',2,'kind','knowledge','textVi','Second'),
+                    jsonb_build_object('position',1,'kind','can_do','textVi','First')),
+                  'sections',jsonb_build_array(
+                    jsonb_build_object('id',?::text,'position',2),
+                    jsonb_build_object('id',?::text,'position',1)))
+                WHERE lesson_id=? AND revision=1
+                """, sectionTwo, sectionOne, lesson.id());
         jdbc.update("UPDATE lesson_revisions SET sealed_at=now() WHERE lesson_id=? AND revision=1", lesson.id());
         jdbc.update("UPDATE lessons SET published_revision=1 WHERE id=?", lesson.id());
         mvc.perform(get("/api/v1/lessons/" + lesson.slug())).andExpect(status().isOk())
@@ -366,10 +389,9 @@ class PublicContentIntegrationTest {
         for (int revision : new int[] {2, 3}) {
             jdbc.update("INSERT INTO lesson_revisions(lesson_id,revision,title_vi,rights_id) VALUES(?,?,?,?)",
                     lesson.id(), revision, "Bài " + revision, rights);
-            jdbc.update("INSERT INTO lesson_revision_sections(lesson_id,lesson_revision,section_id,position) " +
-                    "VALUES(?,?,?,1)", lesson.id(), revision, section);
             jdbc.update("INSERT INTO lesson_revision_items(lesson_id,lesson_revision,section_id,position,item_id,item_revision) " +
                     "VALUES(?,?,?,1,?,1)", lesson.id(), revision, section, item.id());
+            setLessonPresentation(lesson.id(), revision);
             jdbc.update("UPDATE lesson_revisions SET sealed_at=now() WHERE lesson_id=? AND revision=?",
                     lesson.id(), revision);
         }
@@ -512,12 +534,13 @@ class PublicContentIntegrationTest {
             publishLesson(lesson, lessonRight, item, 1, 1, "Lesson", section(lesson.id(), 1));
             PathFixture path = pathFixture(pathRight, lesson);
             jdbc.update("INSERT INTO path_revisions(path_id,revision,title_vi,rights_id) VALUES(?,1,'Path',?)", path.id(), pathRight);
-            jdbc.update("INSERT INTO path_revision_stages(path_id,path_revision,stage_id,position,title_vi,rights_id) " +
-                    "VALUES(?,1,?,1,'Stage',?)", path.id(), path.stage(), stageRight);
-            jdbc.update("INSERT INTO path_revision_chapters(path_id,path_revision,stage_id,chapter_id,position,title_vi,rights_id) " +
-                    "VALUES(?,1,?,?,1,'Chapter',?)", path.id(), path.stage(), path.chapter(), chapterRight);
+            jdbc.update("INSERT INTO path_revision_stages(path_id,path_revision,stage_id,rights_id) " +
+                    "VALUES(?,1,?,?)", path.id(), path.stage(), stageRight);
+            jdbc.update("INSERT INTO path_revision_chapters(path_id,path_revision,stage_id,chapter_id,rights_id) " +
+                    "VALUES(?,1,?,?,?)", path.id(), path.stage(), path.chapter(), chapterRight);
             jdbc.update("INSERT INTO path_revision_lessons(path_id,path_revision,chapter_id,position,placement_id,lesson_id,lesson_revision) " +
                     "VALUES(?,1,?,1,?,?,1)", path.id(), path.chapter(), path.placement(), lesson.id());
+            setPathPresentation(path.id(), 1);
             jdbc.update("UPDATE path_revisions SET sealed_at=now() WHERE path_id=? AND revision=1", path.id());
             jdbc.update("UPDATE learning_paths SET published_revision=1 WHERE id=?", path.id());
             assertTrue(jdbc.queryForObject("SELECT path_revision_public(?,1)", Boolean.class, path.id()));
@@ -540,15 +563,15 @@ class PublicContentIntegrationTest {
         PathFixture path = pathFixture(right, lesson);
         jdbc.update("INSERT INTO path_revisions(path_id,revision,title_vi,rights_id) VALUES(?,1,'Path',?)", path.id(), right);
         assertThrows(DataAccessException.class, () -> jdbc.update(
-                "INSERT INTO path_revision_stages(path_id,path_revision,stage_id,position,title_vi,rights_id) " +
-                "VALUES(?,1,?,1,'Stage',NULL)", path.id(), path.stage()));
-        jdbc.update("INSERT INTO path_revision_stages(path_id,path_revision,stage_id,position,title_vi,rights_id) " +
-                "VALUES(?,1,?,1,'Stage',?)", path.id(), path.stage(), right);
+                "INSERT INTO path_revision_stages(path_id,path_revision,stage_id,rights_id) " +
+                "VALUES(?,1,?,NULL)", path.id(), path.stage()));
+        jdbc.update("INSERT INTO path_revision_stages(path_id,path_revision,stage_id,rights_id) " +
+                "VALUES(?,1,?,?)", path.id(), path.stage(), right);
         assertThrows(DataAccessException.class, () -> jdbc.update(
-                "INSERT INTO path_revision_chapters(path_id,path_revision,stage_id,chapter_id,position,title_vi,rights_id) " +
-                "VALUES(?,1,?,?,1,'Chapter',NULL)", path.id(), path.stage(), path.chapter()));
-        jdbc.update("INSERT INTO path_revision_chapters(path_id,path_revision,stage_id,chapter_id,position,title_vi,rights_id) " +
-                "VALUES(?,1,?,?,1,'Chapter',?)", path.id(), path.stage(), path.chapter(), right);
+                "INSERT INTO path_revision_chapters(path_id,path_revision,stage_id,chapter_id,rights_id) " +
+                "VALUES(?,1,?,?,NULL)", path.id(), path.stage(), path.chapter()));
+        jdbc.update("INSERT INTO path_revision_chapters(path_id,path_revision,stage_id,chapter_id,rights_id) " +
+                "VALUES(?,1,?,?,?)", path.id(), path.stage(), path.chapter(), right);
         assertThrows(DataAccessException.class, () -> jdbc.update(
                 "INSERT INTO path_revision_lessons(path_id,path_revision,chapter_id,position,placement_id,lesson_id,lesson_revision) " +
                 "VALUES(?,1,?,1,?,?,1)", path.id(), path.chapter(), path.placement(), lesson.id()));
@@ -583,6 +606,66 @@ class PublicContentIntegrationTest {
         assertTrue(jdbc.queryForObject("SELECT path_revision_public(?,1)", Boolean.class, path));
         jdbc.update("UPDATE learning_paths SET withdrawn_at=now() WHERE id=?", path);
         assertFalse(jdbc.queryForObject("SELECT path_revision_public(?,1)", Boolean.class, path));
+    }
+
+    @Test
+    void malformedLessonLayoutCannotSealOrExposePins() throws Exception {
+        UUID right = rights("cleared");
+        Item item = item(right);
+        publishItem(item, right, 1, "a");
+        Lesson lesson = lesson(right);
+        UUID section = section(lesson.id(), 1);
+        jdbc.update("INSERT INTO lesson_revisions(lesson_id,revision,title_vi,rights_id) VALUES(?,1,'Lesson',?)",
+                lesson.id(), right);
+        jdbc.update("INSERT INTO lesson_revision_items(lesson_id,lesson_revision,section_id,position,item_id,item_revision) " +
+                "VALUES(?,1,?,1,?,1)", lesson.id(), section, item.id());
+        jdbc.update("UPDATE lesson_revisions SET presentation=?::jsonb WHERE lesson_id=? AND revision=1",
+                "{\"schemaVersion\":\"2.0\",\"objectives\":[],\"sections\":[]}", lesson.id());
+        assertThrows(DataAccessException.class, () -> jdbc.update(
+                "UPDATE lesson_revisions SET sealed_at=now() WHERE lesson_id=? AND revision=1", lesson.id()));
+        jdbc.update("UPDATE lesson_revisions SET presentation=?::jsonb WHERE lesson_id=? AND revision=1",
+                "{\"schemaVersion\":\"1.0\",\"objectives\":[],\"sections\":[]}", lesson.id());
+        assertThrows(DataAccessException.class, () -> jdbc.update(
+                "UPDATE lesson_revisions SET sealed_at=now() WHERE lesson_id=? AND revision=1", lesson.id()));
+        mvc.perform(get("/api/v1/lessons/" + lesson.slug())).andExpect(status().isNotFound());
+        setLessonPresentation(lesson.id(), 1);
+        jdbc.update("UPDATE lesson_revisions SET sealed_at=now() WHERE lesson_id=? AND revision=1", lesson.id());
+        jdbc.update("UPDATE lessons SET published_revision=1 WHERE id=?", lesson.id());
+        mvc.perform(get("/api/v1/lessons/" + lesson.slug())).andExpect(status().isOk());
+        assertThrows(DataAccessException.class, () -> jdbc.update(
+                "UPDATE lesson_revisions SET presentation='{}'::jsonb WHERE lesson_id=? AND revision=1", lesson.id()));
+    }
+
+    @Test
+    void duplicateOrOmittedPathLayoutCannotSeal() {
+        UUID right = rights("cleared");
+        Item item = item(right);
+        publishItem(item, right, 1, "a");
+        Lesson lesson = lesson(right);
+        publishLesson(lesson, right, item, 1, 1, "Lesson", section(lesson.id(), 1));
+        PathFixture path = pathFixture(right, lesson);
+        jdbc.update("INSERT INTO path_revisions(path_id,revision,title_vi,rights_id) VALUES(?,1,'Path',?)", path.id(), right);
+        jdbc.update("INSERT INTO path_revision_stages(path_id,path_revision,stage_id,rights_id) VALUES(?,1,?,?)",
+                path.id(), path.stage(), right);
+        jdbc.update("INSERT INTO path_revision_chapters(path_id,path_revision,stage_id,chapter_id,rights_id) " +
+                "VALUES(?,1,?,?,?)", path.id(), path.stage(), path.chapter(), right);
+        jdbc.update("INSERT INTO path_revision_lessons(path_id,path_revision,chapter_id,position,placement_id,lesson_id,lesson_revision) " +
+                "VALUES(?,1,?,1,?,?,1)", path.id(), path.chapter(), path.placement(), lesson.id());
+        assertThrows(DataAccessException.class, () -> jdbc.update(
+                "UPDATE path_revisions SET sealed_at=now() WHERE path_id=? AND revision=1", path.id()));
+        setPathPresentation(path.id(), 1);
+        jdbc.update("UPDATE path_revisions SET presentation=jsonb_set(presentation,'{stages,0,chapters}', " +
+                "(presentation->'stages'->0->'chapters') || (presentation->'stages'->0->'chapters')) " +
+                "WHERE path_id=? AND revision=1", path.id());
+        assertThrows(DataAccessException.class, () -> jdbc.update(
+                "UPDATE path_revisions SET sealed_at=now() WHERE path_id=? AND revision=1", path.id()));
+        setPathPresentation(path.id(), 1);
+        jdbc.update("UPDATE path_revisions SET sealed_at=now() WHERE path_id=? AND revision=1", path.id());
+        jdbc.update("UPDATE learning_paths SET published_revision=1 WHERE id=?", path.id());
+        assertTrue(jdbc.queryForObject("SELECT path_revision_public(?,1)", Boolean.class, path.id()));
+        assertThrows(DataAccessException.class, () -> jdbc.update(
+                "INSERT INTO path_revision_lessons(path_id,path_revision,chapter_id,position,placement_id,lesson_id,lesson_revision) " +
+                "VALUES(?,1,?,2,?,?,1)", path.id(), path.chapter(), path.placement(), lesson.id()));
     }
 
     private int racePointer(UUID lessonId, int revision, CountDownLatch ready, CountDownLatch go) {
@@ -638,12 +721,9 @@ class PublicContentIntegrationTest {
                                int revision, String title, UUID section) {
         jdbc.update("INSERT INTO lesson_revisions(lesson_id,revision,title_vi,rights_id) VALUES(?,?,?,?)",
                 lesson.id(), revision, title, rights);
-        jdbc.update("INSERT INTO lesson_revision_objectives(lesson_id,lesson_revision,position,kind,text_vi) " +
-                "VALUES(?,?,1,'can_do','Nhận biết âm đã học')", lesson.id(), revision);
-        jdbc.update("INSERT INTO lesson_revision_sections(lesson_id,lesson_revision,section_id,position) " +
-                "VALUES(?,?,?,1)", lesson.id(), revision, section);
         jdbc.update("INSERT INTO lesson_revision_items(lesson_id,lesson_revision,section_id,position,item_id,item_revision) " +
                 "VALUES(?,?,?,1,?,?)", lesson.id(), revision, section, item.id(), itemRevision);
+        setLessonPresentation(lesson.id(), revision);
         jdbc.update("UPDATE lesson_revisions SET sealed_at=now() WHERE lesson_id=? AND revision=?",
                 lesson.id(), revision);
         jdbc.update("UPDATE lessons SET published_revision=? WHERE id=?", revision, lesson.id());
@@ -667,15 +747,51 @@ class PublicContentIntegrationTest {
                                      int revision, int lessonRevision) {
         jdbc.update("INSERT INTO path_revisions(path_id,revision,title_vi,rights_id) VALUES(?,?,?,?)",
                 path.id(), revision, "Lộ trình " + revision, rights);
-        jdbc.update("INSERT INTO path_revision_stages(path_id,path_revision,stage_id,position,title_vi,rights_id) " +
-                "VALUES(?,?,?,1,'Giai đoạn',?)", path.id(), revision, path.stage(), rights);
-        jdbc.update("INSERT INTO path_revision_chapters(path_id,path_revision,stage_id,chapter_id,position,title_vi,rights_id) " +
-                "VALUES(?,?,?,?,1,'Chương',?)", path.id(), revision, path.stage(), path.chapter(), rights);
+        jdbc.update("INSERT INTO path_revision_stages(path_id,path_revision,stage_id,rights_id) " +
+                "VALUES(?,?,?,?)", path.id(), revision, path.stage(), rights);
+        jdbc.update("INSERT INTO path_revision_chapters(path_id,path_revision,stage_id,chapter_id,rights_id) " +
+                "VALUES(?,?,?,?,?)", path.id(), revision, path.stage(), path.chapter(), rights);
         jdbc.update("INSERT INTO path_revision_lessons(path_id,path_revision,chapter_id,position,placement_id,lesson_id,lesson_revision) " +
                 "VALUES(?,?,?,1,?,?,?)", path.id(), revision, path.chapter(), path.placement(),
                 lesson.id(), lessonRevision);
+        setPathPresentation(path.id(), revision);
         jdbc.update("UPDATE path_revisions SET sealed_at=now() WHERE path_id=? AND revision=?", path.id(), revision);
         jdbc.update("UPDATE learning_paths SET published_revision=? WHERE id=?", revision, path.id());
+    }
+
+    private void setLessonPresentation(UUID lessonId, int revision) {
+        jdbc.update("""
+                UPDATE lesson_revisions lr SET presentation=jsonb_build_object(
+                  'schemaVersion','1.0',
+                  'objectives',jsonb_build_array(jsonb_build_object(
+                    'position',1,'kind','can_do','textVi','Nhận biết âm đã học')),
+                  'sections',COALESCE((
+                    SELECT jsonb_agg(jsonb_strip_nulls(jsonb_build_object(
+                      'id',s.id,'position',s.position,'titleVi',s.title_vi)) ORDER BY s.position)
+                    FROM lesson_sections s WHERE s.lesson_id=lr.lesson_id), '[]'::jsonb))
+                WHERE lr.lesson_id=? AND lr.revision=?
+                """, lessonId, revision);
+    }
+
+    private void setPathPresentation(UUID pathId, int revision) {
+        jdbc.update("""
+                UPDATE path_revisions pr SET presentation=jsonb_build_object(
+                  'schemaVersion','1.0',
+                  'stages',COALESCE((
+                    SELECT jsonb_agg(jsonb_strip_nulls(jsonb_build_object(
+                      'id',s.id,'position',s.position,'titleVi',s.title_vi,
+                      'descriptionVi',s.description_vi,
+                      'chapters',COALESCE((
+                        SELECT jsonb_agg(jsonb_strip_nulls(jsonb_build_object(
+                          'id',c.id,'position',c.position,'titleVi',c.title_vi,
+                          'descriptionVi',c.description_vi)) ORDER BY c.position)
+                        FROM path_revision_chapters pc JOIN stage_chapters c ON c.id=pc.chapter_id
+                        WHERE pc.path_id=pr.path_id AND pc.path_revision=pr.revision
+                          AND pc.stage_id=s.id), '[]'::jsonb))) ORDER BY s.position)
+                    FROM path_revision_stages ps JOIN path_stages s ON s.id=ps.stage_id
+                    WHERE ps.path_id=pr.path_id AND ps.path_revision=pr.revision), '[]'::jsonb))
+                WHERE pr.path_id=? AND pr.revision=?
+                """, pathId, revision);
     }
 
     private record Item(UUID id, String key) {}

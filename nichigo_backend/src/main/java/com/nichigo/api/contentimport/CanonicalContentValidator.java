@@ -19,9 +19,20 @@ public final class CanonicalContentValidator {
     public static final int MAX_DIAGNOSTICS = 200;
     private static final List<String> FILE_TYPES = List.of("rights", "media", "items", "lessons", "paths");
     private final ContentSchemaValidator schemas;
+    private final PublishedPresentationValidator publishedPresentation;
 
     public CanonicalContentValidator(ObjectMapper mapper) {
         this.schemas = new ContentSchemaValidator(mapper);
+        this.publishedPresentation = new PublishedPresentationValidator(mapper, schemas);
+    }
+
+    /** Validate an immutable layout without parsing a package or trusting a client. */
+    public JsonNode validatePublishedLessonPresentation(String json) {
+        return publishedPresentation.lesson(json);
+    }
+
+    public JsonNode validatePublishedPathPresentation(String json) {
+        return publishedPresentation.path(json);
     }
 
     public ValidationReport validate(Map<String, List<CanonicalRecord>> groups,

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Published Path presentation v1",
+  "type": "object",
+  "required": ["schemaVersion", "stages"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {"type": "string", "enum": ["1.0"]},
+    "stages": {"type": "array", "maxItems": 100, "items": {
+      "type": "object", "required": ["id", "position", "titleVi", "chapters"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"},
+        "position": {"type": "integer", "minimum": 1, "maximum": 2147483647},
+        "titleVi": {"type": "string", "maxLength": 4000},
+        "descriptionVi": {"type": "string", "maxLength": 4000},
+        "chapters": {"type": "array", "maxItems": 100, "items": {
+          "type": "object", "required": ["id", "position", "titleVi"],
+          "additionalProperties": false,
+          "properties": {
+            "id": {"type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"},
+            "position": {"type": "integer", "minimum": 1, "maximum": 2147483647},
+            "titleVi": {"type": "string", "maxLength": 4000},
+            "descriptionVi": {"type": "string", "maxLength": 4000}
+          }
+        }}
+      }
+    }}
+  }
+}

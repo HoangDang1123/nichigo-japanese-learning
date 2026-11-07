@@ -3,7 +3,7 @@
 ## System topology
 `Browser → Vercel / Next.js → HTTPS → Render Free / Spring Boot → TLS PostgreSQL → Neon Free`
 
-This is the **target deployment topology**, not a deployed environment verified by this repository. Current source has a Next.js frontend, Spring Boot backend, PostgreSQL/Flyway configuration, session auth, JPN-020 public content reads, and JPN-021 validation on this feature branch. Hosting, quota, progress and production import remain planned.
+This is the **target deployment topology**, not a deployed environment verified by this repository. Current source has a Next.js frontend, Spring Boot backend, PostgreSQL/Flyway configuration, session auth, JPN-020 public content reads, and JPN-021 validation merged in `origin/main`. JPN-ARCH-002 hardening is on a review branch. Hosting, quota, progress and production import remain planned.
 
 - Next.js TypeScript frontend. Java Spring Boot modular monolith REST API.
 - Neon managed PostgreSQL; Flyway migration history in repository.
@@ -28,7 +28,7 @@ antigravity/              # Agent operating guide
 ```
 
 ## Data model (conceptual, adjust with migrations)
-The list below is the historical target sketch, not a table-by-table description of current migrations. `origin/main` has V1 baseline, V2 `users`, V3 Spring Session, and V4 learning-content tables described below. JPN-021 adds V5 authoring keys on this feature branch; guest, quiz and progress tables remain absent. See JPN-002 and JPN-010A implementation notes for the earlier schema.
+The list below is the historical target sketch, not a table-by-table description of current migrations. `origin/main` has V1 baseline, V2 `users`, V3 Spring Session, V4 learning-content tables and V5 authoring keys. JPN-ARCH-002 adds V6 Rights history and V7 Path eligibility on its review branch; guest, quiz and progress tables remain absent. See JPN-002 and JPN-010A implementation notes for the earlier schema.
 The [Nichigo Hybrid curriculum proposal](04-CONTENT-AND-LEARNING.md) adds a conceptual Learning Path → Stage → Chapter → Lesson hierarchy, independent Skills/Practice entry points, and separate lesson-completion versus item-mastery concerns. The JPN-020 branch represents the hierarchy with identified tables; the Railway station granularity remains open.
 
 - `users(id,email,password_hash,status,created_at)`; `auth_sessions(id,user_id,expires_at,revoked_at)`.
@@ -79,7 +79,13 @@ The independent `/api/v1/lessons/{slug}` read resolves the Lesson root's current
 
 Kind-specific Item fields are JSONB with a DB object check; JPN-021 validates their kind-specific shapes before authoring. JPN-022 owns import and production publication/withdrawal operations. JPN-023 owns reviewed content. JPN-030 and JPN-031 consume published reads. JPN-032 records graded attempts with pinned revision keys, while JPN-040 owns lesson completion and item mastery separately. Neither JF/CEFR nor JLPT equivalence is inferred by the schema.
 
-## JPN-021 package validation and authoring boundary (feature branch)
+## JPN-ARCH-002 rights history and Path eligibility (review branch)
+
+V6 adds append-only `content_rights_events`. It captures the current V4/V5 Rights state at upgrade and each later clearance transition, including private provenance evidence. Once a Rights row is cleared, its reviewed source, attribution, permission basis, evidence reference and review timestamp cannot change; clearance may only stay cleared or become revoked. A revoked row cannot be reapproved. Review actor authorization and event attribution belong to JPN-022; the V6 baseline cannot reconstruct changes made before upgrade. The event table is internal and must not be exposed through public APIs.
+
+V7 replaces the Path SQL function's repeated nested Lesson/Item/Media eligibility calls with set-based checks over the exact pinned revision graph. It checks root, Stage, Chapter, Lesson, Item and Media Rights, sealing and withdrawal. Existing foreign keys and `NOT NULL` rights on published Stage/Chapter rows remain. The root pointer and Option B pin behavior do not change. Local synthetic benchmark evidence and draft-model comparison are in [JPN-ARCH-002](implementation/JPN-ARCH-002-content-architecture.md).
+
+## JPN-021 package validation and authoring boundary (merged in `origin/main`)
 
 The offline CLI reads a flat directory of bounded UTF-8 files. `ContentPackageValidator` validates the versioned manifest, parses strict CSV for Rights/Items/Media and JSON arrays for Lessons/Paths, then passes normalized `CanonicalRecord` values to `CanonicalContentValidator`. The latter applies closed-field schemas, kind-specific payload rules, duplicate/order checks, reference and prerequisite-cycle checks, and rights/media checks. A future CMS or JPN-022 operator can call this same normalized-record validator without parsing package files. `ContentSchemaValidator` reads the checked-in schema subset and operates on `JsonNode` values; it is not a general-purpose JSON Schema implementation.
 

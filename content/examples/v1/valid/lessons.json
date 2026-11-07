@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "lessons": [{
+    "key": "intro-kana-a",
+    "slug": "intro-kana-a",
+    "titleVi": "Nhận biết chữ あ",
+    "rightsKey": "original-sample",
+    "objectives": [{"position": 1, "kind": "knowledge", "textVi": "Nhận ra chữ あ."}],
+    "sections": [{"key": "recognition", "position": 1,
+      "items": [{"position": 1, "itemKey": "kana-a"}]}]
+  }]
+}

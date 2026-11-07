@@ -5,7 +5,7 @@ import {
   Grid2X2, Languages, PencilLine, Play, Sparkles,
 } from "lucide-react";
 import type { AuthStatus } from "@/store/slices/auth-slice";
-import styles from "@/app/home.module.css";
+import styles from "../../app/home.module.css";
 
 /** Only verified JPN-040/041 learning data may populate this model. */
 export interface HomeProgress {

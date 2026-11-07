@@ -29,6 +29,8 @@
  --color-surface: #ffffff;
  --color-surface-hover: #fff0f5;
  --color-surface-raised: #f9e4ed;
+ --color-skeleton-base: #f1e5eb;
+ --color-skeleton-highlight: #faf2f6;
 
  /* Typography / Text */
  --color-text: #30252c;
@@ -77,6 +79,8 @@
  --color-surface: #22262b;
  --color-surface-hover: #2e343a;
  --color-surface-raised: #393f46;
+ --color-skeleton-base: #343941;
+ --color-skeleton-highlight: #424750;
 
  /* Typography / Text */
  --color-text: #f0edf0;
@@ -125,6 +129,8 @@
   --color-surface: #22262b;
   --color-surface-hover: #2e343a;
   --color-surface-raised: #393f46;
+  --color-skeleton-base: #343941;
+  --color-skeleton-highlight: #424750;
 
   --color-text: #f0edf0;
   --color-text-muted: #bcb6bd;

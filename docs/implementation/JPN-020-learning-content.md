@@ -41,17 +41,20 @@ The integration suite uses real local PostgreSQL 17; H2 is not used. Set `DB_URL
 
 | IDs | Result | Evidence or remaining responsibility |
 | --- | --- | --- |
-| PUB-01–07, PUB-09–10 | PASS | Draft/reviewed 404; v1 survives draft edits; v2 switches while v1 remains; revision mutation and deletion rejected; old item revision reused. |
+| PUB-01–03, PUB-05–07, PUB-09–10 | PASS | Draft/reviewed 404; v1 published; v2 switches while v1 remains; revision mutation and deletion rejected; old item revision reused. |
+| PUB-04 | PARTIAL | Editing the draft title and item position leaves v1 unchanged; editing draft objectives, sections and item membership in the same test remains to be covered. |
 | PUB-08 | PASS | Duplicate `(lesson_id, revision)` rejected. |
 | INT-01–07, INT-09 | PASS | Stable keys/order/foreign keys/self-prerequisite/pointers and restrictive deletion exercised. Three lessons reuse one item. |
 | INT-08 | DEFERRED | JPN-022 must validate a prerequisite graph before publication; DB currently rejects only self-reference. |
 | INT-10 | PASS (design) | Relational pinned edges are the single published representation; no independent frozen document can diverge. |
 | RGT-01–04, RGT-06–08 | PASS | Uncleared sealing fails; shared item/media revocation blocks dependent reads; evidence hidden; referenced rights cannot be deleted. |
 | RGT-05 | PARTIAL | DB prevents revoked-to-cleared transition; JPN-022 must implement authorized re-review on a new record. |
-| CON-01–02, CON-06, CON-08 | PASS (primitives) | Two conditional pointer updates race; one wins. Failed fixture transaction rolls back revision. No production publisher exists. |
+| CON-01–02 | PASS (primitives) | Two conditional pointer updates race; one wins. Failed fixture transaction rolls back a revision before the pointer switch. No production publisher exists. |
+| CON-06, CON-08 | PARTIAL | Duplicate revision and failed root insertion/rollback are exercised; ambiguous-timeout retry and rollback after inserting child edges need JPN-022 workflow tests. |
 | CON-03–05 | DEFERRED | Multi-root publish orchestration and editorial compare-and-swap enforcement remain JPN-022 acceptance work. Repeatable-read service and immutable pointers are present. |
 | CON-07 | PASS | A separate transaction publishes a fixture but holds commit; public GET remains 404 until commit, then returns 200. |
-| API-01, API-03–10 | PASS/PARTIAL | Hierarchy, 404/400, filtered Skills, rights, no storage key/evidence, pagination bounds, no public audit route exercised. Multi-sibling Path order coverage should expand with JPN-023 content. |
+| API-01 | PARTIAL | Stage/Chapter/Lesson grouping is exercised; ordering across multiple siblings needs a dedicated fixture. |
+| API-03–10 | PASS/PARTIAL | Draft 404, 400, filtered Skills, rights, no storage key/evidence and pagination bounds are exercised. API-04 has no public audit route by controller inspection, but no dedicated 404 assertion. |
 | API-02 | PASS | Multiple sections, items and objectives inserted out of order are returned in position order. |
 
 ## Performance observations

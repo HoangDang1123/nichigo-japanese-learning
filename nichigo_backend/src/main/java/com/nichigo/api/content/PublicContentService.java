@@ -75,6 +75,23 @@ public class PublicContentService {
     @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
     public PublicContentDtos.Lesson lesson(String slug) {
         var root = repository.publishedLesson(slug).orElseThrow(ContentNotFoundException::new);
+        return assembleLesson(root);
+    }
+
+    @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
+    public PublicContentDtos.Lesson lessonAtPlacement(String pathSlug, String placementId) {
+        UUID id;
+        try {
+            id = UUID.fromString(placementId);
+        } catch (IllegalArgumentException ex) {
+            throw new ContentNotFoundException();
+        }
+        var root = repository.lessonAtPublishedPlacement(pathSlug, id)
+                .orElseThrow(ContentNotFoundException::new);
+        return assembleLesson(root);
+    }
+
+    private PublicContentDtos.Lesson assembleLesson(PublicContentRepository.LessonHead root) {
         var sectionRows = repository.sections(root.id(), root.revision());
         var itemRows = repository.lessonItems(root.id(), root.revision());
         if (sectionRows.size() > 100 || itemRows.size() > 1000) {

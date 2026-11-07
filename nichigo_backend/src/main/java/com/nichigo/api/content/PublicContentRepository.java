@@ -100,6 +100,23 @@ public class PublicContentRepository {
                 slug).stream().findFirst();
     }
 
+    public Optional<LessonHead> lessonAtPublishedPlacement(String pathSlug, UUID placementId) {
+        return jdbc.query("""
+                SELECT l.id, l.slug, lr.revision, lr.title_vi, lr.summary_vi
+                FROM learning_paths p
+                JOIN path_revision_lessons pl
+                  ON pl.path_id = p.id AND pl.path_revision = p.published_revision
+                JOIN lesson_revisions lr
+                  ON lr.lesson_id = pl.lesson_id AND lr.revision = pl.lesson_revision
+                JOIN lessons l ON l.id = pl.lesson_id
+                WHERE p.slug = ? AND pl.placement_id = ?
+                  AND path_revision_public(p.id, p.published_revision)
+                  AND lesson_revision_public(l.id, lr.revision)
+                """, (rs, n) -> new LessonHead(rs.getObject("id", UUID.class), rs.getString("slug"),
+                rs.getInt("revision"), rs.getString("title_vi"), rs.getString("summary_vi")),
+                pathSlug, placementId).stream().findFirst();
+    }
+
     public List<ObjectiveRow> objectives(UUID lessonId, int revision) {
         return jdbc.query("""
                 SELECT position, kind, text_vi FROM lesson_revision_objectives

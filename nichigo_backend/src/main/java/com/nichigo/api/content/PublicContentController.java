@@ -23,6 +23,12 @@ public class PublicContentController {
     @GetMapping("/learning-paths/{slug}")
     public PublicContentDtos.Path path(@PathVariable String slug) { return content.path(slug); }
 
+    @GetMapping("/learning-paths/{pathSlug}/placements/{placementId}/lesson")
+    public PublicContentDtos.Lesson lessonAtPlacement(@PathVariable String pathSlug,
+                                                       @PathVariable String placementId) {
+        return content.lessonAtPlacement(pathSlug, placementId);
+    }
+
     @GetMapping("/lessons/{slug}")
     public PublicContentDtos.Lesson lesson(@PathVariable String slug) { return content.lesson(slug); }
 

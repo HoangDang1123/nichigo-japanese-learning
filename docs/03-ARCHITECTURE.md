@@ -3,9 +3,9 @@
 ## System topology
 `Browser → Vercel / Next.js → HTTPS → Render Free / Spring Boot → TLS PostgreSQL → Neon Free`
 
-This is the **target deployment topology**, not a deployed environment verified by this repository. Current source has a Next.js frontend, Spring Boot backend, PostgreSQL/Flyway configuration, session auth, JPN-020 public content reads, and JPN-021 validation merged in `origin/main`. JPN-ARCH-002 hardening is on a review branch. Hosting, quota, progress and production import remain planned.
+This is the **target deployment topology**, not a deployed environment verified by this repository. Current source has a Next.js frontend, Spring Boot backend, PostgreSQL/Flyway configuration, session auth, JPN-020 public content reads, and JPN-021 validation merged in `origin/main`. JPN-ARCH-002 hardening is merged into `main`. Hosting, quota, progress and production import remain planned.
 
-JPN-ARCH-003 is stacked on the JPN-ARCH-002 review branch. Its V8/V9 hybrid published model stores Lesson objectives/Section layout and Path Stage/Chapter display hierarchy in sealed revision JSONB. Stable identities, Stage/Chapter Rights and exact Path→Lesson→Item→Media revision pins stay relational. See [the implementation note](implementation/JPN-ARCH-003-hybrid-published-content.md) for migration and validation boundaries. This is not a production publisher.
+JPN-ARCH-003 PR #26 now targets `main` after PR #25 merged. It evaluates a V8/V9 hybrid published model that stores Lesson objectives/Section layout and Path Stage/Chapter display hierarchy in sealed revision JSONB while keeping stable identities, Rights and exact pins relational. The final review recommends retaining V7 and declining PR #26 because total maintenance complexity did not fall. See [the implementation note](implementation/JPN-ARCH-003-hybrid-published-content.md) for measurements and validation boundaries. No production publisher was added.
 
 - Next.js TypeScript frontend. Java Spring Boot modular monolith REST API.
 - Neon managed PostgreSQL; Flyway migration history in repository.
@@ -64,8 +64,8 @@ erDiagram
   path_revision_chapters ||--o{ path_revision_lessons : pins
   lesson_revisions ||--o{ path_revision_lessons : referenced_by
   lessons ||--o{ lesson_revisions : publishes
-  lesson_revisions ||--o{ lesson_revision_sections : freezes
-  lesson_revision_sections ||--o{ lesson_revision_items : pins
+  lesson_revisions ||--o{ lesson_revision_sections : freezes_in_V7
+  lesson_revision_sections ||--o{ lesson_revision_items : pins_in_V7
   content_item_revisions ||--o{ lesson_revision_items : referenced_by
   content_items ||--o{ content_item_revisions : publishes
   media_asset_revisions ||--o{ content_item_revision_media : referenced_by

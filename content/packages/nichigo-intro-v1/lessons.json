@@ -1,0 +1,179 @@
+{
+  "schemaVersion": "1.0",
+  "lessons": [
+    {
+      "key": "intro-hiragana-vowels",
+      "slug": "intro-hiragana-vowels",
+      "titleVi": "Làm quen với Hiragana — あいうえお",
+      "summaryVi": "Hiragana là một hệ chữ ghi âm của tiếng Nhật. Bài này chỉ giới thiệu năm chữ nguyên âm đầu tiên; chưa bao quát toàn bộ Hiragana.",
+      "rightsKey": "nichigo-intro-original-v1",
+      "communicationLevelCode": "introductory",
+      "objectives": [
+        {
+          "position": 1,
+          "kind": "knowledge",
+          "textVi": "Nhận ra năm chữ Hiragana あ、い、う、え、お."
+        },
+        {
+          "position": 2,
+          "kind": "can_do",
+          "textVi": "Ghép từng chữ với cách đọc a, i, u, e, o."
+        }
+      ],
+      "sections": [
+        {
+          "key": "first-three-vowels",
+          "position": 1,
+          "titleVi": "Ba chữ đầu: あ・い・う",
+          "items": [
+            {
+              "position": 1,
+              "itemKey": "hiragana-a"
+            },
+            {
+              "position": 2,
+              "itemKey": "hiragana-i"
+            },
+            {
+              "position": 3,
+              "itemKey": "hiragana-u"
+            }
+          ]
+        },
+        {
+          "key": "last-two-vowels",
+          "position": 2,
+          "titleVi": "Hai chữ tiếp theo: え・お",
+          "items": [
+            {
+              "position": 1,
+              "itemKey": "hiragana-e"
+            },
+            {
+              "position": 2,
+              "itemKey": "hiragana-o"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "intro-japanese-greetings",
+      "slug": "intro-japanese-greetings",
+      "titleVi": "Những lời chào đầu tiên",
+      "summaryVi": "Nhận biết lời chào theo thời điểm và một cách cảm ơn lịch sự. Các cách nói này có mục đích khác nhau.",
+      "rightsKey": "nichigo-intro-original-v1",
+      "communicationLevelCode": "introductory",
+      "objectives": [
+        {
+          "position": 1,
+          "kind": "can_do",
+          "textVi": "Chọn lời chào phù hợp với buổi sáng, ban ngày và buổi tối."
+        },
+        {
+          "position": 2,
+          "kind": "knowledge",
+          "textVi": "Phân biệt lời cảm ơn lịch sự với lời chào."
+        }
+      ],
+      "sections": [
+        {
+          "key": "time-of-day",
+          "position": 1,
+          "titleVi": "Chào theo thời điểm",
+          "items": [
+            {
+              "position": 1,
+              "itemKey": "ohayou-gozaimasu"
+            },
+            {
+              "position": 2,
+              "itemKey": "konnichiwa"
+            },
+            {
+              "position": 3,
+              "itemKey": "konbanwa"
+            }
+          ]
+        },
+        {
+          "key": "thanks",
+          "position": 2,
+          "titleVi": "Nói lời cảm ơn",
+          "items": [
+            {
+              "position": 1,
+              "itemKey": "arigatou-gozaimasu"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "intro-self-introduction",
+      "slug": "intro-self-introduction",
+      "titleVi": "Giới thiệu bản thân",
+      "summaryVi": "Đọc một lời tự giới thiệu ngắn khi mới gặp. Tên riêng minh họa có Katakana nhưng bài này chưa dạy đọc Katakana.",
+      "rightsKey": "nichigo-intro-original-v1",
+      "communicationLevelCode": "introductory",
+      "prerequisites": [
+        "intro-japanese-greetings"
+      ],
+      "objectives": [
+        {
+          "position": 1,
+          "kind": "can_do",
+          "textVi": "Nhận ra lời mở đầu, câu nêu tên và lời kết trong một lần tự giới thiệu."
+        },
+        {
+          "position": 2,
+          "kind": "knowledge",
+          "textVi": "Hiểu vai trò của mẫu わたしは［名前］です và cách dùng よろしくおねがいします trong ngữ cảnh."
+        }
+      ],
+      "sections": [
+        {
+          "key": "opening-and-closing",
+          "position": 1,
+          "titleVi": "Mở đầu và kết lời",
+          "items": [
+            {
+              "position": 1,
+              "itemKey": "hajimemashite"
+            },
+            {
+              "position": 2,
+              "itemKey": "yoroshiku-onegaishimasu"
+            }
+          ]
+        },
+        {
+          "key": "say-your-name",
+          "position": 2,
+          "titleVi": "Nói tên của mình",
+          "items": [
+            {
+              "position": 1,
+              "itemKey": "watashi-wa-name-desu"
+            },
+            {
+              "position": 2,
+              "itemKey": "watashi-wa-an-desu"
+            }
+          ]
+        },
+        {
+          "key": "read-a-dialogue",
+          "position": 3,
+          "titleVi": "Đọc đoạn hội thoại",
+          "items": [
+            {
+              "position": 1,
+              "itemKey": "first-introduction-dialogue"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

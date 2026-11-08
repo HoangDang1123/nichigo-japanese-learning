@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0",
+  "packageKey": "nichigo-intro-v1",
+  "packageVersion": "1.0.0",
+  "locale": "vi",
+  "author": "NichiGo AI-assisted editorial draft; human review pending",
+  "files": [
+    {
+      "path": "rights.csv",
+      "type": "rights"
+    },
+    {
+      "path": "items.csv",
+      "type": "items"
+    },
+    {
+      "path": "lessons.json",
+      "type": "lessons"
+    },
+    {
+      "path": "paths.json",
+      "type": "paths"
+    }
+  ]
+}

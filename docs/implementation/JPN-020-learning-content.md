@@ -1,5 +1,7 @@
 # JPN-020 — Learning content foundation
 
+Later hardening is tracked separately in [JPN-ARCH-002](JPN-ARCH-002-content-architecture.md): V6 freezes reviewed Rights provenance and records clearance events; V7 replaces the expensive nested Path eligibility walk with a measured set-based check. V4 remains historical and unchanged.
+
 ## Scope and status
 
 The JPN-020 branch implemented the PostgreSQL content model and published-only backend reads, merged into `origin/main` via PR #22. It contains no production curriculum, authoring endpoint, importer, publisher, progress calculation, or frontend integration. Source is **implemented**, PostgreSQL integration tests were **run**, and the technical decision in ADR-015 still awaits owner review. No release is evidenced.

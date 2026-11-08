@@ -39,7 +39,7 @@ class JdbcContentReferenceResolverIntegrationTest {
     }
 
     private void replace(Map<String, byte[]> files, String file, String from, String to) {
-        String source = new String(files.get(file), StandardCharsets.UTF_8);
+        String source = new String(files.get(file), StandardCharsets.UTF_8).replace("\r\n", "\n");
         assertTrue(source.contains(from), from);
         files.put(file, source.replace(from, to).getBytes(StandardCharsets.UTF_8));
     }

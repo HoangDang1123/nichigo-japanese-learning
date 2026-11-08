@@ -1,6 +1,8 @@
-# JPN-021 — Content validation and offline dry-run (feature branch)
+# JPN-021 — Content validation and offline dry-run
 
-**Status:** Implemented and locally tested on the JPN-021 branch. Owner review, PR merge, production operation and release are separate statuses. ADR-015 remains proposed. This ticket provides validation and a local dry-run, not an importer or publisher.
+JPN-021 was merged through PR #24. The later [JPN-ARCH-002](JPN-ARCH-002-content-architecture.md) work keeps its package contract and shared canonical validation boundary while hardening database Rights evidence and Path eligibility. The CLI remains read-only and does not authorize publication.
+
+**Status:** Implemented and tested; merged into `origin/main` via PR #24. Production operation and release are not evidenced. ADR-015 remains proposed. This ticket provides validation and a local dry-run, not an importer or publisher.
 
 ## Scope and structure
 

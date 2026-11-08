@@ -14,6 +14,48 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** Upgrade test creates and removes only its own PostgreSQL schema. */
 class PopulatedV4ToV9MigrationTest {
+    @Test void v9FailureLeavesV8HistoryAndOldPresentationTablesIntact() throws Exception {
+        String baseUrl = System.getenv("DB_URL");
+        assertNotNull(baseUrl, "Use an isolated PostgreSQL test schema");
+        assertTrue(baseUrl.matches("jdbc:postgresql://(?:localhost|127\\.0\\.0\\.1)(?::[0-9]+)?/[a-zA-Z0-9_]+\\?currentSchema=jpn021_[a-zA-Z0-9_]+"),
+                "Refusing nonlocal or shared schema");
+        String user = System.getenv("DB_USERNAME"), password = System.getenv("DB_PASSWORD");
+        assertNotNull(user); assertNotNull(password);
+        String schema = "jpn021_upgrade_fail_" + UUID.randomUUID().toString().replace("-", "");
+        String url = baseUrl.replaceAll("currentSchema=jpn021_[a-zA-Z0-9_]+$", "currentSchema=" + schema);
+        try (Connection admin = DriverManager.getConnection(baseUrl, user, password)) {
+            execute(admin, "CREATE SCHEMA " + schema);
+            try {
+                flyway(url, user, password, schema, "7").migrate();
+                UUID rights = UUID.randomUUID(), lesson = UUID.randomUUID();
+                try (Connection db = DriverManager.getConnection(url, user, password)) {
+                    execute(db, "INSERT INTO content_rights(id,origin_kind,source_label,attribution,permission_basis,clearance_status) " +
+                            "VALUES('" + rights + "','original','Source','Author','Original','cleared')");
+                    execute(db, "INSERT INTO lessons(id,stable_key,slug,title_vi,rights_id) " +
+                            "VALUES('" + lesson + "','oversized-lesson','oversized-lesson','Lesson','" + rights + "')");
+                    execute(db, "INSERT INTO lesson_revisions(lesson_id,revision,title_vi,rights_id) " +
+                            "VALUES('" + lesson + "',1,'Lesson','" + rights + "')");
+                    execute(db, "INSERT INTO lesson_revision_sections(lesson_id,lesson_revision,section_id,position,title_vi) " +
+                            "SELECT '" + lesson + "',1,md5('section-' || n)::uuid,n,'Section' " +
+                            "FROM generate_series(1,101) n");
+                    execute(db, "UPDATE lesson_revisions SET sealed_at=now() WHERE lesson_id='" + lesson + "' AND revision=1");
+                    execute(db, "UPDATE lessons SET published_revision=1 WHERE id='" + lesson + "'");
+                }
+                flyway(url, user, password, schema, "8").migrate();
+                assertThrows(org.flywaydb.core.api.FlywayException.class,
+                        () -> flyway(url, user, password, schema, "9").migrate());
+                try (Connection db = DriverManager.getConnection(url, user, password)) {
+                    assertEquals(8, scalar(db, "SELECT max(version::int) FROM flyway_schema_history WHERE success"));
+                    assertEquals(101, scalar(db, "SELECT count(*) FROM lesson_revision_sections WHERE lesson_id='" + lesson + "'"));
+                    assertEquals(101, scalar(db, "SELECT jsonb_array_length(presentation->'sections') FROM lesson_revisions WHERE lesson_id='" + lesson + "' AND revision=1"));
+                    assertEquals(0, scalar(db, "SELECT count(*) FROM pg_proc WHERE pronamespace=current_schema()::regnamespace AND proname='validate_lesson_presentation'"));
+                }
+            } finally {
+                execute(admin, "DROP SCHEMA " + schema + " CASCADE");
+            }
+        }
+    }
+
     @Test void populatedV4UpgradesThroughV9WithoutChangingIdentitiesOrderOrPublication() throws Exception {
         String baseUrl = System.getenv("DB_URL");
         assertNotNull(baseUrl, "Use an isolated PostgreSQL test schema");
@@ -30,7 +72,7 @@ class PopulatedV4ToV9MigrationTest {
                 throughV4.migrate();
                 UUID rights = UUID.randomUUID(), path = UUID.randomUUID(), stage = UUID.randomUUID();
                 UUID chapter = UUID.randomUUID(), lesson = UUID.randomUUID(), section = UUID.randomUUID();
-                UUID item = UUID.randomUUID(), placement = UUID.randomUUID();
+                UUID item = UUID.randomUUID(), media = UUID.randomUUID(), placement = UUID.randomUUID();
                 try (Connection db = DriverManager.getConnection(url, user, password)) {
                     execute(db, "INSERT INTO content_rights(id,origin_kind,source_label,attribution,permission_basis,clearance_status) " +
                             "VALUES('" + rights + "','original','Source','Author','Original','cleared')");
@@ -40,8 +82,16 @@ class PopulatedV4ToV9MigrationTest {
                     execute(db, "INSERT INTO lessons(id,stable_key,slug,title_vi,rights_id) VALUES('" + lesson + "','lesson-a','lesson-a','Lesson','" + rights + "')");
                     execute(db, "INSERT INTO lesson_sections(id,lesson_id,position,title_vi) VALUES('" + section + "','" + lesson + "',1,'Section')");
                     execute(db, "INSERT INTO content_items(id,stable_key,kind,payload,rights_id) VALUES('" + item + "','item-a','kana','{}'::jsonb,'" + rights + "')");
+                    execute(db, "INSERT INTO media_assets(id,stable_key,media_kind,storage_key,checksum_sha256,mime_type,rights_id) " +
+                            "VALUES('" + media + "','media-a','audio','private-media-a','checksum','audio/mpeg','" + rights + "')");
+                    execute(db, "INSERT INTO media_asset_revisions(media_id,revision,media_kind,storage_key,checksum_sha256,mime_type,rights_id) " +
+                            "VALUES('" + media + "',1,'audio','private-media-revision-a','checksum','audio/mpeg','" + rights + "')");
+                    execute(db, "UPDATE media_asset_revisions SET sealed_at=now() WHERE media_id='" + media + "' AND revision=1");
+                    execute(db, "UPDATE media_assets SET published_revision=1 WHERE id='" + media + "'");
                     execute(db, "INSERT INTO chapter_lessons(id,chapter_id,lesson_id,position) VALUES('" + placement + "','" + chapter + "','" + lesson + "',1)");
                     execute(db, "INSERT INTO content_item_revisions(item_id,revision,kind,payload,rights_id) VALUES('" + item + "',1,'kana','{}'::jsonb,'" + rights + "')");
+                    execute(db, "INSERT INTO content_item_revision_media(item_id,item_revision,position,role_code,media_id,media_revision) " +
+                            "VALUES('" + item + "',1,1,'pronunciation','" + media + "',1)");
                     execute(db, "UPDATE content_item_revisions SET sealed_at=now() WHERE item_id='" + item + "' AND revision=1");
                     execute(db, "UPDATE content_items SET published_revision=1 WHERE id='" + item + "'");
                     execute(db, "INSERT INTO lesson_revisions(lesson_id,revision,title_vi,rights_id) VALUES('" + lesson + "',1,'Published Lesson','" + rights + "')");
@@ -69,6 +119,7 @@ class PopulatedV4ToV9MigrationTest {
                     assertEquals(1, scalar(db, "SELECT position FROM chapter_lessons WHERE id='" + placement + "'"));
                     assertEquals(1, scalar(db, "SELECT published_revision FROM content_items WHERE id='" + item + "'"));
                     assertEquals(1, scalar(db, "SELECT count(*) FROM content_item_revisions WHERE item_id='" + item + "' AND sealed_at IS NOT NULL"));
+                    assertEquals(1, scalar(db, "SELECT count(*) FROM content_item_revision_media WHERE item_id='" + item + "' AND media_id='" + media + "' AND media_revision=1"));
                     assertEquals(1, scalar(db, "SELECT count(*) FROM content_rights WHERE id='" + rights + "' AND stable_key IS NULL"));
                     assertEquals(1, scalar(db, "SELECT count(*) FROM lesson_sections WHERE id='" + section + "' AND stable_key IS NULL"));
                     assertEquals(1, scalar(db, "SELECT count(*) FROM chapter_lessons WHERE id='" + placement + "' AND stable_key IS NULL"));
@@ -114,6 +165,9 @@ class PopulatedV4ToV9MigrationTest {
                     assertEquals(1, scalar(db, "SELECT published_revision FROM lessons WHERE id='" + lesson + "'"));
                     assertEquals(1, scalar(db, "SELECT count(*) FROM path_revision_lessons WHERE path_id='" + path + "' AND lesson_id='" + lesson + "' AND lesson_revision=1"));
                     assertEquals(1, scalar(db, "SELECT count(*) FROM lesson_revision_items WHERE lesson_id='" + lesson + "' AND item_id='" + item + "' AND item_revision=1"));
+                    assertEquals(1, scalar(db, "SELECT count(*) FROM content_item_revision_media WHERE item_id='" + item + "' AND item_revision=1 AND media_id='" + media + "' AND media_revision=1"));
+                    assertEquals(1, scalar(db, "SELECT published_revision FROM media_assets WHERE id='" + media + "'"));
+                    assertEquals(1, scalar(db, "SELECT count(*) FROM content_rights_events WHERE rights_id='" + rights + "' AND clearance_status='cleared'"));
                     assertEquals(1, scalar(db, "SELECT count(*) FROM lesson_revisions WHERE lesson_id='" + lesson + "' AND presentation->'objectives'->0->>'textVi'='Read kana' AND presentation->'sections'->0->>'titleVi'='Published Section'"));
                     assertEquals(1, scalar(db, "SELECT count(*) FROM path_revisions WHERE path_id='" + path + "' AND presentation->'stages'->0->>'titleVi'='Published Stage' AND presentation->'stages'->0->'chapters'->0->>'titleVi'='Published Chapter'"));
                     assertEquals(1, scalar(db, "SELECT count(*) FROM path_revisions WHERE path_id='" + path + "' AND path_revision_public(path_id,revision)"));

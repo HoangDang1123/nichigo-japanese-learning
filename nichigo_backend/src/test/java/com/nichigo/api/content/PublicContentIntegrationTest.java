@@ -40,6 +40,60 @@ class PublicContentIntegrationTest {
                 publicationBoundary.validateLesson(lesson.id(), 1, 1, presentation));
         assertThrows(IllegalStateException.class, () -> transaction.executeWithoutResult(status ->
                 publicationBoundary.validateLesson(lesson.id(), 1, 2, presentation)));
+
+        UUID path = UUID.randomUUID();
+        jdbc.update("INSERT INTO learning_paths(id,slug,title_vi,rights_id) VALUES(?,?,?,?)",
+                path, "boundary-path-" + path, "Path", rights);
+        String pathPresentation = "{\"schemaVersion\":\"1.0\",\"stages\":[]}";
+        jdbc.update("INSERT INTO path_revisions(path_id,revision,title_vi,rights_id,presentation) " +
+                "VALUES(?,1,'Path',?,?::jsonb)", path, rights, pathPresentation);
+        transaction.executeWithoutResult(status ->
+                publicationBoundary.validatePath(path, 1, 1, pathPresentation));
+        assertThrows(IllegalStateException.class, () -> transaction.executeWithoutResult(status ->
+                publicationBoundary.validatePath(path, 1, 2, pathPresentation)));
+    }
+
+    @Test
+    void publicationBoundaryLocksPinnedItemRightsAgainstRevocation() throws Exception {
+        UUID rootRight = rights("cleared"), itemRight = rights("cleared");
+        Item item = item(itemRight);
+        publishItem(item, itemRight, 1, "a");
+        Lesson lesson = lesson(rootRight);
+        UUID section = section(lesson.id(), 1);
+        jdbc.update("INSERT INTO lesson_revisions(lesson_id,revision,title_vi,rights_id) " +
+                "VALUES(?,1,'Lesson',?)", lesson.id(), rootRight);
+        jdbc.update("INSERT INTO lesson_revision_items(lesson_id,lesson_revision,section_id,position,item_id,item_revision) " +
+                "VALUES(?,1,?,1,?,1)", lesson.id(), section, item.id());
+        setLessonPresentation(lesson.id(), 1);
+        String presentation = jdbc.queryForObject("SELECT presentation::text FROM lesson_revisions " +
+                "WHERE lesson_id=? AND revision=1", String.class, lesson.id());
+        CountDownLatch validated = new CountDownLatch(1), release = new CountDownLatch(1);
+        try (var worker = Executors.newSingleThreadExecutor()) {
+            var candidate = worker.submit(() -> new TransactionTemplate(transactions).execute(status -> {
+                publicationBoundary.validateLesson(lesson.id(), 1, 1, presentation);
+                validated.countDown();
+                try {
+                    if (!release.await(5, TimeUnit.SECONDS)) throw new IllegalStateException("candidate not released");
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                    throw new IllegalStateException(ex);
+                }
+                return true;
+            }));
+            assertTrue(validated.await(5, TimeUnit.SECONDS));
+            try {
+                assertThrows(DataAccessException.class, () -> new TransactionTemplate(transactions).execute(status -> {
+                    jdbc.execute("SET LOCAL lock_timeout = '150ms'");
+                    jdbc.update("UPDATE content_rights SET clearance_status='revoked' WHERE id=?", itemRight);
+                    return null;
+                }));
+            } finally {
+                release.countDown();
+            }
+            assertTrue(candidate.get(5, TimeUnit.SECONDS));
+        }
+        jdbc.update("UPDATE content_rights SET clearance_status='revoked' WHERE id=?", itemRight);
+        assertFalse(jdbc.queryForObject("SELECT item_revision_public(?,1)", Boolean.class, item.id()));
     }
 
     @Test
@@ -666,6 +720,37 @@ class PublicContentIntegrationTest {
         assertThrows(DataAccessException.class, () -> jdbc.update(
                 "INSERT INTO path_revision_lessons(path_id,path_revision,chapter_id,position,placement_id,lesson_id,lesson_revision) " +
                 "VALUES(?,1,?,2,?,?,1)", path.id(), path.chapter(), path.placement(), lesson.id()));
+    }
+
+    @Test
+    void publicPathFailsClosedIfPrivilegedSqlCorruptsSealedLayout() throws Exception {
+        UUID right = rights("cleared");
+        Item item = item(right);
+        publishItem(item, right, 1, "a");
+        Lesson lesson = lesson(right);
+        publishLesson(lesson, right, item, 1, 1, "Lesson", section(lesson.id(), 1));
+        PathFixture path = pathFixture(right, lesson);
+        publishPathRevision(path, right, lesson, 1, 1);
+        String original = jdbc.queryForObject("SELECT presentation::text FROM path_revisions " +
+                "WHERE path_id=? AND revision=1", String.class, path.id());
+        try {
+            privilegedPresentationUpdate(path.id(), "{\"schemaVersion\":\"1.0\",\"stages\":[]}");
+            mvc.perform(get("/api/v1/learning-paths/" + path.slug()))
+                    .andExpect(status().isServiceUnavailable())
+                    .andExpect(jsonPath("$.code").value("content_unavailable"));
+        } finally {
+            privilegedPresentationUpdate(path.id(), original);
+        }
+        mvc.perform(get("/api/v1/learning-paths/" + path.slug())).andExpect(status().isOk());
+    }
+
+    private void privilegedPresentationUpdate(UUID pathId, String presentation) {
+        new TransactionTemplate(transactions).executeWithoutResult(status -> {
+            // The disposable test role is a superuser; production writer roles must not be.
+            jdbc.execute("SET LOCAL session_replication_role = 'replica'");
+            jdbc.update("UPDATE path_revisions SET presentation=?::jsonb WHERE path_id=? AND revision=1",
+                    presentation, pathId);
+        });
     }
 
     private int racePointer(UUID lessonId, int revision, CountDownLatch ready, CountDownLatch go) {

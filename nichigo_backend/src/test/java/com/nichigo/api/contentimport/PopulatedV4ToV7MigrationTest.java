@@ -94,6 +94,18 @@ class PopulatedV4ToV7MigrationTest {
                             "UPDATE content_rights SET source_label='Changed' WHERE id='" + rights + "'"));
                     assertEquals(7, scalar(db, "SELECT count(*) FROM flyway_schema_history WHERE success"));
                 }
+                Flyway throughV8 = flyway(url, user, password, schema, "8");
+                throughV8.migrate();
+                throughV8.validate();
+                throughV8.migrate();
+                try (Connection db = DriverManager.getConnection(url, user, password)) {
+                    assertEquals(8, scalar(db, "SELECT count(*) FROM flyway_schema_history WHERE success"));
+                    assertEquals(1, scalar(db, "SELECT published_revision FROM content_items WHERE id='" + item + "'"));
+                    assertEquals(1, scalar(db, "SELECT position FROM chapter_lessons WHERE id='" + placement + "'"));
+                    assertEquals(1, scalar(db, "SELECT count(*) FROM content_rights_events WHERE rights_id='" + rights + "'"));
+                    assertEquals(5, scalar(db, "SELECT count(*) FROM pg_constraint WHERE connamespace=current_schema()::regnamespace AND conname IN ('lesson_sections_lesson_id_position_key','lesson_items_section_id_position_key','path_stages_path_id_position_key','stage_chapters_stage_id_position_key','chapter_lessons_chapter_id_position_key') AND condeferrable"));
+                    assertEquals(0, scalar(db, "SELECT count(*) FROM content_import_batches"));
+                }
             } finally {
                 execute(admin, "DROP SCHEMA " + schema + " CASCADE");
             }

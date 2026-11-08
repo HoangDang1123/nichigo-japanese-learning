@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "1.0",
+  "paths": [
+    {
+      "key": "nichigo-beginner-introduction",
+      "titleVi": "NichiGo — Bước đầu học tiếng Nhật",
+      "descriptionVi": "Lộ trình thử nghiệm gồm ba bài nhập môn; chưa phải giáo trình Hiragana hay JLPT N5 đầy đủ.",
+      "rightsKey": "nichigo-intro-original-v1",
+      "stages": [
+        {
+          "key": "foundation",
+          "position": 1,
+          "titleVi": "Nền tảng",
+          "rightsKey": "nichigo-intro-original-v1",
+          "chapters": [
+            {
+              "key": "hiragana-fundamentals",
+              "position": 1,
+              "titleVi": "Bước đầu với Hiragana",
+              "rightsKey": "nichigo-intro-original-v1",
+              "lessons": [
+                {
+                  "key": "hiragana-vowels-placement",
+                  "position": 1,
+                  "lessonKey": "intro-hiragana-vowels"
+                }
+              ]
+            },
+            {
+              "key": "first-communication",
+              "position": 2,
+              "titleVi": "Giao tiếp đầu tiên",
+              "rightsKey": "nichigo-intro-original-v1",
+              "lessons": [
+                {
+                  "key": "greetings-placement",
+                  "position": 1,
+                  "lessonKey": "intro-japanese-greetings"
+                },
+                {
+                  "key": "self-introduction-placement",
+                  "position": 2,
+                  "lessonKey": "intro-self-introduction"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

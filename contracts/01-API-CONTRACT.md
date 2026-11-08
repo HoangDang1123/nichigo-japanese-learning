@@ -1,6 +1,6 @@
 # REST API Contract — implemented auth and proposed learning endpoints
 
-**Base:** `/api/v1`; JSON UTF-8; authenticated identity from server session cookie, not request body. Auth and the five JPN-020 public learning-content GET routes are merged in `origin/main`; deployment is not evidenced. JPN-021 supplies an offline local validation CLI, **not an HTTP endpoint**. Other learning routes below, including JPN-022 operator import/publish routes, remain proposals. Content errors use the existing flat `{ "code", "message" }` shape. The implemented package format is specified in [the JPN-021 content package contract](02-CONTENT-PACKAGE-CONTRACT.md).
+**Base:** `/api/v1`; JSON UTF-8; authenticated identity from server session cookie, not request body. Auth and the five JPN-020 public learning-content GET routes are merged in `origin/main`; deployment is not evidenced. JPN-021 supplies an offline local validation CLI. JPN-022 implements import/review/publish through a secured operator CLI, **not an HTTP endpoint**. Other learning routes and the internal HTTP routes below remain proposals. Content errors use the existing flat `{ "code", "message" }` shape. The implemented package format is specified in [the content package contract](02-CONTENT-PACKAGE-CONTRACT.md).
 
 | Method | Route | Auth | Description |
 |---|---|---|---|
@@ -20,9 +20,9 @@
 | GET | `/guest/quota` | Guest | Current day allowance and usage |
 | GET | `/tour/status` | Guest/User | Tour state |
 | PUT | `/tour/status` | Guest/User | Mark skipped/completed/in-progress |
-| POST | `/internal/import/validate` | Operator | **Proposed JPN-022** authenticated dry-run transport; JPN-021 has a local CLI only |
-| POST | `/internal/import/batches` | Operator | **Proposed JPN-022** import validated content |
-| POST | `/internal/import/batches/{id}/publish` | Operator | **Proposed JPN-022** publish reviewed content |
+| POST | `/internal/import/validate` | Operator | Proposed HTTP transport only; JPN-022 uses a local operator CLI |
+| POST | `/internal/import/batches` | Operator | Proposed HTTP transport only; JPN-022 uses a local operator CLI |
+| POST | `/internal/import/batches/{id}/publish` | Operator | Proposed HTTP transport only; JPN-022 publishes each root through a local operator CLI |
 
 **Proposed learning typed error (not the current auth error shape)**
 ```json

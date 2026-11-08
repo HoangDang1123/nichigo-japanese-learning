@@ -9,6 +9,7 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,39 +46,42 @@ public class PublicContentService {
     @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
     public PublicContentDtos.Path path(String slug) {
         var root = repository.publishedPath(slug).orElseThrow(ContentNotFoundException::new);
-        contentValidator.validatePublishedPathPresentation(root.presentation());
-        var chapterRows = repository.chapters(root.id(), root.revision());
+        JsonNode presentation = contentValidator.validatePublishedPathPresentation(root.presentation());
         var placementRows = repository.placements(root.id(), root.revision());
-        if (chapterRows.size() > 100 || placementRows.size() > 1000) {
+        if (placementRows.size() > 1000) {
             throw new IllegalStateException("Published path exceeds the bounded response contract.");
         }
         Map<UUID, List<PublicContentDtos.LessonSummary>> lessonsByChapter = new HashMap<>();
-        Set<UUID> chapterIds = new HashSet<>();
-        for (var row : chapterRows) chapterIds.add(row.id());
         for (var row : placementRows) {
-            if (!chapterIds.contains(row.chapterId())) {
-                throw new IllegalStateException("Published Path placement has no layout Chapter.");
-            }
             lessonsByChapter.computeIfAbsent(row.chapterId(), key -> new ArrayList<>())
                     .add(new PublicContentDtos.LessonSummary(row.lessonId(), row.placementId(),
                             row.lessonSlug(), row.position(), row.lessonRevision(),
                             row.title(), row.summary()));
         }
-        Map<UUID, List<PublicContentDtos.Chapter>> chaptersByStage = new HashMap<>();
-        for (var row : chapterRows) {
-            chaptersByStage.computeIfAbsent(row.stageId(), key -> new ArrayList<>())
-                    .add(new PublicContentDtos.Chapter(row.id(), row.position(), row.title(),
-                            row.description(), List.copyOf(lessonsByChapter.getOrDefault(row.id(), List.of()))));
-        }
+        Set<UUID> chapterIds = new HashSet<>();
+        Set<PublicContentRepository.LayoutKey> layoutKeys = new HashSet<>();
         List<PublicContentDtos.Stage> stages = new ArrayList<>();
-        var stageRows = repository.stages(root.id(), root.revision());
-        if (stageRows.size() > 100) {
-            throw new IllegalStateException("Published path exceeds the bounded response contract.");
+        for (JsonNode stage : presentation.path("stages")) {
+            UUID stageId = UUID.fromString(stage.path("id").asText());
+            List<PublicContentDtos.Chapter> chapters = new ArrayList<>();
+            for (JsonNode chapter : stage.path("chapters")) {
+                UUID chapterId = UUID.fromString(chapter.path("id").asText());
+                chapterIds.add(chapterId);
+                layoutKeys.add(new PublicContentRepository.LayoutKey(stageId, chapterId));
+                chapters.add(new PublicContentDtos.Chapter(chapterId, chapter.path("position").asInt(),
+                        chapter.path("titleVi").asText(), optionalText(chapter, "descriptionVi"),
+                        List.copyOf(lessonsByChapter.getOrDefault(chapterId, List.of()))));
+            }
+            if (chapters.isEmpty()) layoutKeys.add(new PublicContentRepository.LayoutKey(stageId, null));
+            chapters.sort(Comparator.comparingInt(PublicContentDtos.Chapter::position));
+            stages.add(new PublicContentDtos.Stage(stageId, stage.path("position").asInt(),
+                    stage.path("titleVi").asText(), optionalText(stage, "descriptionVi"),
+                    List.copyOf(chapters)));
         }
-        for (var row : stageRows) {
-            stages.add(new PublicContentDtos.Stage(row.id(), row.position(), row.title(),
-                    row.description(), List.copyOf(chaptersByStage.getOrDefault(row.id(), List.of()))));
-        }
+        if (!chapterIds.containsAll(lessonsByChapter.keySet())
+                || !layoutKeys.equals(new HashSet<>(repository.pathLayoutKeys(root.id(), root.revision()))))
+            throw new IllegalStateException("Published Path layout does not match relational dependencies.");
+        stages.sort(Comparator.comparingInt(PublicContentDtos.Stage::position));
         return new PublicContentDtos.Path(root.id(), root.slug(), root.title(),
                 root.description(), root.revision(), List.copyOf(stages));
     }
@@ -102,10 +106,9 @@ public class PublicContentService {
     }
 
     private PublicContentDtos.Lesson assembleLesson(PublicContentRepository.LessonHead root) {
-        contentValidator.validatePublishedLessonPresentation(root.presentation());
-        var sectionRows = repository.sections(root.id(), root.revision());
+        JsonNode presentation = contentValidator.validatePublishedLessonPresentation(root.presentation());
         var itemRows = repository.lessonItems(root.id(), root.revision());
-        if (sectionRows.size() > 100 || itemRows.size() > 1000) {
+        if (itemRows.size() > 1000) {
             throw new IllegalStateException("Published lesson exceeds the bounded response contract.");
         }
         Map<ItemPosition, List<PublicContentDtos.Media>> mediaByItem = new HashMap<>();
@@ -121,7 +124,8 @@ public class PublicContentService {
         }
         Map<UUID, List<PublicContentDtos.LessonItem>> itemsBySection = new HashMap<>();
         Set<UUID> sectionIds = new HashSet<>();
-        for (var section : sectionRows) sectionIds.add(section.id());
+        for (JsonNode section : presentation.path("sections"))
+            sectionIds.add(UUID.fromString(section.path("id").asText()));
         for (var row : itemRows) {
             if (!sectionIds.contains(row.sectionId())) {
                 throw new IllegalStateException("Published Item pin has no layout Section.");
@@ -134,17 +138,18 @@ public class PublicContentService {
                     .add(new PublicContentDtos.LessonItem(row.itemId(), row.position(), item));
         }
         List<PublicContentDtos.Section> sections = new ArrayList<>();
-        for (var row : sectionRows) {
-            sections.add(new PublicContentDtos.Section(row.id(), row.position(), row.title(),
-                    List.copyOf(itemsBySection.getOrDefault(row.id(), List.of()))));
+        for (JsonNode section : presentation.path("sections")) {
+            UUID id = UUID.fromString(section.path("id").asText());
+            sections.add(new PublicContentDtos.Section(id, section.path("position").asInt(),
+                    optionalText(section, "titleVi"),
+                    List.copyOf(itemsBySection.getOrDefault(id, List.of()))));
         }
-        var objectiveRows = repository.objectives(root.id(), root.revision());
-        if (objectiveRows.size() > 1000) {
-            throw new IllegalStateException("Published lesson exceeds the bounded response contract.");
-        }
-        var objectives = objectiveRows.stream()
-                .map(row -> new PublicContentDtos.Objective(row.position(), row.kind(), row.text()))
-                .toList();
+        sections.sort(Comparator.comparingInt(PublicContentDtos.Section::position));
+        List<PublicContentDtos.Objective> objectives = new ArrayList<>();
+        for (JsonNode objective : presentation.path("objectives"))
+            objectives.add(new PublicContentDtos.Objective(objective.path("position").asInt(),
+                    objective.path("kind").asText(), objective.path("textVi").asText()));
+        objectives.sort(Comparator.comparingInt(PublicContentDtos.Objective::position));
         return new PublicContentDtos.Lesson(root.id(), root.slug(), root.revision(),
                 root.title(), root.summary(), objectives, List.copyOf(sections));
     }
@@ -167,6 +172,10 @@ public class PublicContentService {
         } catch (Exception ex) {
             throw new IllegalStateException("Published content payload is invalid.", ex);
         }
+    }
+
+    private String optionalText(JsonNode node, String field) {
+        return node.has(field) ? node.get(field).asText() : null;
     }
 
     private void validatePage(int limit, String after) {

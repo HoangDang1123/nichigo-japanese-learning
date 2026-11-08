@@ -54,8 +54,15 @@ public final class ContentOperatorCli {
                     emit(report);return report.valid()?0:1;
                 }
                 case "preview" -> {
-                    if(args.length!=3)return usage();
-                    emit(context.getBean(ContentPublicationService.class).preview(args[1],args[2]));return 0;
+                    if(args.length<3 || args.length%2==0)return usage();
+                    Map<String,Integer> pins=new LinkedHashMap<>();
+                    for(int i=3;i<args.length;i+=2){
+                        if(i+1>=args.length || !args[i].equals("--pin"))return usage();
+                        String[] pair=args[i+1].split("=",2);
+                        if(pair.length!=2 || pins.putIfAbsent(pair[0],Integer.parseInt(pair[1]))!=null)return usage();
+                    }
+                    emit(args.length==3?context.getBean(ContentPublicationService.class).preview(args[1],args[2])
+                            :context.getBean(ContentPublicationService.class).preview(args[1],args[2],pins));return 0;
                 }
                 case "inspect" -> {
                     if(args.length==3 && args[1].equals("batch")) {

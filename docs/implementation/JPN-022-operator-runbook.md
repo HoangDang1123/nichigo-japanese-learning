@@ -15,14 +15,14 @@ From the repository root on Windows:
 .\nichigo_backend\scripts\content-operator.ps1 language review path intro-path 1 --confirm
 .\nichigo_backend\scripts\content-operator.ps1 preview item kana-a
 .\nichigo_backend\scripts\content-operator.ps1 publish item kana-a --expected-version 1 --confirm
-.\nichigo_backend\scripts\content-operator.ps1 preview lesson intro-kana-a
+.\nichigo_backend\scripts\content-operator.ps1 preview lesson intro-kana-a --pin kana-a=1
 .\nichigo_backend\scripts\content-operator.ps1 publish lesson intro-kana-a --expected-version 1 --pin kana-a=1 --confirm
-.\nichigo_backend\scripts\content-operator.ps1 preview path intro-path
+.\nichigo_backend\scripts\content-operator.ps1 preview path intro-path --pin intro-kana-a=1
 .\nichigo_backend\scripts\content-operator.ps1 publish path intro-path --expected-version 1 --pin intro-kana-a=1 --confirm
 .\nichigo_backend\scripts\content-operator.ps1 inspect publication path intro-path
 .\nichigo_backend\scripts\content-operator.ps1 rights review original-sample revoked --confirm
 ```
 
-For Media, review its Rights and language candidate, then `publish media <key> --expected-version <n> --confirm`. Item publication referencing Media requires `--pin <media-key>=<published-revision>` for every association. Supply repeated `--pin` pairs for multiple dependencies. The `preview` output lists required keys; inspect the actual revision content and reviewer evidence before confirming. A v2 Item can be published without moving Lesson v1. Publish a new Lesson with an explicit Item v2 pin, then a new Path with the desired Lesson revision pin. An existing Path continues to serve its older graph until deliberately republished. Never use synthetic example content in a learner-facing environment.
+For Media, review its Rights and language candidate, then `publish media <key> --expected-version <n> --confirm`. Item publication referencing Media requires `--pin <media-key>=<published-revision>` for every association. Supply repeated `--pin` pairs for multiple dependencies. The `preview` output lists required keys and echoes the exact selected pins when provided; inspect the actual revision content and reviewer evidence before confirming. A v2 Item can be published without moving Lesson v1. Publish a new Lesson with an explicit Item v2 pin, then a new Path with the desired Lesson revision pin. An existing Path continues to serve its older graph until deliberately republished. Never use synthetic example content in a learner-facing environment.
 
 `validate` is offline. `dry-run`, `preview` and `inspect` disable Flyway and do not write. Mutating commands authenticate before Spring starts, then run Flyway before the operation. An invalid package, stale edit version, missing review, Rights conflict, unavailable dependency, failed constraint or wrong pin rolls back the action; correct the input and retry. Applied batches are immutable; failed attempts leave no batch row. The script exits with status 0 success, 1 content failure, 2 usage/execution failure, or 3 authentication failure. Standard output is one JSON result; startup diagnostics go to standard error. Do not disclose private Rights evidence or credential material in tickets or learner APIs.

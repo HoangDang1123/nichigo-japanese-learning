@@ -16,13 +16,23 @@ public class ContentPublicationService {
     private final JdbcTemplate db;
     private final ObjectMapper json=new ObjectMapper();
     public ContentPublicationService(JdbcTemplate db){this.db=db;}
-    public record Candidate(String kind,String key,long editVersion,Integer currentRevision,Map<String,Integer> requiredPins){}
+    public record Candidate(String kind,String key,long editVersion,Integer currentRevision,
+                            Map<String,Integer> requiredPins,Map<String,Integer> selectedPins){}
     public record Published(String kind,String key,int revision,Map<String,Integer> pins){}
 
     @Transactional(readOnly=true)
     public Candidate preview(String kind,String key) {
+        return preview(kind,key,null);
+    }
+
+    @Transactional(readOnly=true)
+    public Candidate preview(String kind,String key,Map<String,Integer> pins) {
         Root r=load(kind,key,false);
-        return new Candidate(kind,key,r.version,r.current,required(kind,r.id));
+        Map<String,Integer> required=required(kind,r.id);
+        if(pins!=null && (!required.keySet().equals(pins.keySet())
+                || pins.values().stream().anyMatch(v->v==null || v<1)))
+            throw new IllegalArgumentException("Preview pins must name every dependency exactly once.");
+        return new Candidate(kind,key,r.version,r.current,required,pins==null?Map.of():Map.copyOf(pins));
     }
 
     @Transactional

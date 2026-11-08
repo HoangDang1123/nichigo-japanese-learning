@@ -58,6 +58,8 @@ class ContentOperatorPipelineIntegrationTest {
         reviews.reviewLanguage("path",path,1,principal);
         assertEquals(1,publisher.publish("item",item,1,Map.of(),principal).revision());
         assertEquals(java.util.Set.of(item),publisher.preview("lesson",lesson).requiredPins().keySet());
+        assertEquals(Map.of(item,1),publisher.preview("lesson",lesson,Map.of(item,1)).selectedPins());
+        assertThrows(IllegalArgumentException.class,()->publisher.preview("lesson",lesson,Map.of()));
         assertThrows(IllegalArgumentException.class,()->publisher.publish("lesson",lesson,1,Map.of(),principal));
         assertEquals(0,db.queryForObject("SELECT count(*) FROM lesson_revisions WHERE lesson_id=(SELECT id FROM lessons WHERE stable_key=?)",Integer.class,lesson));
         assertEquals(1,publisher.publish("lesson",lesson,1,Map.of(item,1),principal).revision());

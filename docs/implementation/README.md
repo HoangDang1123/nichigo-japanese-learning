@@ -14,7 +14,7 @@ Tài liệu này mô tả **code đã triển khai** trong repository, khác v�
 | JPN-UI-003 | Shared skeleton primitive, Home auth-loading composition and future data-loader layouts (merged; release not evidenced) | [JPN-UI-003-skeleton-system.md](JPN-UI-003-skeleton-system.md) |
 | JPN-020 | Learning content schema, immutable revisions and published-only read API (merged; ADR-015 still proposed) | [JPN-020-learning-content.md](JPN-020-learning-content.md) |
 | JPN-021 | CSV/JSON validation, PostgreSQL reference checks and offline dry-run CLI (merged via PR #24; release not evidenced) | [JPN-021-content-validation.md](JPN-021-content-validation.md) |
-| JPN-022 | Secured relational import, explicit reviews and exact-pin publication (implementation branch; review pending) | [JPN-022-content-import-publishing.md](JPN-022-content-import-publishing.md), [operator runbook](JPN-022-operator-runbook.md) |
+| JPN-022 | Secured relational import, explicit reviews and exact-pin publication (PR #27; owner review pending) | [JPN-022-content-import-publishing.md](JPN-022-content-import-publishing.md), [operator runbook](JPN-022-operator-runbook.md) |
 | JPN-ARCH-002 | Reviewed Rights evidence, set-based Path eligibility and relational-vs-JSONB draft decision (review branch) | [JPN-ARCH-002-content-architecture.md](JPN-ARCH-002-content-architecture.md) |
 | JPN-030 | Learning Path railway frontend preview; content and progress integration pending | [JPN-030-learning-path.md](JPN-030-learning-path.md) |
 | JPN-041 | Home Study Desk frontend presentation; progress integration pending | [JPN-041-home-study-desk.md](JPN-041-home-study-desk.md) |

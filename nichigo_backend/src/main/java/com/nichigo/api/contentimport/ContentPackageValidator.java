@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-/** Side-effect-free package validation; JPN-022 must re-run against a locked publication candidate. */
+/** Side-effect-free package validation shared by offline dry-run and transactional import. */
 @Service
 public final class ContentPackageValidator {
     public static final int MAX_PACKAGE_BYTES = 10 * 1024 * 1024;
@@ -54,14 +54,19 @@ public final class ContentPackageValidator {
 
     /** Input is a trusted caller-provided file map, not arbitrary paths to open or URLs to fetch. */
     public ValidationReport dryRun(Map<String, byte[]> files, ContentReferenceResolver resolver) {
+        return parse(files, resolver).report();
+    }
+
+    /** Shares the strict parser with the transactional importer. Invalid records are never returned. */
+    public ParsedPackage parse(Map<String, byte[]> files, ContentReferenceResolver resolver) {
         Context context = new Context();
         if (files == null || !files.containsKey("manifest.json")) {
             context.error("PACKAGE_MANIFEST_REQUIRED", "manifest.json", null, null, null, "", null);
-            return context.report();
+            return invalid(context);
         }
         if (files.size() > 6) {
             context.error("PACKAGE_FILE_COUNT", "manifest.json", null, null, "files", "/files", null);
-            return context.report();
+            return invalid(context);
         }
         long bytes = 0;
         for (Map.Entry<String, byte[]> file : files.entrySet()) {
@@ -76,14 +81,14 @@ public final class ContentPackageValidator {
         }
         if (bytes > MAX_PACKAGE_BYTES)
             context.error("PACKAGE_SIZE_LIMIT", "manifest.json", null, null, null, "", null);
-        if (!context.errors.isEmpty()) return context.report();
+        if (!context.errors.isEmpty()) return invalid(context);
 
         JsonNode manifest = parseJson(files.get("manifest.json"), "manifest.json", context);
-        if (manifest == null) return context.report();
+        if (manifest == null) return invalid(context);
         schemas.validate("manifest", manifest, "", issue(context, "manifest.json", null, null, null));
         if (!"1.0".equals(text(manifest, "schemaVersion")))
             context.error("PACKAGE_VERSION_UNSUPPORTED", "manifest.json", null, null, "schemaVersion", "/schemaVersion", null);
-        if (!context.errors.isEmpty()) return context.report();
+        if (!context.errors.isEmpty()) return invalid(context);
 
         Map<String, String> declared = new LinkedHashMap<>();
         for (JsonNode entry : manifest.path("files")) {
@@ -102,7 +107,7 @@ public final class ContentPackageValidator {
         }
         for (String path : files.keySet()) if (!path.equals("manifest.json") && !declared.containsKey(path))
             context.error("PACKAGE_UNDECLARED_FILE", path, null, null, null, "", null);
-        if (!context.errors.isEmpty()) return context.report();
+        if (!context.errors.isEmpty()) return invalid(context);
 
         Map<String, List<CanonicalRecord>> entries = new HashMap<>();
         for (String type : List.of("rights", "media", "items", "lessons", "paths")) {
@@ -113,10 +118,19 @@ public final class ContentPackageValidator {
                     ? parseCsv(files.get(path), path, type, context)
                     : parseArrayFile(files.get(path), path, type, context));
         }
-        if (context.truncated) return context.report();
+        if (context.truncated) return invalid(context);
         canonical.validate(entries, resolver, context);
-        return context.report();
+        ValidationReport report = context.report();
+        return report.valid() ? new ParsedPackage(report, manifest, Map.copyOf(entries))
+                : new ParsedPackage(report, null, Map.of());
     }
+
+    private ParsedPackage invalid(Context context) {
+        return new ParsedPackage(context.report(), null, Map.of());
+    }
+
+    public record ParsedPackage(ValidationReport report, JsonNode manifest,
+                                Map<String, List<CanonicalRecord>> records) {}
 
     private List<CanonicalRecord> parseCsv(byte[] bytes, String file, String type, Context context) {
         String source = decode(bytes, file, context);

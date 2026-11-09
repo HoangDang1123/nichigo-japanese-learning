@@ -1,6 +1,6 @@
 # REST API Contract — implemented auth and proposed learning endpoints
 
-**Base:** `/api/v1`; JSON UTF-8; authenticated identity from server session cookie, not request body. Auth and the five JPN-020 public learning-content GET routes are merged in `origin/main`; deployment is not evidenced. JPN-021 supplies an offline local validation CLI. JPN-022 implements import/review/publish through a secured operator CLI, **not an HTTP endpoint**. Other learning routes and the internal HTTP routes below remain proposals. Content errors use the existing flat `{ "code", "message" }` shape. The implemented package format is specified in [the content package contract](02-CONTENT-PACKAGE-CONTRACT.md).
+**Base:** `/api/v1`; JSON UTF-8; authenticated identity from server session cookie, not request body. Auth, the five JPN-020 public content GET routes, JPN-021 validation CLI, JPN-022 authenticated local operator CLI, and JPN-023 original draft package are merged in `origin/main`; deployment is not evidenced. The operator CLI is **not an HTTP endpoint**. Other learning routes and the internal HTTP routes below remain proposals. Content errors use the existing flat `{ "code", "message" }` shape. The implemented package format is specified in [the content package contract](02-CONTENT-PACKAGE-CONTRACT.md).
 
 | Method | Route | Auth | Description |
 |---|---|---|---|
@@ -46,8 +46,10 @@ Both listing routes enforce `limit` 1–50 and a cursor length ≤200; invalid f
 
 Until detail pagination is designed, the backend refuses a Path larger than 100 Stages, 100 Chapters or 1,000 placements and a Lesson larger than 100 Sections, 1,000 Items, 1,000 Objectives or 5,000 media references with the generic 503 response. JPN-022 must reject such a candidate before publication; this is a protective API bound, not an approved curriculum size.
 
-**Idempotency:** lesson completion uniquely keyed by actor/lesson; repeated calls must not double count. Import keyed by `source + externalId + version` or an explicitly documented stable key. Do not trust client-provided grade, quota date or user ID.
+**Proposed learning behavior:** quiz pass score is at least 80% with unlimited retries; later lessons remain accessible without completing all preceding lessons. Guest quota is at most 2 unique new lesson completions per Asia/Ho_Chi_Minh calendar day. Lesson completion and item mastery remain separate. Activities fit lesson objectives and content type. None of these learning behaviors has an implemented endpoint yet; Lesson/Chapter completion criteria and mastery policy remain open.
+
+**Idempotency:** proposed lesson completion is uniquely keyed by actor/lesson; repeated calls must not double count. JPN-022's implemented operator import uses package key, version and content digest for idempotency. Do not trust client-provided grade, quota date or user ID.
 
 **Tour:** `status = not_started | in_progress | completed | skipped`; `tourVersion` and `lastStep` allow future updates. Guest persistence best effort until retention policy approved.
 
-**Open:** session cookie/domain topology, password reset/verification, exact guest quota, merge semantics, JPN-022 operator transport and authorization, API response envelope. The JPN-021 offline CLI does not settle an HTTP transport decision.
+**Open:** session cookie/domain topology, password reset/verification, guest retention, account-claim merge semantics, any future HTTP operator transport, learning API response envelope, Lesson/Chapter completion criteria and mastery policy. JPN-022 already provides authenticated local operator transport; its CLI does not imply an HTTP operator API.

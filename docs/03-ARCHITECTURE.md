@@ -3,7 +3,7 @@
 ## System topology
 `Browser → Vercel / Next.js → HTTPS → Render Free / Spring Boot → TLS PostgreSQL → Neon Free`
 
-This is the **target deployment topology**, not a deployed environment verified by this repository. Current source has a Next.js frontend, Spring Boot backend, PostgreSQL/Flyway configuration, session auth, JPN-020 public content reads, JPN-021 validation and JPN-ARCH-002 hardening merged in `origin/main`. JPN-022 operator import and publication are on an implementation branch. Hosting, quota, progress and reviewed production content remain planned.
+This is the **target deployment topology**, not a deployed environment verified by this repository. Current source has a Next.js frontend, Spring Boot backend, PostgreSQL/Flyway configuration, session auth, and JPN-020–JPN-023 content work merged in `origin/main`. JPN-022 provides an authenticated local operator CLI, not an HTTP operator API. JPN-023 adds original draft content verified in an isolated database; qualified human review and production publication are pending. Hosting, guest quota and learner progress remain planned.
 
 - Next.js TypeScript frontend. Java Spring Boot modular monolith REST API.
 - Neon managed PostgreSQL; Flyway migration history in repository.
@@ -19,7 +19,7 @@ The shared `Skeleton` and `SkeletonRegion` in `nichigo_frontend/src/components/u
 nichigo_frontend/         # Next.js frontend (App Router, TypeScript)
 nichigo_backend/          # Spring Boot backend (Maven Wrapper, Java 21)
 content/schemas/          # CSV/JSON validation schemas
-content/seeds/            # Reviewed example datasets
+content/packages/         # Draft content packages; publication requires review
 infra/                    # Deployment docs/config (no secrets)
 docs/                     # Project documents
 contracts/                # Proposed API and import contracts
@@ -28,8 +28,8 @@ antigravity/              # Agent operating guide
 ```
 
 ## Data model (conceptual, adjust with migrations)
-The list below is the historical target sketch, not a table-by-table description of current migrations. `origin/main` has V1 baseline, V2 `users`, V3 Spring Session, V4 learning-content tables and V5 authoring keys. JPN-ARCH-002 adds V6 Rights history and V7 Path eligibility on its review branch; guest, quiz and progress tables remain absent. See JPN-002 and JPN-010A implementation notes for the earlier schema.
-The [Nichigo Hybrid curriculum proposal](04-CONTENT-AND-LEARNING.md) adds a conceptual Learning Path → Stage → Chapter → Lesson hierarchy, independent Skills/Practice entry points, and separate lesson-completion versus item-mastery concerns. The JPN-020 branch represents the hierarchy with identified tables; the Railway station granularity remains open.
+The list below is the historical target sketch, not a table-by-table description of current migrations. `origin/main` has V1–V8, including V6 Rights history, V7 Path eligibility and V8 operator pipeline metadata. Guest, quiz and learner-progress tables remain absent. See JPN-002 and JPN-010A implementation notes for the earlier schema.
+The [Nichigo Hybrid curriculum proposal](04-CONTENT-AND-LEARNING.md) adds a conceptual Learning Path → Stage → Chapter → Lesson hierarchy, independent Skills/Practice entry points, and separate lesson-completion versus item-mastery concerns. The merged JPN-020 model represents the hierarchy with identified tables; Railway station granularity remains open.
 
 - `users(id,email,password_hash,status,created_at)`; `auth_sessions(id,user_id,expires_at,revoked_at)`.
 - `guest_sessions(id,created_at,last_seen_at)`; `guest_claims(guest_id,user_id,claimed_at)`.
@@ -77,7 +77,7 @@ Path, Lesson, Item and Media draft roots each carry a nullable `published_revisi
 
 The independent `/api/v1/lessons/{slug}` read resolves the Lesson root's current published revision. The contextual `/api/v1/learning-paths/{pathSlug}/placements/{placementId}/lesson` read first resolves the current eligible Path revision, verifies the placement belongs to it, checks the pinned Lesson and dependencies, then assembles that exact Lesson revision using the same DTO and ordered queries. Neither route accepts a client-selected revision. A Path may therefore remain pinned to Lesson v1 after the independent Lesson root advances to v2; republishing the Path with a v2 pin changes the contextual result. Historical audit requires a separate authorized internal contract and is not exposed here.
 
-Kind-specific Item fields are JSONB with a DB object check; JPN-021 validates their kind-specific shapes before authoring. JPN-022 implements import and publication through a secured operator CLI; withdrawal remains a documented limitation. JPN-023 owns reviewed content. JPN-030 and JPN-031 consume published reads. JPN-032 records graded attempts with pinned revision keys, while JPN-040 owns lesson completion and item mastery separately. Neither JF/CEFR nor JLPT equivalence is inferred by the schema.
+Kind-specific Item fields are JSONB with a DB object check; JPN-021 validates their kind-specific shapes before authoring. JPN-022 implements import and publication through an authenticated local operator CLI; withdrawal remains a documented limitation. JPN-023 provides a three-Lesson original draft verified only in an isolated database; qualified human language/Rights review, owner curriculum acceptance and production publication remain pending. JPN-030 and JPN-031 will consume published reads. JPN-032 is planned to record graded attempts with pinned revision keys, while JPN-040 will keep lesson completion and item mastery separate. The approved Learning Experience v1 rules are in [ADR-016–017](02-DECISIONS.md); quiz, unlock, quota and progress behavior is not implemented. Neither JF/CEFR nor JLPT equivalence is inferred by the schema.
 
 ## JPN-ARCH-002 rights history and Path eligibility (merged baseline)
 

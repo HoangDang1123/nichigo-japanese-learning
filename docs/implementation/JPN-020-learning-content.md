@@ -4,7 +4,7 @@ Later hardening is tracked separately in [JPN-ARCH-002](JPN-ARCH-002-content-arc
 
 ## Scope and status
 
-The JPN-020 branch implemented the PostgreSQL content model and published-only backend reads, merged into `origin/main` via PR #22. It contains no production curriculum, authoring endpoint, importer, publisher, progress calculation, or frontend integration. Source is **implemented**, PostgreSQL integration tests were **run**, and the technical decision in ADR-015 still awaits owner review. No release is evidenced.
+The JPN-020 branch implemented the PostgreSQL content model and published-only backend reads, merged into `origin/main` via PR #22. It contains no production curriculum, authoring endpoint, importer, publisher, progress calculation, or frontend integration. Source is **implemented** and PostgreSQL integration tests were **run**. ADR-015 was approved later; no release is evidenced.
 
 ## Architecture and relationships
 

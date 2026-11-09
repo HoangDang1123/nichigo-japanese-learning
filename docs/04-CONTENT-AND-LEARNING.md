@@ -2,7 +2,7 @@
 
 **Trạng thái:** Hướng **Nichigo Hybrid** đã được Product Owner đồng ý và ghi tại [ADR-014](02-DECISIONS.md). Cấu trúc curriculum, ví dụ và hành vi Railway bên dưới là **PROPOSED**, chưa được phê duyệt để triển khai. Các lựa chọn còn thiếu nằm ở mục **OPEN**. Tài liệu này là nguồn mô tả curriculum; [PRD](01-PRD.md) giữ phạm vi sản phẩm, [kiến trúc](03-ARCHITECTURE.md) giữ mô hình hệ thống, còn [backlog](05-BACKLOG.md) giữ ticket và phụ thuộc.
 
-## JPN-021 — Định dạng biên soạn nội dung (nhánh tính năng)
+## JPN-021 — Định dạng biên soạn nội dung (đã merge)
 
 Gói dữ liệu phẳng có `manifest.json` phiên bản `1.0`; manifest khai báo tối đa một file cho mỗi loại `rights`, `media`, `items`, `lessons`, `paths`. Rights, Media và Item dùng CSV UTF-8 với cột cố định; Lesson và Path dùng JSON UTF-8 với `schemaVersion` và mảng cùng tên loại. [Hợp đồng biên soạn](../contracts/02-CONTENT-PACKAGE-CONTRACT.md) ghi chính xác tên trường, giới hạn và mã lỗi; `content/schemas/v1` là schema máy đọc được. Chỉ `1.0` được hỗ trợ; phiên bản khác bị từ chối, không được tự suy diễn cách nâng cấp.
 
@@ -44,7 +44,7 @@ Skills là lối vào học/ôn độc lập, không phải cấp con của Lear
 | **Practice modes** | Flashcards, Quiz, Review, Mini Games. |
 | **Assessments** | Lesson Check, Chapter Review, Stage Review, JLPT Practice. |
 
-Lesson, Skills và Practice cùng tham chiếu bản ghi nội dung chuẩn cho kana, từ vựng, ngữ pháp, kanji, ví dụ và media được duyệt; không nhân bản nội dung chuẩn theo màn hình. Kết quả hoàn thành Lesson và mức luyện tập/thành thạo từng item cần là hai mô hình khác nhau. Thuật toán mastery và review chưa được quyết định.
+Lesson, Skills và Practice cùng tham chiếu bản ghi nội dung chuẩn cho kana, từ vựng, ngữ pháp, kanji, ví dụ và media được duyệt; không nhân bản nội dung chuẩn theo màn hình. Theo [ADR-016 và ADR-017](02-DECISIONS.md), quiz đạt từ 80%, được làm lại không giới hạn; Lesson sau vẫn truy cập được dù chưa hoàn thành mọi Lesson trước. Hoàn thành Lesson và mastery từng item là hai khái niệm riêng. Hoạt động phải phù hợp mục tiêu và loại nội dung của Lesson, không áp một trình tự cố định. Đây là hướng sản phẩm đã duyệt, **chưa được triển khai**; tiêu chí hoàn thành Lesson/Chapter, thuật toán mastery và review chưa được quyết định.
 
 ## PROPOSED — Quy trình thiết kế Lesson
 
@@ -54,9 +54,9 @@ Lesson, Skills và Practice cùng tham chiếu bản ghi nội dung chuẩn cho 
 4. Đối chiếu phạm vi kiến thức JLPT dự kiến, nhưng không tuyên bố tương đương JF/CEFR hoặc bao phủ N5 khi chưa xác minh.
 5. Thiết kế hoạt động theo ngữ cảnh và kiểm tra kiến thức phù hợp; không buộc một cấu trúc cố định cho mọi Lesson.
 6. Rà soát tính đúng đắn ngôn ngữ, nguồn tham chiếu, ghi công và quyền sử dụng từng văn bản/media.
-7. Kiểm tra dữ liệu và xuất bản qua quy trình import đã lên kế hoạch: bản nháp → rà soát nguồn/quyền và ngôn ngữ → validation/dry-run → thao tác publish được kiểm soát → lưu vết phiên bản.
+7. Kiểm tra dữ liệu và xuất bản qua pipeline JPN-021/JPN-022: bản nháp → validation/dry-run → rà soát nguồn/quyền và ngôn ngữ có thẩm quyền → publish có kiểm soát → lưu vết phiên bản.
 
-JPN-021 hiện kiểm tra khóa ổn định và trùng lặp, trường bắt buộc, tham chiếu, thứ tự, chu trình tiên quyết, định dạng kana/kanji và metadata nguồn/quyền; dry-run trả lỗi theo dòng mà không ghi dữ liệu. JPN-022 vẫn phải cung cấp batch ID, import idempotent, review có thẩm quyền và thao tác publish rõ ràng.
+JPN-021 kiểm tra khóa ổn định và trùng lặp, trường bắt buộc, tham chiếu, thứ tự, chu trình tiên quyết, định dạng kana/kanji và metadata nguồn/quyền; dry-run trả lỗi theo dòng mà không ghi dữ liệu. JPN-022 đã merge: CLI operator cục bộ có xác thực thực hiện import idempotent, review và publish với version pin rõ ràng; đây không phải HTTP operator API.
 
 **Ma trận minh họa — chưa duyệt, không phải syllabus hoặc nội dung để xuất bản:**
 
@@ -80,7 +80,7 @@ Mức station là Chapter hay Lesson vẫn **OPEN**. Nếu hiển thị tiến �
 
 Đợt thiết kế [JPN-020](05-BACKLOG.md) đã chọn cách biểu diễn Stage/Chapter và thứ tự Chapter–Lesson; định danh Lesson ổn định, độc lập số bài trong giáo trình; tham chiếu nội dung chuẩn dùng lại; mục tiêu Can-do; quan hệ tiên quyết; metadata JLPT và metadata mức giao tiếp **tách biệt**; nguồn gốc, giấy phép, trạng thái review/xuất bản; và ranh giới giữa tiến độ hoàn thành Lesson với luyện tập/mastery từng item. Mỗi item chuẩn cần có khóa ổn định, loại nội dung, phiên bản, mức học thích hợp, văn bản/cách đọc/bản dịch khi phù hợp, ví dụ nếu cần, nguồn/giấy phép và trạng thái duyệt/xuất bản. Phân biệt `introductory` với `N5`; không tự gán tương đương giữa các thang mức. Đây là nhu cầu khái niệm, **không phải syllabus hoặc API mới đã duyệt**. [Kiến trúc](03-ARCHITECTURE.md) phân biệt mô hình sơ bộ với V4 đã merge; tiến độ người học vẫn chưa có migration.
 
-**Cập nhật kỹ thuật JPN-020/JPN-021:** V4 đã merge với bảng định danh Path/Stage/Chapter/Lesson và Content Item dùng lại, có thứ tự quan hệ rõ ràng; API công khai chỉ đọc revision đã niêm phong và tham chiếu đúng revision của Item/Media. Quyền sử dụng được kiểm tra lại khi đọc; thu hồi quyền làm nội dung liên quan không còn được phát công khai. JPN-021 trên nhánh hiện tại kiểm tra payload và gói biên soạn, nhưng không publish. Nền tảng kỹ thuật này **không duyệt** Stage/Chapter syllabus, số lượng Lesson, cách gán station Railway, điều kiện mở khóa hoặc bao phủ N5; chưa có dữ liệu bài học được duyệt.
+**Cập nhật kỹ thuật JPN-020–JPN-023:** V4–V8 và JPN-020–JPN-023 đã merge. API công khai chỉ đọc revision đã niêm phong và còn đủ quyền sử dụng. JPN-021 kiểm tra gói biên soạn; JPN-022 cung cấp CLI operator cục bộ để import, review và publish. JPN-023 thêm gói nháp gốc gồm ba Lesson, đã kiểm tra import/publish trong cơ sở dữ liệu cô lập. Chưa có human language/Rights review, curriculum acceptance hoặc publication production. Nền tảng kỹ thuật này **không duyệt** Stage/Chapter syllabus, số lượng Lesson chính thức, cách gán station Railway hoặc bao phủ N5.
 
 ## Phạm vi MVP và các quyết định OPEN
 
@@ -90,10 +90,10 @@ Product Owner cần quyết định trước khi chốt thiết kế/triển kha
 
 1. Số lượng và thứ tự Chapter, Lesson chính thức.
 2. Syllabus Chapter và mức bao phủ N5 đã được kiểm chứng.
-3. Cách mở khóa và có thực thi điều kiện tiên quyết hay không.
+3. Cách hiển thị kiến thức tiên quyết và các giới hạn truy cập khác nếu có; soft unlock giữa các Lesson đã được duyệt.
 4. Chapter Review có bắt buộc hay không.
 5. Railway station đại diện Chapter hay Lesson.
-6. Tiêu chí hoàn thành Lesson và Chapter.
+6. Tiêu chí hoàn thành Lesson và Chapter; điểm quiz 80% không tự quyết định việc hoàn thành.
 7. Mức theo dõi mastery và thuật toán review.
 8. Quyền sử dụng nội dung, giấy phép và tính sẵn có của audio/hình/nét viết đã được rà soát.
 

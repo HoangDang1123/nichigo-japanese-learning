@@ -35,11 +35,12 @@ A Vietnamese-first Japanese learning website for absolute beginners, with a grad
 ## 4. MVP scope (P0)
 - Responsive Vietnamese UI; navigation, error/loading/empty states.
 - Email/password register/login/logout, password hashing and server authorization.
-- Guest identity and backend-enforced daily completed-lesson quota (exact count pending owner approval).
+- Guest identity and backend-enforced quota of at most 2 unique new lesson completions per Asia/Ho_Chi_Minh calendar day.
 - Guided spotlight tour and ability to replay; guest persistence best effort, account persistence durable.
 - Learning path and ordered lessons; free skill browsing of released content.
 - Hiragana/kana foundational learning with character recognition, pronunciation/audio where sourced, writing/stroke guide where available.
-- Vocabulary/grammar lesson content and basic quiz (multiple choice and fill-in); clear correction/explanations.
+- Vocabulary/grammar lesson content and suitable learning activities, including basic quizzes where appropriate; clear correction/explanations. A quiz passes at 80% or higher and permits unlimited retries.
+- Soft lesson unlock: later lessons remain accessible without completing every preceding lesson.
 - Persist attempts, lesson progress, completion and basic dashboard.
 - CSV/JSON content import with validation, dry run, idempotency, draft/publish and provenance.
 - N5 content only in released MVP; published content may be a subset of N5, not a full N5 syllabus.
@@ -56,13 +57,13 @@ A Vietnamese-first Japanese learning website for absolute beginners, with a grad
 
 **FR-03 Auth:** email/password registration, login, logout, protected progress. Acceptance: duplicate email, wrong password, session expiry and logout handled; no password plaintext stored.
 
-**FR-04 Guest quota:** quota by local calendar day (Asia/Ho_Chi_Minh) and unique lesson completions, enforced on backend transactionally. Acceptance: re-opening/completing same lesson on same day does not double count; parallel completions cannot exceed quota; over-quota returns typed error; user sees remaining allowance. Exact numeric default is **not approved**.
+**FR-04 Guest quota:** at most 2 unique new lesson completions per local calendar day (Asia/Ho_Chi_Minh), enforced on backend transactionally. Acceptance: re-opening/completing the same lesson on the same day does not double count; parallel completions cannot exceed 2; over-quota returns a typed error; user sees remaining allowance.
 
 **FR-05 Content:** published path/lesson and skill catalogs; draft content invisible to public. Acceptance: path order deterministic; content reused without duplicate canonical records.
 
-**FR-06 Learning:** lessons show suitable segments (not all skills mandatory), exercises graded server-side, feedback shown. Acceptance: submitted answers have stable question IDs, no client-authoritative scoring.
+**FR-06 Learning:** lessons use activities suited to their objectives and content type, without one fixed activity sequence. Exercises are graded server-side and feedback is shown. A quiz passes at 80% or higher and allows unlimited retries. Later lessons remain accessible without completing all earlier lessons. Acceptance: submitted answers have stable question IDs and no client-authoritative scoring. Quiz pass does not by itself define Lesson or Chapter completion.
 
-**FR-07 Progress:** completed lesson and quiz attempt persisted; resume and dashboard. Acceptance: progress survives refresh/login and is consistent between path and skills.
+**FR-07 Progress:** completed lesson and quiz attempt persisted; resume and dashboard. Lesson completion and per-item mastery are separate records or concepts. Acceptance: progress survives refresh/login and is consistent between path and skills. Completion and mastery rules beyond this separation remain open.
 
 **FR-08 Import:** schema validation, dry-run report, import batch, idempotent upsert by stable key, provenance and publish gate. Acceptance: malformed row doesn't silently publish; rerun same batch doesn't duplicate.
 

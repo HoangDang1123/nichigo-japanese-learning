@@ -1,0 +1,361 @@
+/**
+ * kana-chart.module.css — Kana reference chart, connectors and drawer layout.
+ * Semantic tokens only. Rows of the paired charts and the connector column share the
+ * same fixed row heights, so connector geometry stays aligned.
+ */
+
+.chartArea {
+  --kana-special: #c0264a;
+  --head-h: 1.75rem;
+  --grid-gap: 0.5rem;
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-width: 0;
+}
+
+.pairWrap {
+  /* Layout chrome as variables so each width tier can tighten it consistently:
+     --pad-x  horizontal panel padding   --head-w  row-header column
+     --conn-w connector column           --grid-gap gap between tiles (defined on .chartArea)
+     --tile   tile width: share the container between the charts, clamped (stacked mode sizes ONE
+              chart; side-by-side sizes two). Rows are ~square and shared with the connectors. */
+  --pad-x: var(--space-5);
+  --head-w: 1.75rem;
+  --conn-w: 2rem;
+  --tile: clamp(3rem, calc((100cqi - 2 * var(--pad-x) - var(--head-w) - 5 * var(--grid-gap)) / 5), 4.5rem);
+  --cell-h: calc(var(--tile) * 1.08);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+  padding: var(--space-4) var(--pad-x) var(--space-5);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.trayHeader {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.trayTitle {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.trayJa {
+  font-family: var(--font-japanese-serif);
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.12em;
+  color: var(--color-primary);
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  min-width: 0;
+}
+
+/*
+ * Side by side, in two tiers (container = .chartArea, i.e. the space left of the drawer column):
+ *  - compact  42.75rem–58rem : tighter chrome (6px gaps, 24px header/connector columns, 16px
+ *             padding) so two 5-column charts fit with tiles >= 3.25rem (about 52–72px). Below
+ *             this width tiles would be too small, so the charts stack instead.
+ *  - roomy    >= 58rem       : the original generous chrome, tiles up to 72px (1920px layout).
+ */
+@container (min-width: 42.75rem) {
+  .pairWrap {
+    --pad-x: var(--space-4);
+    --head-w: 1.5rem;
+    --conn-w: 1.5rem;
+    --grid-gap: 0.375rem;
+    --tile: clamp(3.25rem, calc((100cqi - 2 * var(--pad-x) - var(--conn-w) - 2 * var(--head-w) - 10 * var(--grid-gap)) / 10), 4.5rem);
+  }
+  .pair {
+    grid-template-columns: max-content var(--conn-w) max-content;
+    justify-content: start;
+    gap: 0;
+  }
+  .connectorCol {
+    display: flex !important;
+  }
+}
+
+@container (min-width: 58rem) {
+  .pairWrap {
+    --pad-x: var(--space-5);
+    --head-w: 1.75rem;
+    --conn-w: 2rem;
+    --grid-gap: 0.5rem;
+    --tile: clamp(3.5rem, calc((100cqi - 2 * var(--pad-x) - var(--conn-w) - 2 * var(--head-w) - 10 * var(--grid-gap)) / 10), 4.5rem);
+  }
+}
+
+/*
+ * Very narrow chart area (e.g. a 1024px viewport with the docked 24rem drawer leaves ~300px):
+ * trim the panel padding and allow slightly smaller tiles so one 5-column chart never overflows.
+ */
+@container (max-width: 22rem) {
+  .pairWrap {
+    --pad-x: var(--space-3);
+    --tile: clamp(2.5rem, calc((100cqi - 2 * var(--pad-x) - var(--head-w) - 5 * var(--grid-gap)) / 5), 4.5rem);
+  }
+}
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.chartTitle {
+  display: flex;
+  align-items: center;
+  height: 2rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: var(--head-w) repeat(auto-fit, var(--tile));
+  grid-template-rows: var(--head-h);
+  /* Stacked layout: rows without kana collapse (no blank gaps). The side-by-side layout below
+     restores fixed row heights so rows stay aligned with the sibling chart and the connectors. */
+  grid-auto-rows: auto;
+  gap: var(--grid-gap);
+}
+
+/* Side by side: fixed row heights again, so rows align with the sibling chart and connectors.
+   Must come after the base .grid rule to win the cascade. */
+@container (min-width: 42.75rem) {
+  .grid {
+    grid-auto-rows: var(--cell-h);
+  }
+}
+
+.colHead,
+.rowHead {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+}
+
+/* Study tile: near-square, neutral surface, glyph first, romaji second. */
+.cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.125rem;
+  justify-self: center;
+  width: 100%;
+  min-width: 0;
+  min-height: var(--cell-h);
+  padding: 0;
+  font-family: inherit;
+  background-color: color-mix(in srgb, var(--color-text) 3%, var(--color-surface));
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--duration-fast) var(--easing-default),
+              border-color var(--duration-fast) var(--easing-default),
+              box-shadow var(--duration-fast) var(--easing-default);
+}
+
+.cell:hover {
+  background-color: var(--color-primary-subtle);
+  border-color: var(--color-primary);
+}
+
+.cell:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.cellActive,
+.cellActive:hover {
+  background-color: var(--color-primary-subtle);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.glyph,
+.romaji {
+  position: relative;
+  z-index: 1;
+}
+
+.glyph {
+  font-family: var(--font-japanese);
+  font-size: calc(var(--tile) * 0.42);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.1;
+  color: var(--color-text);
+}
+
+.cellActive .glyph {
+  color: var(--color-primary);
+}
+
+.romaji {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  line-height: 1.3;
+  color: var(--color-text-muted);
+}
+
+/* Irregular Hepburn reading: accent colour only. */
+.romajiSpecial {
+  color: var(--kana-special);
+  font-weight: var(--font-weight-semibold);
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme="light"])) .chartArea {
+    --kana-special: #ff8aa5;
+  }
+}
+
+:global(:root[data-theme="dark"]) .chartArea {
+    --kana-special: #ff8aa5;
+}
+
+/* ── Connectors ───────────────────────────────────────────────────────────── */
+.connectorCol {
+  display: none;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.connectorSpacer {
+  height: 2rem;
+  flex-shrink: 0;
+}
+
+.connectorGrid {
+  display: grid;
+  grid-template-rows: var(--head-h);
+  grid-auto-rows: var(--cell-h);
+  gap: var(--grid-gap);
+  flex: 1;
+}
+
+.connectorStraight,
+.connectorBranch {
+  position: relative;
+  grid-column: 1;
+  color: var(--color-border-hover);
+}
+
+.connectorStraight::before {
+  content: "";
+  position: absolute;
+  left: 0.25rem;
+  right: 0.25rem;
+  top: calc(var(--cell-h) / 2 - 1px);
+  border-top: 2px solid currentColor;
+}
+
+.connectorStraight::after,
+.connectorBranch::after {
+  content: "";
+  position: absolute;
+  right: 0.125rem;
+  border-top: 0.3125rem solid transparent;
+  border-bottom: 0.3125rem solid transparent;
+  border-left: 0.5rem solid currentColor;
+}
+
+.connectorStraight::after {
+  top: calc(var(--cell-h) / 2 - 0.3125rem);
+}
+
+/* Branch: vertical rail from the first row down to the last row, then an arrow out. */
+.connectorBranch::before {
+  content: "";
+  position: absolute;
+  left: 0.25rem;
+  top: calc(var(--cell-h) / 2);
+  bottom: calc(var(--cell-h) / 2 - 1px);
+  width: calc(100% - 0.5rem);
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  border-bottom-left-radius: var(--radius-sm);
+}
+
+.connectorBranch::after {
+  bottom: calc(var(--cell-h) / 2 - 0.3125rem);
+}
+
+/* Shared stroke-data credit at the very bottom of the chart page */
+.attribution {
+  margin: 0;
+  padding-top: var(--space-3);
+  border-top: var(--border-width) solid var(--color-border);
+  font-size: var(--font-size-xs);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.attribution a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.attribution a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.relations {
+  margin: 0;
+  padding-left: var(--space-5);
+  max-width: 46rem;
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+/* ── Workspace ────────────────────────────────────────────────────────────── */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+  min-width: 0;
+}
+
+@media (min-width: 64rem) {
+  .workspace {
+    grid-template-columns: minmax(0, 1fr) 24rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell {
+    transition-duration: 0.01ms !important;
+  }
+}

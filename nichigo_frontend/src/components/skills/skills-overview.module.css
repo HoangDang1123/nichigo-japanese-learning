@@ -1,0 +1,548 @@
+/**
+ * skills-overview.module.css — Styles for the /skills overview page (card grid).
+ *
+ * Uses ONLY CSS custom properties from tokens.css / themes.css.
+ * Exception: decorative SVG fill attributes in JSX may use specific sakura
+ * palette colors as inline fill values (they are decorative art, not UI).
+ */
+
+/* ── Page container ───────────────────────────────────────────────────────── */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+  min-width: 0;
+  padding-block: 0 var(--space-12);
+}
+
+/* ── Page header (title + decorative art) ─────────────────────────────────── */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-6);
+  position: relative;
+  min-height: 9rem;
+  padding: var(--space-4) 0 var(--space-2);
+}
+
+.headerLeft {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pageTitle {
+  font-family: var(--font-heading);
+  font-size: clamp(var(--font-size-3xl), 3.6vw, var(--font-size-5xl));
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  text-wrap: balance;
+  margin: 0;
+}
+
+.pageSubtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-relaxed);
+  max-width: 36rem;
+  margin: 0;
+}
+
+.headerArt {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(26rem, 55%);
+  z-index: 0;
+  opacity: 0.7;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 45%);
+  mask-image: linear-gradient(to right, transparent, #000 45%);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── Filter + search bar row ──────────────────────────────────────────────── */
+.controlsRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.filterPill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-5);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--duration-fast) var(--easing-default),
+              border-color var(--duration-fast) var(--easing-default),
+              color var(--duration-fast) var(--easing-default);
+}
+
+.filterPill:hover:not(.filterPillActive) {
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-border-hover);
+  color: var(--color-text);
+}
+
+.filterPill:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.filterPillActive {
+  background-color: var(--color-primary-subtle);
+  border-color: var(--color-primary-subtle);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.controlsSpacer {
+  flex: 1;
+  min-width: var(--space-2);
+}
+
+.searchWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--space-3);
+  color: var(--color-text-muted);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.searchInput {
+  width: min(24rem, 40vw);
+  height: 2.75rem;
+  padding: 0 var(--space-8) 0 var(--space-8);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-full);
+  outline: none;
+  transition: border-color var(--duration-fast) var(--easing-default),
+              box-shadow var(--duration-fast) var(--easing-default),
+              width var(--duration-normal) var(--easing-default);
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-subtle);
+}
+
+.searchInput:hover {
+  border-color: var(--color-border-hover);
+}
+
+.searchInput:focus-visible {
+  border-color: var(--color-focus);
+  box-shadow: 0 0 0 1px var(--color-focus);
+  width: min(26rem, 44vw);
+}
+
+.searchClearBtn {
+  position: absolute;
+  right: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  background-color: var(--color-surface-hover);
+  border: none;
+  border-radius: var(--radius-full);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--easing-default);
+}
+
+.searchClearBtn:hover {
+  background-color: var(--color-surface-raised);
+  color: var(--color-text);
+}
+
+.searchClearBtn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+/* ── Card grid ────────────────────────────────────────────────────────────── */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+/* ── Category card ────────────────────────────────────────────────────────── */
+/* Shared base between <Link> and <div> card variants */
+.card {
+  display: flex;
+  flex-direction: column;
+  min-height: 17rem;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--tint, var(--color-primary)) 14%, var(--color-surface)) 0%, var(--color-surface) 75%);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 2px 10px rgba(152, 59, 98, 0.06);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow var(--duration-fast) var(--easing-default),
+              border-color var(--duration-fast) var(--easing-default),
+              transform var(--duration-fast) var(--easing-default);
+  position: relative;
+}
+
+.cardClickable {
+  cursor: pointer;
+}
+
+.cardClickable:hover {
+  border-color: var(--color-border-hover);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+  transform: translateY(-1px);
+}
+
+.cardClickable:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.cardUnavailable {
+  opacity: 0.75;
+  cursor: default;
+}
+
+/* Art area (top portion of card) */
+.cardArt {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-5) 0;
+  background: transparent;
+  min-height: 5.5rem;
+}
+
+/* Large Japanese glyph marker */
+.cardMarker {
+  font-size: 4rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--tint, var(--color-primary));
+  line-height: 1;
+  z-index: 1;
+}
+
+.cardMarkerSans {
+  font-family: var(--font-japanese);
+}
+
+.cardMarkerSerif {
+  font-family: var(--font-japanese-serif);
+}
+
+/* Decorative SVG illustration area */
+.cardDecorSvg {
+  flex-shrink: 0;
+  opacity: 0.75;
+  width: 6.5rem;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Card body */
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-5) var(--space-3);
+  flex: 1;
+}
+
+.cardTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  line-height: var(--line-height-tight);
+  margin: 0;
+}
+
+.cardSubtitle {
+  font-family: var(--font-japanese);
+  font-size: var(--font-size-xs);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.cardDescription {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-normal);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: var(--space-1) 0 0;
+}
+
+/* Card footer */
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: var(--space-3) var(--space-5);
+  background-color: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+.cardChevron {
+  box-sizing: content-box;
+  padding: 0.35rem;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary-subtle);
+  color: var(--color-primary);
+  opacity: 0.9;
+  transition: opacity var(--duration-fast) var(--easing-default),
+              transform var(--duration-fast) var(--easing-default);
+}
+
+.cardClickable:hover .cardChevron {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+/* Availability badges */
+.badgePlanned {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: var(--space-0-5) var(--space-2);
+  border-radius: var(--radius-xs);
+  background-color: var(--color-primary-subtle);
+  color: var(--color-primary);
+  border: var(--border-width) solid var(--color-primary);
+}
+
+.badgeUnavailable {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-medium);
+  padding: var(--space-0-5) var(--space-2);
+  border-radius: var(--radius-xs);
+  background-color: var(--color-disabled);
+  color: var(--color-disabled-text);
+  border: var(--border-width) solid var(--color-border);
+}
+
+/* ── Empty search state ───────────────────────────────────────────────────── */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-16) var(--space-6);
+  gap: var(--space-3);
+}
+
+.emptyStateTitle {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.emptyStateDesc {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  max-width: 28rem;
+  margin: 0;
+}
+
+.emptyStateClearBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+  background-color: var(--color-primary-subtle);
+  border: var(--border-width) solid var(--color-primary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--easing-default);
+}
+
+.emptyStateClearBtn:hover {
+  background-color: var(--color-surface-raised);
+}
+
+.emptyStateClearBtn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 72rem) {
+  .cardGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 48rem) {
+  .container {
+    gap: var(--space-4);
+    padding-block: 0 var(--space-8);
+  }
+
+  .header {
+    flex-direction: column;
+  }
+
+  .headerArt {
+    display: none;
+  }
+
+  .pageTitle {
+    font-size: var(--font-size-3xl);
+  }
+
+  .cardGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+
+  .controlsRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .controlsSpacer {
+    display: none;
+  }
+
+  .searchInput {
+    width: 100%;
+  }
+
+  .searchInput:focus-visible {
+    width: 100%;
+  }
+
+  .searchWrapper {
+    width: 100%;
+  }
+}
+
+@media (max-width: 30rem) {
+  .cardGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── Reduced motion ───────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .filterPill,
+  .searchInput,
+  .searchClearBtn,
+  .cardChevron {
+    transition-duration: 0.01ms !important;
+  }
+
+  .cardClickable:hover {
+    transform: none;
+  }
+}
+
+/* Per-category decorative tints (decorative only) */
+.tintkana { --tint: #983b62; }
+.tintvocabulary { --tint: #4f7a4a; }
+.tintgrammar { --tint: #a86a2a; }
+.tintkanji { --tint: #3d5a9e; }
+.tintlistening { --tint: #3d5a9e; }
+.tintspeaking { --tint: #7a4a9e; }
+.tintreading { --tint: #4f7a4a; }
+.tintwriting { --tint: #a86a2a; }
+.tintflashcards { --tint: #983b62; }
+
+.filterIcon { flex-shrink: 0; }
+
+/* ── Grouped sections ─────────────────────────────────────────────────────── */
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.sectionNumber {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  letter-spacing: 0.08em;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.sectionRule {
+  flex: 1;
+  height: 1px;
+  background-color: var(--color-border);
+}

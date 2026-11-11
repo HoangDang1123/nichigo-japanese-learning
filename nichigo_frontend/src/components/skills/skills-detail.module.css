@@ -1,0 +1,499 @@
+/**
+ * skills-detail.module.css — Shared styles for all Skills detail pages.
+ * Used by: kana-detail, vocabulary-detail, grammar-detail, kanji-detail,
+ *          unavailable-detail.
+ *
+ * Uses only CSS custom properties from tokens.css / themes.css.
+ */
+
+/* ── Page wrapper ─────────────────────────────────────────────────────────── */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+  min-width: 0;
+  padding-block: 0 var(--space-12);
+}
+
+/* ── Back navigation ──────────────────────────────────────────────────────── */
+.backNav {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--easing-default);
+}
+
+.backNav:hover {
+  color: var(--color-primary);
+}
+
+.backNav:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Page header ──────────────────────────────────────────────────────────── */
+.pageHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+  padding-bottom: var(--space-5);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.pageTitleRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.pageTitle {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+  line-height: var(--line-height-tight);
+  margin: 0;
+}
+
+.pageJapaneseTitle {
+  font-family: var(--font-japanese);
+  font-size: var(--font-size-lg);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.pageDescription {
+  max-width: 44rem;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-relaxed);
+  max-width: 42rem;
+  margin: 0;
+}
+
+/* ── Demo data notice badge ───────────────────────────────────────────────── */
+.demoBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 0.7rem;
+  padding: var(--space-0-5) var(--space-2);
+  border-radius: var(--radius-xs);
+  background-color: var(--color-surface-raised);
+  color: var(--color-text-muted);
+  border: var(--border-width) solid var(--color-border);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+/* ── Kana script toggle ───────────────────────────────────────────────────── */
+.scriptToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  background-color: var(--color-surface-raised);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.scriptToggleBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  padding: var(--space-1-5) var(--space-3);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--easing-default),
+              color var(--duration-fast) var(--easing-default);
+}
+
+.scriptToggleBtn:hover:not(.scriptToggleBtnActive) {
+  background-color: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.scriptToggleBtn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+.scriptToggleBtnActive {
+  background-color: var(--color-surface);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.scriptToggleBtnGlyph {
+  font-family: var(--font-japanese);
+  font-size: var(--font-size-base);
+  line-height: 1;
+}
+
+/* ── Vocabulary list ──────────────────────────────────────────────────────── */
+.vocabList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+  gap: var(--space-4);
+}
+
+.vocabCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--duration-fast) var(--easing-default),
+              background-color var(--duration-fast) var(--easing-default);
+}
+
+.vocabCard:hover {
+  border-color: var(--color-border-hover);
+  background-color: var(--color-surface-hover);
+}
+
+.vocabTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.vocabSurface {
+  font-family: var(--font-japanese);
+  font-size: 1.625rem;
+  line-height: 1.3;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+.vocabTypeBadge {
+  font-size: var(--font-size-xs);
+  padding: 0.125rem var(--space-2);
+  border-radius: var(--radius-xs);
+  background-color: var(--color-surface-raised);
+  color: var(--color-text-muted);
+  border: var(--border-width) solid var(--color-border);
+  white-space: nowrap;
+}
+
+.vocabReadingArea {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  font-size: 1rem;
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.vocabHanViet {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.vocabMeaning {
+  font-size: 1.0625rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.vocabSentenceArea {
+  margin-top: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface-hover);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.vocabSentenceJa {
+  font-family: var(--font-japanese);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+.vocabSentenceVi {
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+/* ── Grammar list ─────────────────────────────────────────────────────────── */
+.grammarList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.grammarCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--color-accent);
+}
+
+.grammarHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.grammarPattern {
+  font-family: var(--font-japanese);
+  font-size: var(--font-size-2xl);
+  line-height: 1.3;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+.grammarMeaning {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+}
+
+.grammarExplanation {
+  font-size: 1.0625rem;
+  color: var(--color-text);
+  line-height: 1.7;
+  max-width: 46rem;
+  margin: 0;
+}
+
+.grammarExampleBox {
+  padding: var(--space-4) var(--space-5);
+  max-width: 46rem;
+  background-color: var(--color-surface-hover);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.grammarExampleJa {
+  font-family: var(--font-japanese);
+  font-size: var(--font-size-xl);
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+.grammarExampleVi {
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+/* ── Kanji grid ───────────────────────────────────────────────────────────── */
+.kanjiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: var(--space-4);
+}
+
+.kanjiCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--duration-fast) var(--easing-default);
+}
+
+.kanjiCard:hover {
+  border-color: var(--color-border-hover);
+}
+
+.kanjiTop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.kanjiGlyphBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 5rem;
+  height: 5rem;
+  background-color: var(--color-surface-raised);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-japanese);
+  font-size: 3.25rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.kanjiInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+}
+
+.kanjiHanViet {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  letter-spacing: 0.05em;
+}
+
+.kanjiMeaning {
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+}
+
+.kanjiStrokes {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.kanjiReadings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: var(--font-size-base);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface-hover);
+  border-radius: var(--radius-sm);
+}
+
+.readingRow {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.readingLabel {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  width: 3rem;
+  flex-shrink: 0;
+}
+
+.readingText {
+  font-family: var(--font-japanese);
+  color: var(--color-text);
+}
+
+.kanjiExample {
+  font-size: var(--font-size-base);
+  flex-wrap: wrap;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1-5);
+  padding-top: var(--space-1);
+}
+
+.kanjiExampleWord {
+  font-family: var(--font-japanese);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+/* ── Unavailable / honest state ───────────────────────────────────────────── */
+.unavailableNotice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-16) var(--space-6);
+  gap: var(--space-4);
+  background-color: var(--color-surface-raised);
+  border: var(--border-width) dashed var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.unavailableIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-full);
+  background-color: var(--color-surface);
+  color: var(--color-primary);
+  border: var(--border-width) solid var(--color-border);
+}
+
+.unavailableTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.unavailableJaTitle {
+  font-family: var(--font-japanese);
+  font-size: var(--font-size-base);
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.unavailableReason {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  max-width: 36rem;
+  line-height: var(--line-height-relaxed);
+  margin: 0;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 48rem) {
+  .page {
+    gap: var(--space-4);
+    padding-block: 0 var(--space-8);
+  }
+
+  .vocabList {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .kanjiGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── Reduced motion ───────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .vocabCard,
+  .kanjiCard,
+  .backNav {
+    transition-duration: 0.01ms !important;
+  }
+}

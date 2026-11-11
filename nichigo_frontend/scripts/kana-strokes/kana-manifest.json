@@ -1,0 +1,1044 @@
+{
+ "_comment": "Required kana characters = every unique Unicode character used by the chart (single-character cells plus the small kana that only appear inside contracted sounds). Generated from the chart data; a test asserts it equals the live chart inventory. expectedStrokes = standard stroke counts (+2 dakuten, +1 handakuten), independent of AnimCJK. kanaId = chart cell id for cells, `<script>-small-<ya|yu|yo>` for small kana.",
+ "source": "animcjk",
+ "commit": "c63765b150cbd567c71d05cf4a4f8d00b57045c9",
+ "folder": "svgsJaKana",
+ "glyphs": [
+  {
+   "kanaId": "hiragana-basic-v-a",
+   "script": "hiragana",
+   "glyph": "あ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-basic-v-i",
+   "script": "hiragana",
+   "glyph": "い",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-basic-v-u",
+   "script": "hiragana",
+   "glyph": "う",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-basic-v-e",
+   "script": "hiragana",
+   "glyph": "え",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-basic-v-o",
+   "script": "hiragana",
+   "glyph": "お",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-basic-k-a",
+   "script": "hiragana",
+   "glyph": "か",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-basic-k-i",
+   "script": "hiragana",
+   "glyph": "き",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "hiragana-basic-k-u",
+   "script": "hiragana",
+   "glyph": "く",
+   "kind": "cell",
+   "expectedStrokes": 1
+  },
+  {
+   "kanaId": "hiragana-basic-k-e",
+   "script": "hiragana",
+   "glyph": "け",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-basic-k-o",
+   "script": "hiragana",
+   "glyph": "こ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-basic-s-a",
+   "script": "hiragana",
+   "glyph": "さ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-basic-s-i",
+   "script": "hiragana",
+   "glyph": "し",
+   "kind": "cell",
+   "expectedStrokes": 1
+  },
+  {
+   "kanaId": "hiragana-basic-s-u",
+   "script": "hiragana",
+   "glyph": "す",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-basic-s-e",
+   "script": "hiragana",
+   "glyph": "せ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-basic-s-o",
+   "script": "hiragana",
+   "glyph": "そ",
+   "kind": "cell",
+   "expectedStrokes": 1
+  },
+  {
+   "kanaId": "hiragana-basic-t-a",
+   "script": "hiragana",
+   "glyph": "た",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "hiragana-basic-t-i",
+   "script": "hiragana",
+   "glyph": "ち",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-basic-t-u",
+   "script": "hiragana",
+   "glyph": "つ",
+   "kind": "cell",
+   "expectedStrokes": 1
+  },
+  {
+   "kanaId": "hiragana-basic-t-e",
+   "script": "hiragana",
+   "glyph": "て",
+   "kind": "cell",
+   "expectedStrokes": 1
+  },
+  {
+   "kanaId": "hiragana-basic-t-o",
+   "script": "hiragana",
+   "glyph": "と",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-basic-n-a",
+   "script": "hiragana",
+   "glyph": "な",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "hiragana-basic-n-i",
+   "script": "hiragana",
+   "glyph": "に",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-basic-n-u",
+   "script": "hiragana",
+   "glyph": "ぬ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-basic-n-e",
+   "script": "hiragana",
+   "glyph": "ね",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-basic-n-o",
+   "script": "hiragana",
+   "glyph": "の",
+   "kind": "cell",
+   "expectedStrokes": 1
+  },
+  {
+   "kanaId": "hiragana-basic-h-a",
+   "script": "hiragana",
+   "glyph": "は",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-basic-h-i",
+   "script": "hiragana",
+   "glyph": "ひ",
+   "kind": "cell",
+   "expectedStrokes": 1
+  },
+  {
+   "kanaId": "hiragana-basic-h-u",
+   "script": "hiragana",
+   "glyph": "ふ",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "hiragana-basic-h-e",
+   "script": "hiragana",
+   "glyph": "へ",
+   "kind": "cell",
+   "expectedStrokes": 1
+  },
+  {
+   "kanaId": "hiragana-basic-h-o",
+   "script": "hiragana",
+   "glyph": "ほ",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "hiragana-basic-m-a",
+   "script": "hiragana",
+   "glyph": "ま",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-basic-m-i",
+   "script": "hiragana",
+   "glyph": "み",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-basic-m-u",
+   "script": "hiragana",
+   "glyph": "む",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-basic-m-e",
+   "script": "hiragana",
+   "glyph": "め",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-basic-m-o",
+   "script": "hiragana",
+   "glyph": "も",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-basic-y-a",
+   "script": "hiragana",
+   "glyph": "や",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-basic-y-u",
+   "script": "hiragana",
+   "glyph": "ゆ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-basic-y-o",
+   "script": "hiragana",
+   "glyph": "よ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-basic-r-a",
+   "script": "hiragana",
+   "glyph": "ら",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-basic-r-i",
+   "script": "hiragana",
+   "glyph": "り",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-basic-r-u",
+   "script": "hiragana",
+   "glyph": "る",
+   "kind": "cell",
+   "expectedStrokes": 1
+  },
+  {
+   "kanaId": "hiragana-basic-r-e",
+   "script": "hiragana",
+   "glyph": "れ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-basic-r-o",
+   "script": "hiragana",
+   "glyph": "ろ",
+   "kind": "cell",
+   "expectedStrokes": 1
+  },
+  {
+   "kanaId": "hiragana-basic-w-a",
+   "script": "hiragana",
+   "glyph": "わ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-basic-w-o",
+   "script": "hiragana",
+   "glyph": "を",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-basic-nn-a",
+   "script": "hiragana",
+   "glyph": "ん",
+   "kind": "cell",
+   "expectedStrokes": 1
+  },
+  {
+   "kanaId": "hiragana-voiced-g-a",
+   "script": "hiragana",
+   "glyph": "が",
+   "kind": "cell",
+   "expectedStrokes": 5
+  },
+  {
+   "kanaId": "hiragana-voiced-g-i",
+   "script": "hiragana",
+   "glyph": "ぎ",
+   "kind": "cell",
+   "expectedStrokes": 6
+  },
+  {
+   "kanaId": "hiragana-voiced-g-u",
+   "script": "hiragana",
+   "glyph": "ぐ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-voiced-g-e",
+   "script": "hiragana",
+   "glyph": "げ",
+   "kind": "cell",
+   "expectedStrokes": 5
+  },
+  {
+   "kanaId": "hiragana-voiced-g-o",
+   "script": "hiragana",
+   "glyph": "ご",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "hiragana-voiced-z-a",
+   "script": "hiragana",
+   "glyph": "ざ",
+   "kind": "cell",
+   "expectedStrokes": 5
+  },
+  {
+   "kanaId": "hiragana-voiced-z-i",
+   "script": "hiragana",
+   "glyph": "じ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-voiced-z-u",
+   "script": "hiragana",
+   "glyph": "ず",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "hiragana-voiced-z-e",
+   "script": "hiragana",
+   "glyph": "ぜ",
+   "kind": "cell",
+   "expectedStrokes": 5
+  },
+  {
+   "kanaId": "hiragana-voiced-z-o",
+   "script": "hiragana",
+   "glyph": "ぞ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-voiced-d-a",
+   "script": "hiragana",
+   "glyph": "だ",
+   "kind": "cell",
+   "expectedStrokes": 6
+  },
+  {
+   "kanaId": "hiragana-voiced-d-i",
+   "script": "hiragana",
+   "glyph": "ぢ",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "hiragana-voiced-d-u",
+   "script": "hiragana",
+   "glyph": "づ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-voiced-d-e",
+   "script": "hiragana",
+   "glyph": "で",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-voiced-d-o",
+   "script": "hiragana",
+   "glyph": "ど",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "hiragana-voiced-b-a",
+   "script": "hiragana",
+   "glyph": "ば",
+   "kind": "cell",
+   "expectedStrokes": 5
+  },
+  {
+   "kanaId": "hiragana-voiced-b-i",
+   "script": "hiragana",
+   "glyph": "び",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-voiced-b-u",
+   "script": "hiragana",
+   "glyph": "ぶ",
+   "kind": "cell",
+   "expectedStrokes": 6
+  },
+  {
+   "kanaId": "hiragana-voiced-b-e",
+   "script": "hiragana",
+   "glyph": "べ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-voiced-b-o",
+   "script": "hiragana",
+   "glyph": "ぼ",
+   "kind": "cell",
+   "expectedStrokes": 6
+  },
+  {
+   "kanaId": "hiragana-voiced-p-a",
+   "script": "hiragana",
+   "glyph": "ぱ",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "hiragana-voiced-p-i",
+   "script": "hiragana",
+   "glyph": "ぴ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-voiced-p-u",
+   "script": "hiragana",
+   "glyph": "ぷ",
+   "kind": "cell",
+   "expectedStrokes": 5
+  },
+  {
+   "kanaId": "hiragana-voiced-p-e",
+   "script": "hiragana",
+   "glyph": "ぺ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-voiced-p-o",
+   "script": "hiragana",
+   "glyph": "ぽ",
+   "kind": "cell",
+   "expectedStrokes": 5
+  },
+  {
+   "kanaId": "hiragana-small-ya",
+   "script": "hiragana",
+   "glyph": "ゃ",
+   "kind": "small",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "hiragana-small-yu",
+   "script": "hiragana",
+   "glyph": "ゅ",
+   "kind": "small",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "hiragana-small-yo",
+   "script": "hiragana",
+   "glyph": "ょ",
+   "kind": "small",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-v-a",
+   "script": "katakana",
+   "glyph": "ア",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-v-i",
+   "script": "katakana",
+   "glyph": "イ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-v-u",
+   "script": "katakana",
+   "glyph": "ウ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-basic-v-e",
+   "script": "katakana",
+   "glyph": "エ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-basic-v-o",
+   "script": "katakana",
+   "glyph": "オ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-basic-k-a",
+   "script": "katakana",
+   "glyph": "カ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-k-i",
+   "script": "katakana",
+   "glyph": "キ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-basic-k-u",
+   "script": "katakana",
+   "glyph": "ク",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-k-e",
+   "script": "katakana",
+   "glyph": "ケ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-basic-k-o",
+   "script": "katakana",
+   "glyph": "コ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-s-a",
+   "script": "katakana",
+   "glyph": "サ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-basic-s-i",
+   "script": "katakana",
+   "glyph": "シ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-basic-s-u",
+   "script": "katakana",
+   "glyph": "ス",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-s-e",
+   "script": "katakana",
+   "glyph": "セ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-s-o",
+   "script": "katakana",
+   "glyph": "ソ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-t-a",
+   "script": "katakana",
+   "glyph": "タ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-basic-t-i",
+   "script": "katakana",
+   "glyph": "チ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-basic-t-u",
+   "script": "katakana",
+   "glyph": "ツ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-basic-t-e",
+   "script": "katakana",
+   "glyph": "テ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-basic-t-o",
+   "script": "katakana",
+   "glyph": "ト",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-n-a",
+   "script": "katakana",
+   "glyph": "ナ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-n-i",
+   "script": "katakana",
+   "glyph": "ニ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-n-u",
+   "script": "katakana",
+   "glyph": "ヌ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-n-e",
+   "script": "katakana",
+   "glyph": "ネ",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "katakana-basic-n-o",
+   "script": "katakana",
+   "glyph": "ノ",
+   "kind": "cell",
+   "expectedStrokes": 1
+  },
+  {
+   "kanaId": "katakana-basic-h-a",
+   "script": "katakana",
+   "glyph": "ハ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-h-i",
+   "script": "katakana",
+   "glyph": "ヒ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-h-u",
+   "script": "katakana",
+   "glyph": "フ",
+   "kind": "cell",
+   "expectedStrokes": 1
+  },
+  {
+   "kanaId": "katakana-basic-h-e",
+   "script": "katakana",
+   "glyph": "ヘ",
+   "kind": "cell",
+   "expectedStrokes": 1
+  },
+  {
+   "kanaId": "katakana-basic-h-o",
+   "script": "katakana",
+   "glyph": "ホ",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "katakana-basic-m-a",
+   "script": "katakana",
+   "glyph": "マ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-m-i",
+   "script": "katakana",
+   "glyph": "ミ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-basic-m-u",
+   "script": "katakana",
+   "glyph": "ム",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-m-e",
+   "script": "katakana",
+   "glyph": "メ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-m-o",
+   "script": "katakana",
+   "glyph": "モ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-basic-y-a",
+   "script": "katakana",
+   "glyph": "ヤ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-y-u",
+   "script": "katakana",
+   "glyph": "ユ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-y-o",
+   "script": "katakana",
+   "glyph": "ヨ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-basic-r-a",
+   "script": "katakana",
+   "glyph": "ラ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-r-i",
+   "script": "katakana",
+   "glyph": "リ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-r-u",
+   "script": "katakana",
+   "glyph": "ル",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-r-e",
+   "script": "katakana",
+   "glyph": "レ",
+   "kind": "cell",
+   "expectedStrokes": 1
+  },
+  {
+   "kanaId": "katakana-basic-r-o",
+   "script": "katakana",
+   "glyph": "ロ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-basic-w-a",
+   "script": "katakana",
+   "glyph": "ワ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-basic-w-o",
+   "script": "katakana",
+   "glyph": "ヲ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-basic-nn-a",
+   "script": "katakana",
+   "glyph": "ン",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-voiced-g-a",
+   "script": "katakana",
+   "glyph": "ガ",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "katakana-voiced-g-i",
+   "script": "katakana",
+   "glyph": "ギ",
+   "kind": "cell",
+   "expectedStrokes": 5
+  },
+  {
+   "kanaId": "katakana-voiced-g-u",
+   "script": "katakana",
+   "glyph": "グ",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "katakana-voiced-g-e",
+   "script": "katakana",
+   "glyph": "ゲ",
+   "kind": "cell",
+   "expectedStrokes": 5
+  },
+  {
+   "kanaId": "katakana-voiced-g-o",
+   "script": "katakana",
+   "glyph": "ゴ",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "katakana-voiced-z-a",
+   "script": "katakana",
+   "glyph": "ザ",
+   "kind": "cell",
+   "expectedStrokes": 5
+  },
+  {
+   "kanaId": "katakana-voiced-z-i",
+   "script": "katakana",
+   "glyph": "ジ",
+   "kind": "cell",
+   "expectedStrokes": 5
+  },
+  {
+   "kanaId": "katakana-voiced-z-u",
+   "script": "katakana",
+   "glyph": "ズ",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "katakana-voiced-z-e",
+   "script": "katakana",
+   "glyph": "ゼ",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "katakana-voiced-z-o",
+   "script": "katakana",
+   "glyph": "ゾ",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "katakana-voiced-d-a",
+   "script": "katakana",
+   "glyph": "ダ",
+   "kind": "cell",
+   "expectedStrokes": 5
+  },
+  {
+   "kanaId": "katakana-voiced-d-i",
+   "script": "katakana",
+   "glyph": "ヂ",
+   "kind": "cell",
+   "expectedStrokes": 5
+  },
+  {
+   "kanaId": "katakana-voiced-d-u",
+   "script": "katakana",
+   "glyph": "ヅ",
+   "kind": "cell",
+   "expectedStrokes": 5
+  },
+  {
+   "kanaId": "katakana-voiced-d-e",
+   "script": "katakana",
+   "glyph": "デ",
+   "kind": "cell",
+   "expectedStrokes": 5
+  },
+  {
+   "kanaId": "katakana-voiced-d-o",
+   "script": "katakana",
+   "glyph": "ド",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "katakana-voiced-b-a",
+   "script": "katakana",
+   "glyph": "バ",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "katakana-voiced-b-i",
+   "script": "katakana",
+   "glyph": "ビ",
+   "kind": "cell",
+   "expectedStrokes": 4
+  },
+  {
+   "kanaId": "katakana-voiced-b-u",
+   "script": "katakana",
+   "glyph": "ブ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-voiced-b-e",
+   "script": "katakana",
+   "glyph": "ベ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-voiced-b-o",
+   "script": "katakana",
+   "glyph": "ボ",
+   "kind": "cell",
+   "expectedStrokes": 6
+  },
+  {
+   "kanaId": "katakana-voiced-p-a",
+   "script": "katakana",
+   "glyph": "パ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-voiced-p-i",
+   "script": "katakana",
+   "glyph": "ピ",
+   "kind": "cell",
+   "expectedStrokes": 3
+  },
+  {
+   "kanaId": "katakana-voiced-p-u",
+   "script": "katakana",
+   "glyph": "プ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-voiced-p-e",
+   "script": "katakana",
+   "glyph": "ペ",
+   "kind": "cell",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-voiced-p-o",
+   "script": "katakana",
+   "glyph": "ポ",
+   "kind": "cell",
+   "expectedStrokes": 5
+  },
+  {
+   "kanaId": "katakana-small-ya",
+   "script": "katakana",
+   "glyph": "ャ",
+   "kind": "small",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-small-yu",
+   "script": "katakana",
+   "glyph": "ュ",
+   "kind": "small",
+   "expectedStrokes": 2
+  },
+  {
+   "kanaId": "katakana-small-yo",
+   "script": "katakana",
+   "glyph": "ョ",
+   "kind": "small",
+   "expectedStrokes": 3
+  }
+ ]
+}

@@ -18,6 +18,7 @@ Tài liệu này mô tả **code đã triển khai** trong repository, khác v�
 | JPN-023 | Original three-Lesson draft and isolated import/publication verification (merged via PR #28); human Rights/language review, curriculum acceptance and production publication pending | [JPN-023-first-learning-content.md](JPN-023-first-learning-content.md) |
 | JPN-ARCH-002 | Reviewed Rights evidence, set-based Path eligibility and relational-vs-JSONB draft decision (merged via PR #25; ADR-015 approved later) | [JPN-ARCH-002-content-architecture.md](JPN-ARCH-002-content-architecture.md) |
 | JPN-030 | Learning Path railway frontend preview; content and progress integration pending | [JPN-030-learning-path.md](JPN-030-learning-path.md) |
+| JPN-035 | Skills overview (mock/demo data) and Kana reference chart, drawer and vendored AnimCJK stroke guidance; frontend only; Kana UI v1 visually approved; **AnimCJK licensing review PENDING (release blocker)**; audio, real-device and accessibility checks pending; not merged or released | [JPN-035-skills-kana-reference.md](JPN-035-skills-kana-reference.md) |
 | JPN-041 | Home Study Desk frontend presentation; progress integration pending | [JPN-041-home-study-desk.md](JPN-041-home-study-desk.md) |
 
 ## Workflow và mức độ xác nhận

@@ -6,6 +6,7 @@
     "jsx": "react-jsx",
     "strict": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "types": ["node"],
     "outDir": ".test-dist",
@@ -27,6 +28,9 @@
     "src/components/ui/skeleton.test.tsx",
     "src/components/home/home-loading.ts",
     "src/components/home/home-skeleton.tsx",
-    "src/components/home/home-study-desk.tsx"
+    "src/components/home/home-study-desk.tsx",
+    "src/components/skills/kana-chart-data.test.ts",
+    "src/components/skills/kana-drawer.test.tsx",
+    "src/components/skills/kana-stroke-guidance.test.tsx"
   ]
 }

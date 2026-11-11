@@ -1,0 +1,11 @@
+{
+  "_comment": "NichiGo-OWNED pedagogical stroke-ending annotations (not AnimCJK data). Keyed by kanaId -> stroke order -> tome|hane|harai. Only strokes listed here are annotated; everything else renders its plain ending. Status: pending review by a Japanese handwriting teacher.",
+  "reviewStatus": "pending-review",
+  "annotations": {
+    "hiragana-basic-v-i": { "1": "hane" },
+    "hiragana-basic-s-i": { "1": "harai" },
+    "hiragana-basic-n-o": { "1": "harai" },
+    "katakana-basic-v-a": { "2": "harai" },
+    "katakana-basic-k-i": { "3": "tome" }
+  }
+}

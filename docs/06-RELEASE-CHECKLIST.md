@@ -21,6 +21,9 @@
 - [ ] Import dry-run, idempotency, publication gate, provenance tested.
 - [ ] Database export performed and restore tested on separate database.
 
+## Legal / third-party licensing
+- [ ] **BLOCKER — AnimCJK (LGPL-3.0-or-later per file headers) licensing review before any commercial release.** Stroke-guidance assets derived from AnimCJK (`nichigo_frontend/src/data/kana-strokes/`) must be reviewed by the Product Owner/legal for LGPL obligations on bundled data (licence/source notices, replaceability) and for the **unresolved provenance of the kana outlines** (AnimCJK says shapes were partly derived from Arphic KaitiM fonts, which fall under the Arphic Public License; it is unconfirmed whether the kana outlines can be offered under the LGPL). Status: **PENDING** — see [JPN-035-skills-kana-reference.md](implementation/JPN-035-skills-kana-reference.md). Importing the data (now all 148 chart characters) does not satisfy this item. Any later Kanji data (Arphic Public License) needs its own review.
+
 ## Hosting and operations
 - [ ] Vercel Free FE + Render Free BE + Neon Free DB confirmed.
 - [ ] Render service cold-start loading/timeout UX tested.

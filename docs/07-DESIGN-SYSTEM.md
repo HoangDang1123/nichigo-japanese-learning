@@ -25,6 +25,20 @@ Load fonts once in the root layout with `next/font/google` and CSS variables; us
 
 Check Vietnamese diacritics and Japanese glyphs in both Light and Dark at desktop and mobile widths. Keep a legible line height, visible focus states and wrapping without horizontal text overflow. Font choices must remain the same in System mode as the resolved theme changes.
 
+### Japanese Reading & Rōmaji Typography
+
+Project-wide convention for showing how Japanese is read. It applies to new and future Kana, Vocabulary, Grammar, Flashcards and related learning UI; it is not a mandate to refactor existing modules in one pass.
+
+- **Style.** Hepburn rōmaji is *italic* by default, in a semantic secondary colour (for example `--color-text-muted`).
+- **Typeface.** Rōmaji is Latin text: use the regular Latin UI face (`--font-body`), never the Japanese font stack or Japanese glyph styling.
+- **No decoration.** Do not wrap rōmaji in phonemic slashes `/…/` or phonetic brackets `[…]`, and do not put it in badges or chips. Rōmaji is a Latin-script representation of Japanese, **not IPA**.
+- **Other text stays plain.** Japanese text and Vietnamese meanings are not italic unless another documented style requires it independently.
+- **Example sentences.** Rōmaji for a whole sentence may be optional and collapsed by default (a small text control such as “Hiện cách đọc”, exposing its state with `aria-expanded`) so learners are nudged to read Japanese script first. Place it between the Japanese sentence and its Vietnamese translation.
+- **Data integrity.** Never infer a kanji word's reading from its glyphs, and never generate sentence readings in bulk. Use authoritative or hand-curated reading data only; when none exists, omit the reading and its toggle instead of guessing. Do not alter example sentences to fit a reading.
+- **Markup.** Mark Japanese spans `lang="ja"`; rōmaji spans need no `lang` override.
+
+Current deviations (reported, not yet changed): the Kana chart tiles render rōmaji in `--font-mono` and upright, while the Kana detail drawer already uses italic secondary text.
+
 ## Approved conceptual layouts
 
 These describe composition and interaction intent. The shared shell and Home Study Desk presentation are present in current source; other planned screens and real learning progress need scoped feature work and acceptance review. See the roadmap before scheduling implementation.

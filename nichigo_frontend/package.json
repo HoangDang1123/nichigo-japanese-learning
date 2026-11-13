@@ -9,7 +9,7 @@
         "start": "next start",
         "lint": "eslint",
         "type-check": "tsc --noEmit",
-        "test": "tsc -p tsconfig.test.json && node --test .test-dist/api/auth.test.js .test-dist/components/theme-switcher-icons.test.js .test-dist/components/ui/skeleton.test.js .test-dist/components/skills/kana-chart-data.test.js .test-dist/components/skills/kana-drawer.test.js .test-dist/components/skills/kana-stroke-guidance.test.js"
+        "test": "tsc -p tsconfig.test.json && node --test .test-dist/api/auth.test.js .test-dist/components/theme-switcher-icons.test.js .test-dist/components/ui/skeleton.test.js .test-dist/components/skills/kana-chart-data.test.js .test-dist/components/skills/kana-drawer.test.js .test-dist/components/skills/kana-stroke-guidance.test.js .test-dist/components/skills/vocabulary/vocabulary-logic.test.js .test-dist/components/skills/vocabulary/quiz-runner.test.js .test-dist/components/skills/vocabulary/study-rail.test.js"
     },
     "dependencies": {
         "@reduxjs/toolkit": "^2.13.0",

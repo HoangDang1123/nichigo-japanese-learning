@@ -6,7 +6,7 @@ import { SKILL_CATEGORIES } from "@/components/skills/skills-mock-data";
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return SKILL_CATEGORIES.filter((c) => c.key !== "kana").map((c) => ({ category: c.key }));
+  return SKILL_CATEGORIES.filter((c) => c.key !== "kana" && c.key !== "vocabulary").map((c) => ({ category: c.key }));
 }
 
 export default async function SkillsCategoryPage({

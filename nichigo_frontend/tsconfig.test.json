@@ -31,6 +31,9 @@
     "src/components/home/home-study-desk.tsx",
     "src/components/skills/kana-chart-data.test.ts",
     "src/components/skills/kana-drawer.test.tsx",
-    "src/components/skills/kana-stroke-guidance.test.tsx"
+    "src/components/skills/kana-stroke-guidance.test.tsx",
+    "src/components/skills/vocabulary/vocabulary-logic.test.ts",
+    "src/components/skills/vocabulary/quiz-runner.test.tsx",
+    "src/components/skills/vocabulary/study-rail.test.tsx"
   ]
 }

@@ -24,7 +24,7 @@ A Vietnamese-first Japanese learning website for absolute beginners, with a grad
 - **Reference:** `docs/07-DESIGN-SYSTEM.md` records the approved conceptual layouts, tokens, style principles and UI acceptance checks. Concept approval does not mean every screen is implemented or in the MVP.
 
 ## 3. User journeys
-**Guest:** land on home → spotlight tour (or skip) → see default beginner path → open a published lesson → practice → see feedback and daily lesson allowance → sign up to retain progress.
+**Guest:** land on home → spotlight tour (or skip) → see beginner path or published Skills → select Start Learning to unlock a Lesson → practice and, where configured, take its Assessment → see remaining daily unlock allowance. A valid Guest browser identity restores retained server-side data on return; account claiming remains unresolved.
 
 **Registered learner:** register/login with email and password → choose path or free practice → learn and quiz → see dashboard and continue where left off.
 
@@ -35,12 +35,13 @@ A Vietnamese-first Japanese learning website for absolute beginners, with a grad
 ## 4. MVP scope (P0)
 - Responsive Vietnamese UI; navigation, error/loading/empty states.
 - Email/password register/login/logout, password hashing and server authorization.
-- Guest identity and backend-enforced quota of at most 2 unique new lesson completions per Asia/Ho_Chi_Minh calendar day.
-- Guided spotlight tour and ability to replay; guest persistence best effort, account persistence durable.
+- Server-issued Guest identity with secured browser cookie/session and server-side learning data; data eligible for cleanup after 90 days of inactivity.
+- Backend-enforced quota of 2 newly unlocked Lessons per Asia/Ho_Chi_Minh calendar day; 20 currently saved canonical Skills Items across all categories.
+- Guided spotlight tour and ability to replay; account persistence durable.
 - Learning path and ordered lessons; free skill browsing of released content.
 - Hiragana/kana foundational learning with character recognition, pronunciation/audio where sourced, writing/stroke guide where available.
-- Vocabulary/grammar lesson content and suitable learning activities, including basic quizzes where appropriate; clear correction/explanations. A quiz passes at 80% or higher and permits unlimited retries.
-- Soft lesson unlock: later lessons remain accessible without completing every preceding lesson.
+- Vocabulary/grammar lesson content and five suitable Activity types; immediate-feedback Practice is distinct from official server-graded Lesson Assessment. Assessments pass at 80% or higher and permit unlimited retries.
+- Soft lesson unlock: learners may select later Lessons without completing earlier Lessons. A Guest still uses one daily unlock allowance when selecting Start Learning for a previously locked Lesson; authenticated Users have no Guest unlock quota.
 - Persist attempts, lesson progress, completion and basic dashboard.
 - CSV/JSON content import with validation, dry run, idempotency, draft/publish and provenance.
 - N5 content only in released MVP; published content may be a subset of N5, not a full N5 syllabus.
@@ -57,13 +58,17 @@ A Vietnamese-first Japanese learning website for absolute beginners, with a grad
 
 **FR-03 Auth:** email/password registration, login, logout, protected progress. Acceptance: duplicate email, wrong password, session expiry and logout handled; no password plaintext stored.
 
-**FR-04 Guest quota:** at most 2 unique new lesson completions per local calendar day (Asia/Ho_Chi_Minh), enforced on backend transactionally. Acceptance: re-opening/completing the same lesson on the same day does not double count; parallel completions cannot exceed 2; over-quota returns a typed error; user sees remaining allowance.
+**FR-04 Guest identity and unlock:** backend issues a stable Guest identity in a secured cookie/session and retains access, bookmarks, attempts and progress server-side until eligible for cleanup after 90 days without qualifying activity. A Guest can unlock at most 2 previously locked Lessons per Asia/Ho_Chi_Minh calendar day. Selecting Start Learning atomically authorizes and records the first unlock before full content is returned; reopening, practice, completion and retry cost no further allowance. Unused allowance does not accumulate; prior unlocks remain accessible while Guest identity/data remain valid. Acceptance: direct full Lesson API requests cannot bypass the gate; parallel first unlocks with one slot left produce at most one new unlock; a third new Lesson is denied that day, while previously unlocked Lessons and public catalog remain accessible; Users have no Guest unlock quota. Lost cookies/devices may prevent recovery before linkage.
 
-**FR-05 Content:** published path/lesson and skill catalogs; draft content invisible to public. Acceptance: path order deterministic; content reused without duplicate canonical records.
+**FR-05 Content and Skills:** public catalog exposes eligible Lesson metadata; full Lesson/activity/Assessment access requires a Guest unlock. Guests and Users can browse/search/read all eligible reviewed published Skills, including available Kana, Vocabulary, Grammar and Kanji; supported flashcards, free practice and Vocabulary Quick Check do not consume Lesson unlocks. Draft, withdrawn and Rights-revoked material stays unavailable. Acceptance: path order deterministic; canonical Items reused without granting access to a Lesson that references them.
 
-**FR-06 Learning:** lessons use activities suited to their objectives and content type, without one fixed activity sequence. Exercises are graded server-side and feedback is shown. A quiz passes at 80% or higher and allows unlimited retries. Later lessons remain accessible without completing all earlier lessons. Acceptance: submitted answers have stable question IDs and no client-authoritative scoring. Quiz pass does not by itself define Lesson or Chapter completion.
+**FR-05A Skills bookmarks:** Guests may save 20 distinct currently bookmarked canonical Skills Items across categories; Users have no product-level bookmark count limit. Acceptance: repeat save is idempotent, unbookmark frees a slot immediately, a 21st distinct save fails without a partial write, concurrent saves cannot exceed 20, returning valid Guests regain saved items, and revoked/unpublished item content cannot be recovered through Saved. Reaching the limit does not restrict browsing, flashcards, practice or Quick Check. Bookmarking does not establish Lesson completion or Item mastery.
 
-**FR-07 Progress:** completed lesson and quiz attempt persisted; resume and dashboard. Lesson completion and per-item mastery are separate records or concepts. Acceptance: progress survives refresh/login and is consistent between path and skills. Completion and mastery rules beyond this separation remain open.
+**FR-06 Learning and Assessment:** Lessons use Single Choice, Matching Pairs, Fill in the Blank, Ordering and Typed Answer as appropriate, without one fixed sequence. Practice permits immediate feedback/retries without an official score. Only Lessons configured for Assessment have one: reviewed published Activity revisions, equal full-or-zero scoring, server-graded pass at 80% or higher, unlimited retries, configurable size (typically 5 or 8–10), question/order rotation with fallback reuse. Answer keys, accepted answers and official explanations remain private until submission; typed answers use authored alternatives and controlled Unicode/whitespace normalization without treating Kana/Kanji/Romaji as equivalent. Acceptance: stable identities and pinned revisions, persisted latest/best results, no client-authoritative official grade, earlier pass retained after a later failure; passing completes an Assessment-required Lesson. Lessons without Assessment need explicit completion. Later Lessons may be chosen without completing predecessors, subject to Guest unlock quota.
+
+**FR-06A Recovery:** in-progress Assessment answers autosave authoritatively on the backend; refresh/reopen and reconnect restore recoverable work. Temporary offline drafts reconcile without stale writes overwriting newer state or accidentally submitting unsynced answers. Duplicate submission creates one grade. A Rights-revoked unfinished attempt stops safely without a recorded failure; valid historical grades/completions remain without prohibited content exposure. Exact endpoint/version/conflict and incomplete-attempt retention contracts are pending.
+
+**FR-07 Progress:** persist Guest unlock, Lesson completion, official Assessment results, Skills bookmarks and Item review/mastery as distinct concepts. Acceptance: progress survives refresh for a valid Guest identity or authenticated account and is consistent between path and Skills. No mastery algorithm or Chapter Review requirement is approved. Vocabulary Quick Check demo scores and bookmarks do not prove mastery.
 
 **FR-08 Import:** schema validation, dry-run report, import batch, idempotent upsert by stable key, provenance and publish gate. Acceptance: malformed row doesn't silently publish; rerun same batch doesn't duplicate.
 

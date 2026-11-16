@@ -1,5 +1,7 @@
 # JPN-035 — Skills Directory & Kana Reference (frontend)
 
+> **JPN-DOC-001 status/contract alignment:** Frontend source was merged through PR #30 (commit `26176ca` on `main`); the branch-era status below is retained as historical evidence. Eligible reviewed published Skills are available to Guests and Users independently of Lesson unlocks. Optional Saved integration must use canonical Item identities and the shared 20-current-Item Guest limit; this remains unimplemented. Kana UI visual approval is not feature or release approval.
+
 > ## ⚠ PRE-COMMERCIAL-RELEASE LICENSING REVIEW REQUIRED — STATUS: PENDING
 > All stroke assets are derived from **AnimCJK**. Kana SVG file headers state the **GNU LGPL v3 or later**; `licenses/COPYING.txt` states Kana/Bopomofo/stroke SVGs may be used under the LGPL at the user's option, while other character SVGs fall under the **Arphic Public License**.
 > **Unresolved provenance question:** AnimCJK's README says its shapes derive partly from the Arphic PL KaitiM fonts and were edited in Inkscape. It is **not confirmed** whether the kana outlines descend from Arphic glyphs, and therefore whether they may be offered under the LGPL rather than the Arphic Public License. It is also open how LGPL obligations apply to data bundled in a web app.
@@ -25,7 +27,7 @@ Not included: Vocabulary, Grammar, Kanji, Flashcards (JPN-033) or any other Skil
 - **Pending:** real-device (touch) testing; accessibility audit (screen reader, full keyboard pass); browsers other than Chromium/Edge.
 - **Deferred:** audio playback. The sound button is a visible but disabled placeholder with no handler, audio, TTS or API.
 - **Licensing: PENDING — release blocker** (banner above): AnimCJK commercial licensing and the provenance of the Kana outlines are not reviewed and not cleared.
-- **Merged:** no. **Released:** no.
+- **Merged:** frontend source via PR #30 (`26176ca`); this does not complete the integrated Skills feature. **Released:** no.
 
 ## Skills overview
 `/skills` renders the nine category cards from `SKILL_CATEGORIES` (mock/demo data, honest availability labels). Kana links to `/skills/kana`; the other categories link to `/skills/<key>`, a static detail page (`category-detail.tsx`) that shows either clearly labelled demo items (Vocabulary, Grammar, Kanji) or an availability notice, never real lesson content. No asynchronous data is loaded, so no skeleton is needed yet; add one when the overview is connected to real data.

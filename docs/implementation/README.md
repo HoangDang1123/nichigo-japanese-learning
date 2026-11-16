@@ -11,6 +11,7 @@ Tài liệu này mô tả **code đã triển khai** trong repository, khác v�
 | JPN-003 | App Shell, responsive navigation, UI states | [JPN-003-app-shell.md](JPN-003-app-shell.md) |
 | JPN-010A | Backend authentication, session, CSRF and V2/V3 migrations | [JPN-010-auth-backend.md](JPN-010-auth-backend.md) |
 | JPN-010B | Frontend authentication, session and CSRF integration | [JPN-010-frontend-auth.md](JPN-010-frontend-auth.md) |
+| JPN-011 | Guest identity, active-use retention, Lesson unlock/access, and Skills bookmarks (backend review branch only; not merged or deployed) | [JPN-011-guest-foundation-backend.md](JPN-011-guest-foundation-backend.md), [technical contract](JPN-011-guest-foundation-contract.md) |
 | JPN-UI-003 | Shared skeleton primitive, Home auth-loading composition and future data-loader layouts (merged; release not evidenced) | [JPN-UI-003-skeleton-system.md](JPN-UI-003-skeleton-system.md) |
 | JPN-020 | Learning content schema, immutable revisions and published-only read API (merged; ADR-015 approved later) | [JPN-020-learning-content.md](JPN-020-learning-content.md) |
 | JPN-021 | CSV/JSON validation, PostgreSQL reference checks and offline dry-run CLI (merged via PR #24; release not evidenced) | [JPN-021-content-validation.md](JPN-021-content-validation.md) |

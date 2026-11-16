@@ -44,9 +44,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/v1/health", "/actuator/health", "/api/v1/auth/csrf",
-                                "/api/v1/auth/register", "/api/v1/auth/login").permitAll()
+                                "/api/v1/auth/register", "/api/v1/auth/login",
+                                "/api/v1/guest/**", "/api/v1/skills/bookmarks/**",
+                                "/api/v1/skills/bookmarks").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/learning-paths", "/api/v1/learning-paths/**",
                                 "/api/v1/lessons/**", "/api/v1/skills/*/items").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/lessons/*/unlock",
+                                "/api/v1/learning-paths/*/placements/*/lesson/unlock").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint((request, response, exception) -> writeError(

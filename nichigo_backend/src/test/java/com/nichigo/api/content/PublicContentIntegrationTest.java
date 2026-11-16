@@ -7,9 +7,13 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.security.test.context.support.WithMockUser;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.UUID;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -27,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class PublicContentIntegrationTest {
     @Autowired JdbcTemplate jdbc;
     @Autowired MockMvc mvc;
+    @Autowired ObjectMapper json;
     @Autowired PlatformTransactionManager transactions;
 
     @Test
@@ -134,14 +139,12 @@ class PublicContentIntegrationTest {
             publishLesson(lessons[i], otherRights, item, 1, 1, "Bài " + i, section);
             mvc.perform(get("/api/v1/lessons/" + lessons[i].slug())).andExpect(status().isOk());
         }
-        mvc.perform(get("/api/v1/skills/kana/items"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.items[?(@.key=='" + item.key() + "')]").exists());
+        assertEquals(1, countSkillAcrossPages(item.key()));
         jdbc.update("UPDATE content_rights SET clearance_status='revoked' WHERE id=?", itemRights);
         for (Lesson lesson : lessons) {
             mvc.perform(get("/api/v1/lessons/" + lesson.slug())).andExpect(status().isNotFound());
         }
-        mvc.perform(get("/api/v1/skills/kana/items"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.items[?(@.key=='" + item.key() + "')]").doesNotExist());
+        assertEquals(0, countSkillAcrossPages(item.key()));
         assertThrows(DataAccessException.class, () -> jdbc.update(
                 "UPDATE content_rights SET clearance_status='cleared' WHERE id=?", itemRights));
         assertThrows(DataAccessException.class, () -> jdbc.update("DELETE FROM content_rights WHERE id=?", itemRights));
@@ -597,6 +600,25 @@ class PublicContentIntegrationTest {
             Thread.currentThread().interrupt();
             throw new IllegalStateException(ex);
         }
+    }
+
+    private int countSkillAcrossPages(String key) throws Exception {
+        String after = null;
+        Set<String> seenCursors = new HashSet<>();
+        int matches = 0;
+        do {
+            var request = get("/api/v1/skills/kana/items");
+            if (after != null) request.param("after", after);
+            MvcResult result = mvc.perform(request).andExpect(status().isOk()).andReturn();
+            var body = json.readTree(result.getResponse().getContentAsString());
+            for (var item : body.get("items")) {
+                if (key.equals(item.get("key").asText())) matches++;
+            }
+            var next = body.get("nextCursor");
+            after = next == null || next.isNull() ? null : next.asText();
+            if (after != null) assertTrue(seenCursors.add(after), "Skills cursor must advance");
+        } while (after != null);
+        return matches;
     }
 
     private UUID rights(String status) {

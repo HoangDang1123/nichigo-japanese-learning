@@ -28,6 +28,15 @@ server:
         secure: ${SESSION_COOKIE_SECURE:false}
         same-site: ${SESSION_COOKIE_SAME_SITE:Lax}
 
+# Guest credential is independent of the 30-minute Auth/CSRF SESSION.
+# Configure Secure and SameSite for the actual HTTPS/frontend topology.
+nichigo:
+  guest:
+    cookie:
+      secure: ${GUEST_COOKIE_SECURE:${SESSION_COOKIE_SECURE:false}}
+      same-site: ${GUEST_COOKIE_SAME_SITE:${SESSION_COOKIE_SAME_SITE:Lax}}
+      domain: ${GUEST_COOKIE_DOMAIN:}
+
 # CORS allowed origins (comma-separated). Override in environment.
 app:
   cors:

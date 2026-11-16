@@ -1,10 +1,10 @@
 # JPN-011 — Guest Foundation API Contract
 
-**DRAFT — TECHNICAL CONTRACT FOR OWNER REVIEW — NOT IMPLEMENTED**
+**APPROVED TECHNICAL CONTRACT — BACKEND IMPLEMENTED ON REVIEW BRANCH; NOT MERGED**
 
-This document specifies proposed HTTP and persistence boundaries for the **approved product rules** in [ADR-002, ADR-018 and ADR-019](../02-DECISIONS.md). Route names, DTO fields and new error codes below are technical selections for review, not implemented or previously owner-approved wire contracts. It does not define JPN-012 account claiming, JPN-032 Assessment mechanics, JPN-040 completion or Item mastery. `/api/v1` prefixes all paths below.
+This document specifies the approved HTTP and persistence boundaries for the **approved product rules** in [ADR-002, ADR-018 and ADR-019](../02-DECISIONS.md). Its baseline and draft wording below record the state before JPN-011 implementation. The [backend implementation note](JPN-011-guest-foundation-backend.md) records the backend review branch source and test evidence. This contract does not define JPN-012 account claiming, JPN-032 Assessment mechanics, JPN-040 completion or Item mastery. `/api/v1` prefixes all paths below.
 
-## Current system baseline — VERIFIED CURRENT BEHAVIOR
+## Pre-JPN-011 system baseline — HISTORICAL SOURCE BEHAVIOR
 
 | Area | Verified source behavior | JPN-011 gap |
 |---|---|---|
@@ -15,9 +15,9 @@ This document specifies proposed HTTP and persistence boundaries for the **appro
 | Database | Flyway [V2](../../nichigo_backend/src/main/resources/db/migration/V2__create_users.sql) adds `users`; [V3](../../nichigo_backend/src/main/resources/db/migration/V3__create_session_tables.sql) adds Spring Session tables; [V4](../../nichigo_backend/src/main/resources/db/migration/V4__learning_content_foundation.sql) adds stable Lesson, canonical Item and sealed revision identities. V5–V8 extend content authoring/Rights/operator behavior. | No Guest identity, Lesson unlock, bookmark, attempt or learner progress persistence exists. Existing Spring Session tables are not a Guest learning-data store. |
 | Errors | Security returns flat `{ "code", "message" }` for 401/403; [ApiExceptionHandler](../../nichigo_backend/src/main/java/com/nichigo/api/common/web/ApiExceptionHandler.java) uses that shape for auth/validation. [PublicContentExceptionHandler](../../nichigo_backend/src/main/java/com/nichigo/api/content/PublicContentExceptionHandler.java) uses `invalid_content_query` (400), `content_not_found` (404) and `content_unavailable` (503). | New codes/statuses below are draft; the older nested learning error example in the main contract is not the current convention. |
 
-## Target actor, cookie and CSRF contract — DRAFT
+## Actor, cookie and CSRF contract — APPROVED
 
-The server issues a cryptographically unpredictable opaque Guest credential in an HttpOnly cookie named `NICHIGO_GUEST` (proposed name). The credential maps to a stable server-side Guest identity; neither credential nor Guest ID appears in response JSON, URL, request body or JavaScript-readable storage. The server stores a one-way verifier for the credential and resolves the actor on every Guest request. A valid authenticated User session takes precedence over a Guest cookie; the two actors' data are never mixed. Guest-to-account claim is **PENDING OWNER DECISION**. A missing/invalid Guest credential never selects another Guest by client-supplied ID.
+The server issues a cryptographically unpredictable opaque Guest credential in an HttpOnly cookie named `NICHIGO_GUEST`. The credential maps to a stable server-side Guest identity; neither credential nor Guest ID appears in response JSON, URL, request body or JavaScript-readable storage. The server stores a one-way verifier for the credential and resolves the actor on every Guest request. A valid authenticated User session takes precedence over a Guest cookie; the two actors' data are never mixed. Guest-to-account claim is **PENDING OWNER DECISION**. A missing/invalid Guest credential never selects another Guest by client-supplied ID.
 
 The proposed Guest cookie is `Secure` in HTTPS deployment, HttpOnly and scoped to the API; deployment-specific `SameSite`/domain topology remains open. Local HTTP may use the existing development-only insecure setting. The Guest credential and Auth/CSRF `SESSION` have independent lifecycles: the existing `SESSION` can expire after 30 minutes without deleting the Guest identity or server-side learning data. A returning Guest with a valid Guest credential can obtain a new `SESSION`-bound CSRF token through `GET /auth/csrf`, then continue permitted mutations with both cookies and `X-CSRF-TOKEN`. Cookie renewal is specified below as a **technical draft**, not an approved product rule. Guest-to-account claim/merge remains **PENDING OWNER DECISION**.
 
@@ -25,7 +25,7 @@ The proposed Guest cookie is `Secure` in HTTPS deployment, HttpOnly and scoped t
 
 All proposed state-changing requests, including Guest initialization and idempotent PUT/DELETE, require the existing `SESSION`-bound `X-CSRF-TOKEN` from `GET /auth/csrf`, plus credentials. GET requests do not require a CSRF header. After User login, obtain a fresh CSRF token as current auth behavior requires. The backend must validate the Guest credential and current actor on every request; the frontend cannot authorize access by hiding controls.
 
-## Endpoint specification — TARGET CONTRACT, NOT IMPLEMENTED
+## Endpoint specification — APPROVED CONTRACT
 
 `Guest` means a valid server-issued Guest credential and no authenticated User session. `Actor` means either a Guest or authenticated User, resolved only on the server. All success DTOs below are presentation data, not database entities. Path/query/body IDs are selectors, never actor identity or grade/quota authority. All errors use the flat error body in the next section. `204` responses have no body.
 
@@ -51,7 +51,7 @@ All proposed state-changing requests, including Guest initialization and idempot
 
 Existing public `GET /learning-paths` and `GET /learning-paths/{slug}` remain metadata-only discovery. The backend should expose objective metadata through a separate safe catalog projection where needed; the current full Lesson DTO must not be reused as a public preview. The exact public objective projection is outside this Guest mutation contract and requires FE/API integration review. Public `GET /skills/{type}/items` remains independent of Guest unlock. Skills detail/search/flashcard transport is outside JPN-011 and remains [pending in the main API contract](../../contracts/01-API-CONTRACT.md). An eligible Item appearing in Saved or a Lesson does not grant Lesson access.
 
-## Database integrity — TARGET INVARIANTS, NO MIGRATION YET
+## Database integrity — APPROVED INVARIANTS
 
 - A stable server-issued Guest identity is distinct from the opaque browser credential and from `users`/`SPRING_SESSION`. Credential validation is server-side; store a non-reversible verifier, never the bearer value in plaintext application tables or logs. Guest data survives ordinary auth-session expiry and browser refresh while its identity remains valid.
 - `last_active_at` is server-owned. An activity signal is accepted only after resolving a valid, non-expired Guest credential and CSRF session; no Guest ID or timestamp from the client is authoritative. The first active signal after Guest creation is persisted immediately. Draft write-throttling: after a persisted active signal, valid signals within five minutes return the persisted `lastActiveAt`/`retentionEligibleAt` without another database write; the first signal at or after that interval persists the current server time. To avoid cleanup or expiry earlier than 90 days after a qualifying signal within that window, calculate `retentionEligibleAt` and the server-side credential cutoff conservatively as persisted `last_active_at` plus 90 days plus at most the five-minute throttle window. This is a technical precision margin, not a visit limit or a change to the approved 90-day inactivity rule. An activity signal cannot alter unlocks, bookmarks, Assessment attempts, completion or mastery.
@@ -62,13 +62,13 @@ Existing public `GET /learning-paths` and `GET /learning-paths/{slug}` remain me
 - Guest access, bookmarks, attempts and progress are stored server-side as separate concerns. Unlock, Lesson completion, official Assessment result, bookmark and Item mastery are not interchangeable. JPN-032/JPN-040 own their later persistence contracts.
 - Cleanup eligibility follows 90 days after the latest active use. The draft five-minute write throttle requires the conservative cutoff above so a coalesced signal cannot cause early cleanup; throttling must not let an already expired identity become valid again. The qualifying activities and exclusions are the approved list above. Guest-to-account claim/merge/conflict rules remain **PENDING OWNER DECISION**. Cleanup job timing remains an implementation detail.
 
-## Security and error contract — DRAFT
+## Security and error contract — APPROVED
 
 Guest credential and `SESSION` cookies must be sent only to the approved API origin; production must use HTTPS, `Secure`, HttpOnly, an approved SameSite/domain configuration, an explicit CORS origin allowlist and credentials. The Guest credential remains independent of the 30-minute Auth/CSRF session: a returning Guest with valid identity can establish a fresh CSRF session/token without losing server-side learning data. CSRF applies to every Guest mutation. Login's session-ID rotation and CSRF invalidation remain intact. Authenticated User precedence prevents a stale Guest cookie from exposing/mutating Guest records under a User session. A Guest may access only records linked to the server-resolved Guest identity; no caller-supplied actor ID is accepted. Direct independent and Path-contextual Lesson GETs check both live Rights/publication and unlock. Backend authorization is required for future Activity/Assessment reads under JPN-032. Saved reads return only eligible public fields or a minimal unavailable entry for Unsave; errors do not reveal private Rights reasons, other Guests or unpublished identities. New content-bearing requests must recheck live eligibility, and HTTP cache policy must reduce stale replay risk; already downloaded bytes cannot be recalled.
 
 **Retention is separate from abuse controls:** JPN-011 records validated Guest activity and protects identity/data integrity. JPN-051 owns rate limiting, spam/bot defenses and any temporary cooldown, including any future `429`/`Retry-After` or backend-timed frontend countdown. This draft does not impose a visit, Back, Reload, Skills or Lesson revisit limit. The five-minute interval above throttles only activity database writes, not requests or access.
 
-New error payloads use the implemented flat shape: `{ "code":"guest_unlock_quota_exceeded", "message":"Daily Lesson unlock limit reached." }`. These codes/statuses are **draft technical choices**, not current responses. Actor routes use existing `401 unauthorized` when neither valid Guest nor User actor exists; Guest-only routes use `401 guest_identity_invalid`. Where content existence must remain private, the same generic `content_not_found` covers missing and ineligible resources.
+New error payloads use the implemented flat shape: `{ "code":"guest_unlock_quota_exceeded", "message":"Daily Lesson unlock limit reached." }`. These codes/statuses are approved technical contract responses in the current backend worktree. Actor routes use existing `401 unauthorized` when neither valid Guest nor User actor exists; Guest-only routes use `401 guest_identity_invalid`. Where content existence must remain private, the same generic `content_not_found` covers missing and ineligible resources.
 
 | HTTP | Draft code | Case / FE handling |
 |---|---|---|
@@ -111,4 +111,4 @@ JPN-030 consumes catalog metadata plus `LessonAccess`, `GuestQuota` and `LessonU
 | Identity/security | Activity write throttling | Two valid signals within the draft five-minute interval avoid a second write but return the persisted timestamp; the first signal after the interval persists server time. Conservative cleanup/credential cutoffs prevent early expiry of a coalesced signal. No 429, cooldown or access denial is introduced by this interval. |
 | Identity/security | 90-day inactivity boundary | Data becomes cleanup-eligible 90 days after latest active use. An expired credential or identity cannot be renewed by `POST /guest/activity`; no activity update occurs. |
 
-No application test is claimed by this documentation draft. The matrix is the future JPN-011 verification scope, not evidence of implementation.
+The [backend implementation note](JPN-011-guest-foundation-backend.md) records the application tests run against the current worktree. This matrix remains the contract-level verification scope; frontend integration and production deployment remain unverified.

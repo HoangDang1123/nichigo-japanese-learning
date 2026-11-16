@@ -1,6 +1,8 @@
 package com.nichigo.api.content;
 
 import com.nichigo.api.content.dto.PublicContentDtos;
+import com.nichigo.api.guest.LessonAccessService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +23,13 @@ public class PublicContentService {
             "kana", "vocabulary", "grammar", "kanji", "example", "dialogue");
     private final PublicContentRepository repository;
     private final ObjectMapper objectMapper;
+    private final LessonAccessService access;
 
-    public PublicContentService(PublicContentRepository repository, ObjectMapper objectMapper) {
+    public PublicContentService(PublicContentRepository repository, ObjectMapper objectMapper,
+                                LessonAccessService access) {
         this.repository = repository;
         this.objectMapper = objectMapper;
+        this.access = access;
     }
 
     @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
@@ -73,13 +78,15 @@ public class PublicContentService {
     }
 
     @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
-    public PublicContentDtos.Lesson lesson(String slug) {
+    public PublicContentDtos.Lesson lesson(String slug, HttpServletRequest request) {
         var root = repository.publishedLesson(slug).orElseThrow(ContentNotFoundException::new);
+        access.requireFullLesson(root, request);
         return assembleLesson(root);
     }
 
     @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
-    public PublicContentDtos.Lesson lessonAtPlacement(String pathSlug, String placementId) {
+    public PublicContentDtos.Lesson lessonAtPlacement(String pathSlug, String placementId,
+                                                       HttpServletRequest request) {
         UUID id;
         try {
             id = UUID.fromString(placementId);
@@ -88,6 +95,7 @@ public class PublicContentService {
         }
         var root = repository.lessonAtPublishedPlacement(pathSlug, id)
                 .orElseThrow(ContentNotFoundException::new);
+        access.requireFullLesson(root, request);
         return assembleLesson(root);
     }
 

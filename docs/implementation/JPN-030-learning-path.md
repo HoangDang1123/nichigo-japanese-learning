@@ -1,5 +1,7 @@
 # JPN-030 — Learning Path railway presentation
 
+> **JPN-DOC-001 contract alignment:** This historical note records the UI preview evidence below. The intended integration now uses public published catalog metadata and an explicit Guest Start Learning action. A first Lesson unlock consumes one of two daily Asia/Ho_Chi_Minh allowances; full Lesson/activity/Assessment reads require backend authorization. Choosing a later Lesson does not require earlier completion. The preview has no Guest unlock wiring or real progress; see [the API contract](../../contracts/01-API-CONTRACT.md). No JPN-030 feature completion is claimed.
+
 **Status (2026-11-06):** The Product Owner approved the Railway Journey frontend UI after polish iteration 2. This is presentation approval only; JPN-030 content, progress, and free skill browsing are still incomplete. No merge, release, or end-to-end JPN-030 completion is claimed.
 
 ## Scope and architecture
@@ -12,7 +14,7 @@ The page includes a railway with CSS/SVG landscape decoration, selected lesson a
 
 ## Integration and limits
 
-JPN-020/JPN-023 must provide approved, published ordered content and its usage rights. JPN-040 must provide verified lesson/review/streak progress. A future adapter should map those sources into `LearningPathData`, handle loading and error states, and confirm any lesson navigation destination before enabling it. The proposed `/learning-paths` and `/progress` contracts are not implemented. No backend, auth, database, quiz, lesson reader, or persistence changes are part of this presentation phase. JPN-030 also includes free skill browsing, which this change does not implement.
+JPN-020/JPN-023 must provide approved, published ordered content and its usage rights. JPN-040 must provide verified lesson/review/streak progress. A future adapter should map those sources into `LearningPathData`, handle loading and error states, and confirm any lesson navigation destination before enabling it. `/learning-paths` reads are implemented by JPN-020 but have no frontend wiring or reviewed production content; `/progress` is unimplemented. No backend, auth, database, quiz, lesson reader, or persistence changes are part of this presentation phase. JPN-030 also includes free skill browsing, which this change does not implement.
 
 ## Verification
 

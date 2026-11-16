@@ -1,6 +1,8 @@
 # JPN-036 — Vocabulary Skill UI Foundation (frontend)
 
-> **Prototype status.** This is a **frontend UI prototype on demo data**. Product Owner visual approval of *Vocabulary UI prototype v1* is a visual approval only. It is not approval of the whole ticket, of the learning rules, of the content, or of a release. It is **not merged and not released**.
+> **JPN-DOC-001 status/contract alignment:** Frontend source was merged through PR #31 (commit `81fad8e` on `main`); branch-era status below remains historical evidence. The existing client-evaluated Vocabulary Quick Check, immediate feedback and demo 30-second countdown are a separate Skills review flow, not official Lesson Assessment. Published-content and server-side bookmark integration remain unimplemented; Guest Saved will use the shared 20-current-canonical-Item limit. UI prototype visual approval does not approve feature completion or release.
+
+> **Prototype status.** This is a **frontend UI prototype on demo data**. Product Owner visual approval of *Vocabulary UI prototype v1* is a visual approval only. It is not approval of the whole ticket, of the learning rules, of the content, or of a release. Frontend source is merged; the integrated feature is not complete or released.
 
 **Ticket:** JPN-036 — Vocabulary Skill UI Foundation (registered in [the backlog](../05-BACKLOG.md); JPN-033 remains Flashcards). **Branch:** `jpn-036/features/frontend-vocabulary-ui-foundation`. **Depends on:** JPN-003, JPN-UI-002, JPN-035 (Skills overview). Frontend only: no backend, database or API changes, so there is no FE/BE integration to verify.
 
@@ -26,7 +28,7 @@ Not included: Flashcards (JPN-033), Grammar, Kanji or other Skills; pronunciatio
   - **A comprehensive accessibility audit** (screen reader output, full keyboard pass); only the checks listed under QA were done.
   - Browsers other than Chromium.
 - **Not implemented:** backend, API, database, persistence, production spaced repetition, audio.
-- **Merged:** no. **Released:** no.
+- **Merged:** frontend source via PR #31 (`81fad8e`); this does not complete the integrated Vocabulary feature. **Released:** no.
 
 ## Routes and state lifetime
 | Route | Screen |

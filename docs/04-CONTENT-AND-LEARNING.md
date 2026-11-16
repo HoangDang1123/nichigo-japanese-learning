@@ -44,7 +44,11 @@ Skills là lối vào học/ôn độc lập, không phải cấp con của Lear
 | **Practice modes** | Flashcards, Quiz, Review, Mini Games. |
 | **Assessments** | Lesson Check, Chapter Review, Stage Review, JLPT Practice. |
 
-Lesson, Skills và Practice cùng tham chiếu bản ghi nội dung chuẩn cho kana, từ vựng, ngữ pháp, kanji, ví dụ và media được duyệt; không nhân bản nội dung chuẩn theo màn hình. Theo [ADR-016 và ADR-017](02-DECISIONS.md), quiz đạt từ 80%, được làm lại không giới hạn; Lesson sau vẫn truy cập được dù chưa hoàn thành mọi Lesson trước. Hoàn thành Lesson và mastery từng item là hai khái niệm riêng. Hoạt động phải phù hợp mục tiêu và loại nội dung của Lesson, không áp một trình tự cố định. Đây là hướng sản phẩm đã duyệt, **chưa được triển khai**; tiêu chí hoàn thành Lesson/Chapter, thuật toán mastery và review chưa được quyết định.
+Lesson, Skills và Practice cùng tham chiếu bản ghi nội dung chuẩn cho kana, từ vựng, ngữ pháp, kanji, ví dụ và media được duyệt; không nhân bản nội dung chuẩn theo màn hình. Theo [ADR-016–022](02-DECISIONS.md), Guest và User đều được xem/tìm kiếm nội dung Skills đã rà soát, đủ điều kiện và xuất bản, dùng flashcards/Practice hỗ trợ và Vocabulary Quick Check không giới hạn lượt. Truy cập Item chuẩn trong Skills không mở toàn bộ Lesson, ngữ cảnh riêng của Lesson hay Assessment chính thức. Catalog Lesson công khai có metadata; Guest chọn Start Learning để mở Lesson mới, tối đa 2 lần/ngày theo Asia/Ho_Chi_Minh, kể cả khi chọn Lesson sau trực tiếp. Nội dung/hoạt động/Assessment đầy đủ phải được backend kiểm tra quyền mở; User đăng nhập không có hạn mức này. Bookmark của Guest là tối đa 20 Item chuẩn đang lưu chung mọi nhóm Skills, tách biệt với việc mở/hoàn thành Lesson và mastery. Đây là quy tắc đã duyệt, **chưa được triển khai**.
+
+**Ba tương tác khác nhau:** Vocabulary Quick Check là ôn từ nhẹ trong Skills, có phản hồi ngay và có thể chấm trên client ở prototype hiện tại; nó không tạo điểm Assessment chính thức, không hoàn thành/mở Lesson và không tự chứng minh mastery. Practice cho hoạt động Lesson phản hồi ngay, cho làm lại, không tạo điểm Assessment. Official Lesson Assessment chỉ có ở Lesson được cấu hình; chấm trên server với năm loại Single Choice, Matching Pairs, Fill in the Blank, Ordering, Typed Answer, mỗi hoạt động trọng số bằng nhau và chỉ đạt trọn điểm hoặc 0. Đạt từ 80% thì qua, làm lại không giới hạn; lần trượt sau không xóa lần qua. Lesson cần Assessment hoàn thành khi qua; Lesson không có Assessment cần hành động hoàn thành rõ ràng. Kích thước Assessment tùy Lesson (thường 5 hoặc 8–10), dùng câu hỏi đã rà soát, xoay thứ tự/câu hỏi và tái dùng khi ngân hàng thiếu đa dạng. Đáp án, biến thể chấp nhận và giải thích chính thức chỉ hiện sau khi nộp toàn bộ; câu trả lời gõ dùng biến thể được biên soạn cùng chuẩn hóa Unicode/khoảng trắng có kiểm soát, không mặc nhiên coi Kana, Kanji, Romaji tương đương.
+
+Assessment dở dang được lưu tự động trên backend; bản nháp tạm khi offline cần đối soát khi kết nối lại, không ghi đè bản mới hơn hoặc nộp thiếu câu do chưa đồng bộ. Nộp lặp không tạo điểm trùng. Lần thử ghim đúng revision Lesson/Activity khi bắt đầu; Item chuẩn và Activity/Question có định danh riêng. Chỉ câu hỏi và revision đủ điều kiện, đã rà soát, xuất bản mới dùng để đánh giá chính thức. Nếu quyền của Item/media bị thu hồi giữa lần thử, dừng an toàn mà không tính trượt; giữ điểm/hoàn thành hợp lệ trước đó nhưng không phát lại nội dung bị cấm. JPN-021/JPN-022 hiện chỉ hỗ trợ package `1.0` và pipeline operator đã mô tả; xuất bản Activity là công việc tương lai, không phải schema `1.0` đã duyệt. Chính sách mastery, Chapter Review, lưu lần thử dở dang và hợp đồng transport chi tiết vẫn chưa được duyệt.
 
 ## PROPOSED — Quy trình thiết kế Lesson
 
@@ -84,7 +88,7 @@ Mức station là Chapter hay Lesson vẫn **OPEN**. Nếu hiển thị tiến �
 
 ## Phạm vi MVP và các quyết định OPEN
 
-Vertical slice ban đầu vẫn là học Hiragana nền tảng, quiz, phản hồi và tiến độ lưu được, đi cùng các yêu cầu guest/account hiện có trong [PRD](01-PRD.md). Gợi ý cũ về bộ chữ đầu, audio quyền rõ ràng, minh họa nét viết và 5–10 câu hỏi **chưa được duyệt về số lượng hoặc asset**. Không thêm N4+, thi thử đầy đủ, Mini Games hay thuật toán ôn nâng cao vào MVP bằng tài liệu này.
+Vertical slice ban đầu vẫn là học Hiragana nền tảng, Assessment, phản hồi và tiến độ lưu được, đi cùng các yêu cầu guest/account hiện có trong [PRD](01-PRD.md). Số lượng chữ đầu, audio và tài sản nét viết cụ thể **chưa được duyệt**; kích thước Assessment được cấu hình theo Lesson, thường 5 hoặc 8–10 hoạt động, không ấn định nội dung cụ thể. Không thêm N4+, thi thử đầy đủ, Mini Games hay thuật toán ôn nâng cao vào MVP bằng tài liệu này.
 
 Product Owner cần quyết định trước khi chốt thiết kế/triển khai:
 
@@ -93,7 +97,7 @@ Product Owner cần quyết định trước khi chốt thiết kế/triển kha
 3. Cách hiển thị kiến thức tiên quyết và các giới hạn truy cập khác nếu có; soft unlock giữa các Lesson đã được duyệt.
 4. Chapter Review có bắt buộc hay không.
 5. Railway station đại diện Chapter hay Lesson.
-6. Tiêu chí hoàn thành Lesson và Chapter; điểm quiz 80% không tự quyết định việc hoàn thành.
+6. Tiêu chí hoàn thành Chapter; Lesson cần Assessment hoàn thành khi qua từ 80%, Lesson không có Assessment cần thao tác hoàn thành rõ ràng.
 7. Mức theo dõi mastery và thuật toán review.
 8. Quyền sử dụng nội dung, giấy phép và tính sẵn có của audio/hình/nét viết đã được rà soát.
 

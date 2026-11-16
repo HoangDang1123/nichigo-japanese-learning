@@ -34,6 +34,7 @@
     "src/components/skills/kana-stroke-guidance.test.tsx",
     "src/components/skills/vocabulary/vocabulary-logic.test.ts",
     "src/components/skills/vocabulary/quiz-runner.test.tsx",
-    "src/components/skills/vocabulary/study-rail.test.tsx"
+    "src/components/skills/vocabulary/study-rail.test.tsx",
+    "src/components/skills/grammar/grammar.test.tsx"
   ]
 }

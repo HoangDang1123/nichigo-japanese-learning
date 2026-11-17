@@ -7,7 +7,7 @@ import {
   SKILL_CATEGORIES,
   type CategoryMeta,
   type SkillFilterGroup,
-} from "./skills-mock-data";
+} from "../shared/skills-categories";
 import styles from "./skills-overview.module.css";
 
 // ---------------------------------------------------------------------------

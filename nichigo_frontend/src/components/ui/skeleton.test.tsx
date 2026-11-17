@@ -13,10 +13,9 @@ testRequire.extensions[".css"] = (module) => {
   module.exports = new Proxy({}, { get: (_target, key) => key === "__esModule" ? false : String(key) });
 };
 writeFileSync(join(__dirname, "skeleton.module.css"), "");
-const emittedApp = resolve(__dirname, "../../app");
-mkdirSync(emittedApp, { recursive: true });
-writeFileSync(join(emittedApp, "home.module.css"), "");
 const emittedHome = resolve(__dirname, "../home");
+mkdirSync(emittedHome, { recursive: true });
+writeFileSync(join(emittedHome, "home.module.css"), "");
 writeFileSync(join(emittedHome, "home-skeleton.module.css"), "");
 
 test("SKEL-01/04: primitive variants have dimensions and stay decorative", async () => {
@@ -83,8 +82,8 @@ test("SKEL-05/06/07/08/10: Home only uses its skeleton during auth checking", as
 
 test("SKEL-11/12: future compositions are responsive but static routes do not mount them", () => {
   const railway = readFileSync(resolve(process.cwd(), "src/components/learning-path/learning-path-skeleton.module.css"), "utf8");
-  const skills = readFileSync(resolve(process.cwd(), "src/components/skills/skills-skeleton.module.css"), "utf8");
-  const home = readFileSync(resolve(process.cwd(), "src/app/home.module.css"), "utf8");
+  const skills = readFileSync(resolve(process.cwd(), "src/components/skills/overview/skills-skeleton.module.css"), "utf8");
+  const home = readFileSync(resolve(process.cwd(), "src/components/home/home.module.css"), "utf8");
   const learnRoute = readFileSync(resolve(process.cwd(), "src/app/learn/page.tsx"), "utf8");
   const skillsRoute = readFileSync(resolve(process.cwd(), "src/app/skills/page.tsx"), "utf8");
   assert.match(railway, /max-width: 600px/);

@@ -1,17 +1,18 @@
 import assert from "node:assert/strict";
-import { writeFileSync } from "node:fs";
-import { createRequire } from "node:module";
-import { join } from "node:path";
+import Module from "node:module";
 import { test } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { KANA_CELLS, findCell } from "./kana-chart-data";
 
-// CSS Modules are not bundled by the Node test runner; stub them with empty files.
-const testRequire = createRequire(__filename);
-testRequire.extensions[".css"] = (module) => {
-  module.exports = new Proxy({}, { get: (_target, key) => (key === "__esModule" ? false : String(key)) });
+// CSS Modules are not bundled by the Node test runner: answer every stylesheet request in memory
+// with a proxy whose class names echo their keys, so no stub file is written to disk.
+const internals = Module as unknown as { _load: (...a: unknown[]) => unknown };
+const originalLoad = internals._load;
+const classNameProxy = new Proxy({}, { get: (_target, key) => (key === "__esModule" ? false : String(key)) });
+internals._load = function (request: unknown, ...rest: unknown[]) {
+  if (String(request).endsWith(".css")) return classNameProxy;
+  return originalLoad.call(this, request, ...rest);
 };
-writeFileSync(join(__dirname, "kana-drawer.module.css"), "");
 
 test("KANA-DRAWER: compact header — glyph + romaji as the heading, no title, no metadata, no decoration", async () => {
   const { KanaDrawer } = await import("./kana-drawer");

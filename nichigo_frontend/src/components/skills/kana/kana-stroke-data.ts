@@ -6,8 +6,8 @@
  * file header; commercial-licensing review PENDING) — see
  * docs/implementation/JPN-035-skills-kana-reference.md.
  */
-import type { KanaStrokeGuidance, StrokeDataSource } from "./kana-stroke-guidance";
-import strokeData from "../../data/kana-strokes/animcjk-kana.json";
+import type { KanaStrokeGuidance, StrokeDataSource } from "./kana-stroke-types";
+import strokeData from "../../../data/kana-strokes/animcjk-kana.json";
 
 type PilotGlyph = Omit<KanaStrokeGuidance, "source" | "assetVersion">;
 

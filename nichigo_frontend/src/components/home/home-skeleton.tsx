@@ -1,5 +1,5 @@
 import { Skeleton, SkeletonRegion } from "../ui/skeleton";
-import home from "../../app/home.module.css";
+import home from "./home.module.css";
 import styles from "./home-skeleton.module.css";
 
 /** Shown only while the existing auth session check has not resolved. */

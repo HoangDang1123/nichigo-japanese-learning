@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
-import { CategoryDetail, isDetailCategory } from "@/components/skills/category-detail";
-import { SKILL_CATEGORIES } from "@/components/skills/skills-mock-data";
+import { CategoryDetail, isDetailCategory } from "@/components/skills/category/category-detail";
+import { SKILL_CATEGORIES } from "@/components/skills/shared/skills-categories";
 
 export const dynamicParams = false;
 

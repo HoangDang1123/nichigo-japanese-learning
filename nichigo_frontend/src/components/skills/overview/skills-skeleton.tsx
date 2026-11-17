@@ -1,4 +1,4 @@
-import { Skeleton, SkeletonRegion } from "../ui/skeleton";
+import { Skeleton, SkeletonRegion } from "../../ui/skeleton";
 import styles from "./skills-skeleton.module.css";
 
 /** Future published Skills listing loader; /skills currently has an honest static empty state. */

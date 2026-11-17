@@ -14,6 +14,14 @@ This is the **target deployment topology**, not a deployed environment verified 
 
 The shared `Skeleton` and `SkeletonRegion` in `nichigo_frontend/src/components/ui/` provide decorative shapes and one accessible loading announcement for genuine initial data requests. Feature compositions preserve the proportions of their eventual content. The current Home state adapter uses a Study Desk skeleton only while Redux checks the existing auth session; guest, authenticated-empty and unavailable states use their established content. Railway and Skills compositions are exported for future data adapters but are not mounted on their current static preview/empty routes. Short auth form submissions retain their button pending state. No `loading.tsx` route boundary is added while these routes have no server-side content load; future data integrations should place Suspense boundaries at the data-backed region and keep the AppShell stable. See the [design rules](07-DESIGN-SYSTEM.md#skeleton-loading-system).
 
+### Frontend source layout (JPN-ARCH-004)
+
+`nichigo_frontend/src/` keeps `app/` for routes, layouts and framework boundaries, and organizes the rest by ownership:
+- `components/ui`, `layout`, `states`, `branding`, `providers`, `account` hold genuinely shared primitives and the shell. Shared code does not import feature code.
+- Feature folders hold their own components, logic, types, demo data, CSS Module and tests: `components/home`, `learning-path`, `auth`, and the Skills areas `components/skills/{overview,kana,category,vocabulary,grammar}`. A file used by two Skills areas lives in `components/skills/shared/`. Skills areas do not import each other (category metadata used by both `overview` and `category` is in `shared/`).
+- `api/`, `store/`, `lib/`, `styles/`, `data/` are unchanged: the Axios client and CSRF lifecycle, the Redux auth store, and the semantic tokens. Feature-local providers keep their route-layout lifecycle (for example `VocabularyProvider`).
+- Demo data stays separate from types and logic and keeps its not-approved-for-publishing labelling. The import graph must stay free of cycles. Details and the full tree: [FRONTEND-CONTEXT](agents/FRONTEND-CONTEXT.md) and [JPN-ARCH-004](implementation/JPN-ARCH-004-frontend-component-structure.md).
+
 ## Repository structure (approved — JPN-001)
 ```
 nichigo_frontend/         # Next.js frontend (App Router, TypeScript)

@@ -10,7 +10,7 @@ The `/` route keeps the existing JPN-003 `AppShell`, including sidebar, mobile d
 
 - `src/components/home/home-state.tsx` reads the existing Redux auth status and user. It passes no progress data because the current application has no learning progress source.
 - `src/components/home/home-study-desk.tsx` renders the welcome, resume, recommendations, activity, goal and quick-access areas. Its exported `HomeProgress` interface is a future presentation boundary for **verified** learning data.
-- `src/app/home.module.css` provides responsive Study Desk styling using existing semantic theme variables. No new palette, logo, sidebar or UI dependency was added.
+- `src/components/home/home.module.css` (moved from `src/app/home.module.css` by JPN-ARCH-004) provides responsive Study Desk styling using existing semantic theme variables. No new palette, logo, sidebar or UI dependency was added.
 
 The view distinguishes authenticated learners with a supplied real `HomeProgress` object, authenticated learners without it, guests, auth checking, and auth unavailable. Resume titles, completed counts, activity minutes, recommendations and goal percentages only render when supplied through that typed object. The live adapter currently supplies `null`, so it never presents fabricated learner history. Empty states and generic exploration links remain visible.
 

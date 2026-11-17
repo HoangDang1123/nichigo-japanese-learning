@@ -66,4 +66,4 @@ Automated tests cover data integrity (unique ids, valid categories and relations
 - Content, translations and rōmaji need independent content review before any production use.
 - Real-device testing, a full accessibility audit and non-Chromium browsers remain open.
 - The `1 Issue` development badge noted above is unverified.
-- Deferred cleanup (not part of this change): the old Grammar branch in `category-detail.tsx` and `MOCK_GRAMMAR_ITEMS` are now unreachable for `/skills/grammar`.
+- Deferred cleanup (not part of this change): the old Grammar branch in `category-detail.tsx` (now `components/skills/category/category-detail.tsx`, JPN-ARCH-004) and `MOCK_GRAMMAR_ITEMS` (now in `category/category-mock-data.ts`) are now unreachable for `/skills/grammar`.

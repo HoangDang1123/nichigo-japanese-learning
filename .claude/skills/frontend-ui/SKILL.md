@@ -16,7 +16,7 @@ Root `AGENTS.md` and `nichigo_frontend/AGENTS.md` win over this file. Do not run
 
 ## 2. Where code goes
 - `src/app/`: routes, layouts, framework boundaries only. Keep URLs, layouts and navigation behaviour stable.
-- `src/components/<feature>/`: feature components, logic, types, demo data, CSS Module and tests together. Skills are grouped by area (for example `skills/vocabulary/`, `skills/grammar/`).
+- `src/components/<feature>/` (`home`, `learning-path`, `auth`, `skills/<area>`): feature components, logic, types, demo data, CSS Module and tests together. Skills are grouped by area: `skills/overview/`, `skills/kana/`, `skills/category/`, `skills/vocabulary/`, `skills/grammar/`. A file used by two areas goes in `skills/shared/`; areas do not import each other. Current tree: `docs/agents/FRONTEND-CONTEXT.md`.
 - `src/components/ui|layout|states|branding`: genuinely shared primitives and shell. Do not promote a component to shared because two nearby screens use it.
 - Shared code must not import from a feature. Avoid import cycles; put shared types in a file both sides can import.
 - Keep demo data separate from domain types and logic, and keep the "demo data, not approved for publishing" label wherever mock content is shown. Never present mock data as production data.

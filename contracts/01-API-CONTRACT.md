@@ -13,7 +13,10 @@
 | GET | `/learning-paths/{slug}` | Public | Published Stage → Chapter → Lesson hierarchy |
 | GET | `/learning-paths/{pathSlug}/placements/{placementId}/lesson` | Guest unlock or User session | Exact eligible Lesson revision pinned by a placement in the current published Path; Guest full-content access requires a stable Lesson unlock |
 | GET | `/skills/{type}/items` | Public | Published canonical items by content kind, keyset-paginated |
-| PENDING CONTRACT | Skills detail/search and presentation DTO | Public | Eligible reviewed published canonical Items, FE-friendly fields where reviewed content exists; public browse/search/detail independent of Lesson unlock |
+| GET | `/skills` | Public | Eight Skills in ordered Foundation Knowledge and Language Skills groups; eligible canonical Item counts and distinct API availability states; JPN-033 API foundation slice |
+| GET | `/skills/items` | Public | Search/filter published canonical Items with keyset pagination; JPN-033 API foundation slice |
+| GET | `/skills/items/{itemId}` | Public | Current eligible published canonical Item detail; JPN-033 API foundation slice |
+| GET | `/skills/flashcards` | Public | Source-backed presentation cards, with no review persistence; JPN-033 API foundation slice. See [the JPN-033 contract](../docs/implementation/JPN-033-skills-content-api.md) |
 | GET | `/lessons/{slug}` | Guest unlock or User session | Full published Lesson DTO; Guest full-content access requires a stable Lesson unlock |
 | JPN-011 review branch | `POST/GET /guest/session`; `POST /guest/activity`; `GET /guest/quota` | Guest | Server-issued identity, active-use retention tracking and daily allowance |
 | JPN-011 review branch | `GET /lessons/{slug}/access`; `POST /lessons/{slug}/unlock`; Path-placement access/unlock variants | Guest/User as specified | Actor-specific status and atomic first unlock of stable Lesson identity |

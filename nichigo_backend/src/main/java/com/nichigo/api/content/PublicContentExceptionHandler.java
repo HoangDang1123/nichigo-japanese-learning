@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice(assignableTypes = {PublicContentController.class,
+@RestControllerAdvice(assignableTypes = {PublicContentController.class, SkillsContentController.class,
         com.nichigo.api.guest.LessonAccessController.class,
         com.nichigo.api.guest.BookmarkController.class})
 public class PublicContentExceptionHandler {

@@ -57,6 +57,27 @@ desktop.ini
 logs/
 spring.log
 
+# ── AI agent local state (Claude Code / Codex) ───────────────────────────────
+# Shared instructions and skills stay tracked: AGENTS.md, CLAUDE.md (root and nested),
+# .agents/skills/, .claude/skills/ (including .agents-sync.json) and scripts/sync-agent-skills.mjs.
+# Only per-user, per-machine state is ignored; do not ignore .claude/ or .agents/ as a whole.
+.claude/settings.local.json
+.claude/worktrees/
+CLAUDE.local.md
+**/CLAUDE.local.md
+# Defensive: the Codex home layout (auth, sessions, caches, logs, sandbox state) must never be
+# committed if CODEX_HOME is ever pointed inside the repository. .codex/config.toml is not ignored.
+.codex/auth.json*
+.codex/auth.lock
+.codex/sessions/
+.codex/cache/
+.codex/logs/
+.codex/log/
+.codex/tmp/
+.codex/.tmp/
+.codex/.sandbox*
+.codex/*.sqlite*
+
 # ── Local databases (dev only) ────────────────────────────────────────────────
 *.db
 *.sqlite

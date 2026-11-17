@@ -2,6 +2,17 @@
 
 Work on one approved feature at a time. Read the actual source and Git state before treating documentation or a prior report as evidence of completion. Preserve existing behavior and uncommitted work.
 
+## Authorization and Git write operations
+
+These rules are mandatory for every agent and take precedence over any workflow description below or in a skill.
+
+1. **Default: no Git write operation without explicit owner authorization.** This covers creating, renaming, switching, merging and deleting branches; staging and committing; pushing; opening or updating pull requests; merging; deploying; and rewriting history. Read-only Git commands (`status`, `log`, `diff`, `show`, `ls-remote`) are always allowed. `git fetch` only updates remote-tracking references and is allowed when it cannot affect the working tree.
+2. **Authorization is specific.** It names the operation and its scope. Approval of one operation (for example creating or switching a branch) does not authorize another (committing, pushing, merging, deleting), and approval in one task does not carry to the next.
+3. **The workflow sections below describe the procedure to follow once an operation is authorized.** They never authorize an operation by themselves.
+4. **Preserve all uncommitted and untracked work.** Never discard it; if work cannot be separated and preserved safely, stop and report the blocker.
+5. **Never use `git reset --hard`, `git clean -fd`, force-push, or destructive checkout**, and do not stash, delete or overwrite unfinished work unless the owner has explicitly asked for that exact operation.
+6. Never silently change approved business rules, authentication/security contracts, or release scope.
+
 ## Read before each development ticket
 
 1. This file and the assigned feature in [the backlog](docs/05-BACKLOG.md) or current roadmap.
@@ -19,19 +30,19 @@ Do not commit, push, merge, deploy, delete branches, or rewrite Git history with
 
 ## Assigned-clone Git workflow
 
-The Product Owner authorizes two independent clones of the same monorepo and GitHub repository: Anti uses `H:\Code\Projects\nichigo-japanese-learning` for Frontend work; Codex uses `H:\Code\Projects\nichigo-japanese-learning-codex` for Backend, Database and Content work. Each agent must work only inside its assigned clone and must not modify the other's checkout. Coordinate shared documentation and cross-layer changes through GitHub review. Do not create further worktrees or clones without Product Owner authorization.
+The Product Owner authorizes two independent clones of the same monorepo and GitHub repository: Anti uses `H:\Code\Projects\nichigo-japanese-learning` for Frontend work; Codex uses `H:\Code\Projects\nichigo-japanese-learning-codex` for Backend, Database and Content work. Each agent must work only inside its assigned clone and must not modify the other's checkout. Coordinate shared documentation and cross-layer changes through GitHub review. Do not create further worktrees or clones without Product Owner authorization. The steps below apply only once the owner has authorized the corresponding Git operation (see Authorization and Git write operations).
 
 ### Starting a ticket
 
 1. Read the relevant project instructions and ticket requirements. Inspect `git status`, the current branch, and untracked files before switching tickets.
-2. If the current ticket has unfinished legitimate work, review it, then commit and push it to its appropriate ticket branch. Separate unrelated tickets into distinct commits and branches; never stage every changed file blindly.
+2. If the current ticket has unfinished legitimate work, review it, then, once the owner authorizes it, commit and push it to its appropriate ticket branch. Separate unrelated tickets into distinct commits and branches; never stage every changed file blindly.
 3. Never discard uncommitted or untracked work. If changes cannot be separated and preserved safely, stop and report the blocker instead of switching branches.
-4. Fetch the latest remote state and synchronize the assigned clone with `main` before creating the next ticket branch. Use the branch naming convention below and start only when that checkout is safe.
+4. Fetch the latest remote state and synchronize the assigned clone with `main` before creating the next ticket branch. Use the branch naming convention below and start only when that checkout is safe and the owner has authorized the branch operation.
 
 ### Completing a ticket
 
 1. Review the diff, run relevant checks and tests, and update implementation documentation.
-2. Commit one logical ticket-scoped change at a time using the Conventional Commits convention below; push the branch and open or update a PR targeting `main` for review.
+2. When the owner authorizes it, commit one logical ticket-scoped change at a time using the Conventional Commits convention below; push the branch and open or update a PR targeting `main` for review.
 3. Merge only when the work is complete, verified, and explicitly authorized. Never merge an unfinished feature. After merge, synchronize the assigned clone with `main` before starting another independent ticket.
 
 Never use `git reset --hard`, `git clean -fd`, force-push, or destructive checkout to resolve a branch switch. Do not delete or overwrite unfinished work or rewrite historical commits to satisfy a newer convention. If a Git operation could lose work or rewrite history, stop and report the risk.
@@ -76,7 +87,7 @@ Examples:
 4. Organize work by complete features, even when frontend and backend are implemented on separate branches.
 5. Clearly document how FE and BE branches are integrated and verified together before marking a feature complete.
 6. Never treat a completed frontend branch as proof that the entire feature is complete.
-7. Never create, rename, switch, merge, delete, or push branches without explicit owner authorization.
+7. Never create, rename, switch, merge, delete, or push branches without explicit owner authorization. Authorization names the operation and scope; approval to create or switch a branch does not authorize committing, pushing, merging or deleting.
 8. Do not rename or rewrite existing historical branches solely to conform to this new convention.
 9. If a task spans multiple features, stop and identify the correct scope before implementation.
 10. Keep this convention recorded here and referenced in relevant project workflow documentation.
@@ -116,3 +127,13 @@ Allowed types: `feat`, `fix`, `style`, `refactor`, `docs`, `test`, `chore`, `per
 - **Released:** the feature is deployed and its release checks are complete.
 
 Definition of Done for a feature: approved acceptance criteria, necessary FE/BE/API/DB integration, relevant tests, responsive and accessible UI with Light/Dark/System checks where applicable, no known unrelated regression, updated implementation docs, stated limitations, and Product Owner approval. Record each status separately; approval of one visual detail is not approval of the entire feature.
+
+## Shared agent skills
+
+Reusable procedures live in `.agents/skills/<name>/SKILL.md`, the single canonical source for Claude Code and Codex. `.claude/skills/` is generated from it by `scripts/sync-agent-skills.mjs`; never edit the generated copies. Run `node scripts/sync-agent-skills.mjs --check` after changing a skill. See [the skills README](.agents/skills/README.md).
+
+- `feature-development` — implement an approved feature end to end.
+- `code-review` — review a diff or PR and report prioritized findings.
+- `frontend-ui` — Nichigo frontend work: Next.js, design system, themes, states and visual verification.
+
+Skills describe how to apply the rules in this file; they never relax them. If a skill and this file disagree, this file wins. Nested `AGENTS.md` files (for example `nichigo_frontend/AGENTS.md`) remain in force for their directories.

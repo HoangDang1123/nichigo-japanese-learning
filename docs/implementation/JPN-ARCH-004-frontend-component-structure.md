@@ -1,6 +1,6 @@
 # JPN-ARCH-004 — Frontend component structure and test CI
 
-> **Maintenance status.** A behavior-preserving reorganization of `nichigo_frontend/src/components/` plus CI hardening. No product feature, route, API, authentication, state lifecycle, backend, database or content change. The work is on a local branch: it is **not merged and not released**.
+> **Maintenance status.** A behavior-preserving reorganization of `nichigo_frontend/src/components/` plus CI hardening. No product feature, route, API, authentication, state lifecycle, backend, database or content change. The work is on branch `jpn-arch-004/chore/frontend-component-structure` and under review in [PR #38](https://github.com/HoangDang1123/nichigo-japanese-learning/pull/38): it is **not merged and not released**.
 
 **Ticket:** JPN-ARCH-004 (registered in [the backlog](../05-BACKLOG.md); Product Owner approved, P1). **Branch:** `jpn-arch-004/chore/frontend-component-structure`, from `main` at `9aaadfb`. **Depends on:** JPN-003, JPN-UI-003, JPN-035, JPN-036, JPN-037, JPN-DOC-001 (shared skills script).
 
@@ -24,7 +24,7 @@ A source audit found, with evidence from the import graph:
 | Stroke types | declared in `kana-stroke-guidance.ts` | `kana/kana-stroke-types.ts` (guidance re-exports them, so imports keep working); the import cycle is gone |
 | Vocabulary, Grammar, `ui`, `layout`, `states`, `auth`, `learning-path`, `api`, `store`, `app` routes | — | unchanged (route files only had import paths updated) |
 
-Moves were done with `git mv`; every moved file is a 100% rename, and the only content edits inside them are import paths (plus the Kana CSS test mock below). Routes and URLs are unchanged.
+Moves were done with `git mv`. Git detects renames by content similarity, so the percentage is not always 100%: pure moves stay at 100%; many files changed only their import paths; `kana-stroke-guidance.ts` also lost its type declarations to `kana-stroke-types.ts` (lowest similarity); and the Kana tests changed their CSS stubbing (below, committed before the move). Routes and URLs are unchanged.
 
 **Legacy files kept on purpose.** `components/skills/skills-mock-data.ts` remains as a deprecated re-export of the three new modules because the untracked legacy `skills-library.tsx` still imports from it; nothing in tracked source imports it. Delete both together when the owner decides. `skills-library.*` was not touched.
 
@@ -40,7 +40,7 @@ Moves were done with `git mv`; every moved file is a 100% rename, and the only c
 - Production server: `/`, `/learn`, `/skills`, `/skills/kana`, `/skills/vocabulary` (+ `explore`, `saved`, `study/greetings`), `/skills/grammar` (+ `de-place`), `/skills/kanji`, `/skills/listening`, `/login`, `/register`, `/progress` return 200; unknown Grammar id returns 404.
 - Headless Chrome, 11 routes at 1440 Light, 1440 Dark, 390 and 320: no horizontal overflow and no console errors other than the expected refused connection to the absent backend (`/auth/me`); Dark applies the dark background.
 - Vocabulary lifecycle: a word bookmarked in Explore is listed in Saved after in-app navigation through the Vocabulary Home link (provider still mounted by the route layout). Grammar filter chips and the Kana drawer still respond.
-- **Not done:** no side-by-side visual or HTML comparison with the pre-refactor build (a baseline build could not be set up in this environment); no comparison of the state reset on full reload against a baseline beyond the documented behavior; the new CI steps have **not been run on GitHub or on Linux**; no real-device, screen-reader or non-Chromium checks.
+- **Not done:** no side-by-side visual or HTML comparison with the pre-refactor build (a baseline build could not be set up in this environment); no comparison of the state reset on full reload against a baseline beyond the documented behavior; the new CI steps had not run on GitHub or Linux when this note was written (results are on PR #38); no real-device, screen-reader or non-Chromium checks.
 
 ## Conventions (see also [FRONTEND-CONTEXT](../agents/FRONTEND-CONTEXT.md) and [architecture](../03-ARCHITECTURE.md))
 Routes in `app/`; feature code, demo data, styles and tests together in the feature folder; shared folders never import features; Skills areas do not import each other (category and overview both read the category metadata from `shared/skills-categories.ts`); a file used by two areas goes in `skills/shared/`; no import cycles; demo data stays separate and labelled.

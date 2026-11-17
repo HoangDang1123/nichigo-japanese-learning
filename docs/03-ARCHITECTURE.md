@@ -24,6 +24,10 @@ infra/                    # Deployment docs/config (no secrets)
 docs/                     # Project documents
 contracts/                # Proposed API and import contracts
 antigravity/              # Agent operating guide
+.agents/skills/            # Canonical shared agent skills (Claude Code and Codex)
+.claude/skills/            # Generated from .agents/skills by scripts/sync-agent-skills.mjs; do not edit
+scripts/                  # Repository tooling (agent skill sync/check)
+AGENTS.md, CLAUDE.md      # Authoritative agent rules; Claude Code entry point
 .github/workflows/        # GitHub Actions CI
 ```
 

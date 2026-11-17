@@ -7,7 +7,7 @@
  * in skills-mock-data.ts. Voiced and contracted (yōon) cells deliberately have no
  * example until verified words exist.
  */
-import { MOCK_HIRAGANA_ITEMS, MOCK_KATAKANA_ITEMS } from "./skills-mock-data";
+import { MOCK_HIRAGANA_ITEMS, MOCK_KATAKANA_ITEMS } from "./kana-mock-data";
 
 export type KanaScript = "hiragana" | "katakana";
 export type KanaSectionKey = "basic" | "voiced" | "yoon" | "voiced-yoon";

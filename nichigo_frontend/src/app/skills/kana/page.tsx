@@ -1,5 +1,5 @@
 import { AppShell } from "@/components/layout/app-shell";
-import { KanaDetail } from "@/components/skills/kana-detail";
+import { KanaDetail } from "@/components/skills/kana/kana-detail";
 
 export default function SkillsKanaPage() {
   return (

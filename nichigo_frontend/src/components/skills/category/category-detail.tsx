@@ -1,13 +1,8 @@
 import Link from "next/link";
 import { ArrowLeft, Lock } from "lucide-react";
-import {
-  MOCK_VOCAB_ITEMS,
-  MOCK_GRAMMAR_ITEMS,
-  MOCK_KANJI_ITEMS,
-  SKILL_CATEGORIES,
-  type SkillCategoryKey,
-} from "./skills-mock-data";
-import styles from "./skills-detail.module.css";
+import { SKILL_CATEGORIES, type SkillCategoryKey } from "../shared/skills-categories";
+import { MOCK_VOCAB_ITEMS, MOCK_GRAMMAR_ITEMS, MOCK_KANJI_ITEMS } from "./category-mock-data";
+import styles from "../shared/skills-detail.module.css";
 
 const DEMO_KEYS: SkillCategoryKey[] = ["vocabulary", "grammar", "kanji"];
 

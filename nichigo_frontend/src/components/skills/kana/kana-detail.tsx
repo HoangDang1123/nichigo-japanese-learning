@@ -11,7 +11,7 @@ import {
 } from "./kana-chart-data";
 import { KanaChart } from "./kana-chart";
 import { KanaDrawer } from "./kana-drawer";
-import detail from "./skills-detail.module.css";
+import detail from "../shared/skills-detail.module.css";
 import chart from "./kana-chart.module.css";
 import drawerStyles from "./kana-drawer.module.css";
 

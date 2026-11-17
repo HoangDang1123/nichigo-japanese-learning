@@ -1,5 +1,5 @@
 import { AppShell } from "@/components/layout/app-shell";
-import { SkillsOverview } from "@/components/skills/skills-overview";
+import { SkillsOverview } from "@/components/skills/overview/skills-overview";
 
 export default function SkillsPage() {
   return (

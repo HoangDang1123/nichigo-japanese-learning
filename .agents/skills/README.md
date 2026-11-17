@@ -5,6 +5,7 @@
 | Skill | Use it to |
 |---|---|
 | `feature-development` | Implement an approved feature end to end: scope, plan, implement, verify, document, report. |
+| `git-workflow` | Run Git operations safely: preflight, sync, branch, stage, commit, push, PR, conflicts, merge, post-merge. |
 | `code-review` | Review a diff, branch or PR and report findings ranked by severity. |
 | `frontend-ui` | Build and verify Nichigo frontend UI: Next.js, design system, themes, states, visual checks. |
 

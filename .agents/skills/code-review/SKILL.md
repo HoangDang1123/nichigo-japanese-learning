@@ -24,7 +24,7 @@ Read the ticket row (`docs/05-BACKLOG.md`), the relevant PRD requirement and ADR
 5. **UI and accessibility (when UI changed):** semantic HTML, labels, `aria-*`, keyboard and focus, visible `:focus-visible`, contrast in Light and Dark, responsive behaviour (320 to 1920 px), loading/empty/error states, reduced motion, Vietnamese diacritics and Japanese glyphs, semantic tokens instead of raw colours, no extra font.
 6. **Tests:** does each acceptance criterion and each risky branch have a test? Do tests assert behaviour, not implementation text? Do they leave generated files in the source tree?
 7. **Requirement compliance:** approved business rules, demo-data disclaimers, status wording (Implemented / Tested / Reviewed / Merged / Released), no mock content presented as published.
-8. **Process:** branch and commit naming against `AGENTS.md`, one logical change per commit, no unrelated files.
+8. **Process and merge readiness:** branch and commit naming against `AGENTS.md`, one logical change per commit, no unrelated files; for a PR, check the PR content list, squash-ready title and the required CI checks as reported by GitHub (see `AGENTS.md` and `git-workflow`). Report readiness; never merge or change checks yourself.
 
 ## 4. Verify before reporting
 Re-read the code for every finding. Reproduce with a test or command when cheap. Mark each finding **Confirmed** (shown by code/test/output) or **Plausible** (needs the owner or more context). Drop anything you cannot support.

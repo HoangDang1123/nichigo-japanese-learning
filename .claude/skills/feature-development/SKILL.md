@@ -21,7 +21,7 @@ Write a short plan with:
 - Dependencies, assumptions and open product choices (list them; do not resolve them by guessing).
 - Files to add or change, reusing existing patterns and components; no new dependency unless justified.
 - Verification: which tests, builds and manual checks prove each acceptance criterion.
-- Git needs (branch, commits) as a request to the owner, not as an action.
+- Git needs (branch, commits) as a request to the owner, not as an action. When Git operations are authorized, follow the `git-workflow` skill.
 
 For frontend work, also load the `frontend-ui` skill.
 

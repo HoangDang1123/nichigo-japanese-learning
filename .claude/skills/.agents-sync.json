@@ -2,8 +2,9 @@
   "generatedBy": "scripts/sync-agent-skills.mjs",
   "source": ".agents/skills",
   "files": {
-    "code-review/SKILL.md": "84d57265e68fcaf5754eab269ee6b58b0bde230a14f616d2768875266d16a66e",
-    "feature-development/SKILL.md": "9669a4fb6357cc62ead56b0bb59f271eda0e4920af36748f537c1f72de21e3de",
-    "frontend-ui/SKILL.md": "e80f9bf348b5bf2878676f3a9a279df709d793ffef5976fff2786e45c782ee31"
+    "code-review/SKILL.md": "cc3a420acf7ffcbe91047d9cfa46c85d7cc1d1a7967ec22440327eecf0d56753",
+    "feature-development/SKILL.md": "e5d6d7f3a4f2cb2550af4f1abef6962826a9cad2685f6ce93561f5b2c494efde",
+    "frontend-ui/SKILL.md": "e80f9bf348b5bf2878676f3a9a279df709d793ffef5976fff2786e45c782ee31",
+    "git-workflow/SKILL.md": "8b0ec1ac56ca12d4e72655963072ecb62fb0a0af565aaf30e273cdd1481563d7"
   }
 }

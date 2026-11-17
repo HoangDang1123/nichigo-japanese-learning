@@ -12,6 +12,7 @@ These rules are mandatory for every agent and take precedence over any workflow 
 4. **Preserve all uncommitted and untracked work.** Never discard it; if work cannot be separated and preserved safely, stop and report the blocker.
 5. **Never use `git reset --hard`, `git clean -fd`, force-push, or destructive checkout**, and do not stash, delete or overwrite unfinished work unless the owner has explicitly asked for that exact operation.
 6. Never silently change approved business rules, authentication/security contracts, or release scope.
+7. **Fetch, pull, merge and rebase are different operations with different risk and need separate authorization where they write.** Rebase (including interactive), amending a pushed commit, cherry-pick and revert alter history or behaviour and need explicit authorization naming the branch and commits. Force-push is never the default way to resolve a conflict.
 
 ## Read before each development ticket
 
@@ -46,6 +47,15 @@ The Product Owner authorizes two independent clones of the same monorepo and Git
 3. Merge only when the work is complete, verified, and explicitly authorized. Never merge an unfinished feature. After merge, synchronize the assigned clone with `main` before starting another independent ticket.
 
 Never use `git reset --hard`, `git clean -fd`, force-push, or destructive checkout to resolve a branch switch. Do not delete or overwrite unfinished work or rewrite historical commits to satisfy a newer convention. If a Git operation could lose work or rewrite history, stop and report the risk.
+
+## Pull requests and merging
+
+- **PR content.** Each PR states: the JPN ticket ID; goal and scope; base and source branches; what is and is not implemented; API/schema/migration impact; tests run with real results and checks not run with reasons; screenshots or visual verification for UI changes; known limitations and risks; decisions the owner must review. Do not mix unrelated tickets in one PR without approved scope. Opening a PR does not complete a feature.
+- **Merge strategy.** Squash merge is the default for PRs into `main`. The squash commit uses Conventional Commits with the ticket ID, for example `refactor(jpn-arch-004): reorganize frontend components`. If a PR holds independent changes whose history must stay separate, report it to the Product Owner to choose an exception or split the PR. Agents never change repository or branch-protection settings.
+- **CI gate.** All required CI checks must pass before merging. Never merge with failed, pending or unconfirmed checks; never bypass (including admin bypass), disable, delete or weaken checks or tests; local results are not CI evidence. If required checks are not configured in GitHub branch protection or rulesets, report the gap and do not claim the branch is protected. Changing the required-check list is a separate governance decision for the Product Owner.
+- **Merge readiness.** Besides CI: owner approval for the scope, no unresolved conflicts, no known serious regression without an approved plan, updated documentation, and the PR's acceptance criteria verified. UI approval is not approval of the whole feature. Merging requires explicit owner authorization of the merge itself.
+- **Conflicts.** Read both sides and check them against business rules, API contracts and architecture. Never apply blanket `ours`/`theirs`, overwrite another agent's work, or force-push after resolving. Stop and ask the owner when a conflict touches business policy, security, data schema or work outside scope.
+- **After merge.** Verify the merge on GitHub or in Git history; for a squash merge find the squash commit on `main` (the original commits are not ancestors). Mark **Merged** only with that evidence and **Released** only with deployment evidence. Synchronize the assigned clone only when authorized, and never delete branches, clear stashes or clean untracked files unless the owner asks.
 
 ## Typography Rule
 
@@ -133,6 +143,7 @@ Definition of Done for a feature: approved acceptance criteria, necessary FE/BE/
 Reusable procedures live in `.agents/skills/<name>/SKILL.md`, the single canonical source for Claude Code and Codex. `.claude/skills/` is generated from it by `scripts/sync-agent-skills.mjs`; never edit the generated copies. Run `node scripts/sync-agent-skills.mjs --check` after changing a skill. See [the skills README](.agents/skills/README.md).
 
 - `feature-development` — implement an approved feature end to end.
+- `git-workflow` — execute Git operations (preflight, sync, branch, stage, commit, push, PR, conflicts, merge, post-merge) under the rules in this file.
 - `code-review` — review a diff or PR and report prioritized findings.
 - `frontend-ui` — Nichigo frontend work: Next.js, design system, themes, states and visual verification.
 

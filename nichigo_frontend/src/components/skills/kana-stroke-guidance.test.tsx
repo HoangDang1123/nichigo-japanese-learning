@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { readFileSync, writeFileSync } from "node:fs";
-import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
+import Module from "node:module";
 import { join } from "node:path";
 import { test } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -16,11 +16,15 @@ import {
   type KanaStrokeGuidance,
 } from "./kana-stroke-guidance";
 
-const testRequire = createRequire(__filename);
-testRequire.extensions[".css"] = (module) => {
-  module.exports = new Proxy({}, { get: (_target, key) => (key === "__esModule" ? false : String(key)) });
+// CSS Modules are not bundled by the Node test runner: answer every stylesheet request in memory
+// with a proxy whose class names echo their keys, so no stub file is written to disk.
+const internals = Module as unknown as { _load: (...a: unknown[]) => unknown };
+const originalLoad = internals._load;
+const classNameProxy = new Proxy({}, { get: (_target, key) => (key === "__esModule" ? false : String(key)) });
+internals._load = function (request: unknown, ...rest: unknown[]) {
+  if (String(request).endsWith(".css")) return classNameProxy;
+  return originalLoad.call(this, request, ...rest);
 };
-writeFileSync(join(__dirname, "kana-drawer.module.css"), "");
 
 const SCRIPTS: KanaScript[] = ["hiragana", "katakana"];
 const SOURCE_DIR = join(process.cwd(), "src/data/kana-strokes/source/animcjk-c63765b");

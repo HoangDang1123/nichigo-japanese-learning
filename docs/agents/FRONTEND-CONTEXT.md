@@ -43,6 +43,7 @@ nichigo_frontend/
 │   │   │   ├── overview/    # /skills directory: SkillsOverview, SkillsSkeleton
 │   │   │   ├── kana/        # Kana chart, drawer, stroke guidance (+ data adapter, types, mock data, tests)
 │   │   │   ├── category/    # /skills/[category] detail (Kanji demo, "unavailable" placeholders) and its mock data
+│   │   │   ├── kanji/       # /skills/kanji and /skills/kanji/[itemId]: Skills Content API only (mapping, list reducer, detail loader, tests)
 │   │   │   ├── vocabulary/  # Vocabulary feature (provider, logic, data, tests)
 │   │   │   ├── grammar/     # Grammar feature (overview, detail, data, logic, tests)
 │   │   │   ├── shared/      # skills-detail.module.css (page chrome) and skills-categories.ts (category metadata), used by more than one area

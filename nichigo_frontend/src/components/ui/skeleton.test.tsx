@@ -80,7 +80,7 @@ test("SKEL-05/06/07/08/10: Home only uses its skeleton during auth checking", as
   assert.doesNotMatch(loaded, /class="skeleton /);
 });
 
-test("SKEL-11/12: future compositions are responsive but static routes do not mount them", () => {
+test("SKEL-11/12: future compositions are responsive but route files do not mount them (Skills mounts its skeleton inside the overview container while the Directory loads)", () => {
   const railway = readFileSync(resolve(process.cwd(), "src/components/learning-path/learning-path-skeleton.module.css"), "utf8");
   const skills = readFileSync(resolve(process.cwd(), "src/components/skills/overview/skills-skeleton.module.css"), "utf8");
   const home = readFileSync(resolve(process.cwd(), "src/components/home/home.module.css"), "utf8");

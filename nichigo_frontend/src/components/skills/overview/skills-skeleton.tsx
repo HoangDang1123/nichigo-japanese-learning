@@ -1,7 +1,7 @@
 import { Skeleton, SkeletonRegion } from "../../ui/skeleton";
 import styles from "./skills-skeleton.module.css";
 
-/** Future published Skills listing loader; /skills currently has an honest static empty state. */
+/** Initial loader for the Skills Directory (GET /api/v1/skills). */
 export function SkillsSkeleton() {
   return <SkeletonRegion label="Đang tải thư viện kỹ năng…" className={styles.page}>
     <div className={styles.heading} aria-hidden="true">

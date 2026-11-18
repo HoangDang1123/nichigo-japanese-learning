@@ -29,7 +29,7 @@ Always defer to authoritative project documentation for product and architectura
 ```text
 nichigo_frontend/
 ├── src/
-│   ├── api/          # Axios instance, typed ApiError, auth and CSRF endpoints
+│   ├── api/          # Axios instance, typed ApiError, auth, CSRF and public Skills content endpoints (skills.ts)
 │   ├── app/          # Routes, layouts and framework boundaries only (see section 6 for the routes)
 │   ├── components/   # Shared UI plus feature folders
 │   │   ├── account/  # Account menu dropdown

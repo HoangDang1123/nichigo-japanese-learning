@@ -6,7 +6,7 @@ import { SKILL_CATEGORIES } from "@/components/skills/shared/skills-categories";
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return SKILL_CATEGORIES.filter((c) => c.key !== "kana" && c.key !== "vocabulary" && c.key !== "grammar").map((c) => ({ category: c.key }));
+  return SKILL_CATEGORIES.filter((c) => c.key !== "kana" && c.key !== "vocabulary" && c.key !== "grammar" && c.key !== "kanji").map((c) => ({ category: c.key }));
 }
 
 export default async function SkillsCategoryPage({

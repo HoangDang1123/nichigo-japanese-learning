@@ -86,7 +86,7 @@ export function backendStatus(entry: DirectoryEntry): BackendStatus | null {
 
 /** True when the card opens a screen that still renders demo data instead of published content. */
 export function usesDemoData(entry: DirectoryEntry): boolean {
-  return entry.meta.availability === "demo";
+  return entry.meta.availability === "demo" && entry.meta.contentSource !== "api";
 }
 
 export function directoryErrorMessage(error: unknown): string {

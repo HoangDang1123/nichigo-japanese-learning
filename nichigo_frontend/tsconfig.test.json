@@ -33,6 +33,8 @@
     "src/components/home/home-study-desk.tsx",
     "src/components/skills/overview/skills-directory.ts",
     "src/components/skills/overview/skills-directory.test.tsx",
+    "src/components/skills/kanji/kanji-data.ts",
+    "src/components/skills/kanji/kanji.test.tsx",
     "src/components/skills/kana/kana-chart-data.test.ts",
     "src/components/skills/kana/kana-drawer.test.tsx",
     "src/components/skills/kana/kana-stroke-guidance.test.tsx",

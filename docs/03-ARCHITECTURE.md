@@ -3,7 +3,7 @@
 ## System topology
 `Browser → Vercel / Next.js → HTTPS → Render Free / Spring Boot → TLS PostgreSQL → Neon Free`
 
-This is the **target deployment topology**, not a deployed environment verified by this repository. Current source has a Next.js frontend, Spring Boot backend, PostgreSQL/Flyway configuration, session auth, and JPN-020–JPN-023 content work merged in `origin/main`. JPN-022 provides an authenticated local operator CLI, not an HTTP operator API. JPN-023 adds original draft content verified in an isolated database; qualified human review and production publication are pending. Hosting and Guest identity/bookmark/unlock, Assessment attempt and learner progress persistence remain planned.
+This is the **target deployment topology**, not a deployed environment verified by this repository. Current source has a Next.js frontend, Spring Boot backend, PostgreSQL/Flyway configuration, session auth, and JPN-020–JPN-023 content work merged in `origin/main`. JPN-022 provides an authenticated local operator CLI, not an HTTP operator API. JPN-023 adds original draft content verified in an isolated database; qualified human review and production publication are pending. The JPN-011 Guest backend (identity, Lesson unlock quota, Skills bookmarks; PR #35) and the JPN-033 Skills Content API foundation (PR #36) are also merged; the frontend does not yet call them. Hosting, Assessment attempt and learner progress persistence remain planned, and no release is evidenced.
 
 - Next.js TypeScript frontend. Java Spring Boot modular monolith REST API.
 - Neon managed PostgreSQL; Flyway migration history in repository.
@@ -40,7 +40,7 @@ AGENTS.md, CLAUDE.md      # Authoritative agent rules; Claude Code entry point
 ```
 
 ## Data model (conceptual, adjust with migrations)
-The list below is the historical target sketch, not a table-by-table description of current migrations or approved future SQL names. `origin/main` has V1–V8, including V6 Rights history, V7 Path eligibility and V8 operator pipeline metadata. Guest, bookmark, Assessment attempt and learner-progress tables remain absent. See JPN-002 and JPN-010A implementation notes for the earlier schema.
+The list below is the historical target sketch, not a table-by-table description of current migrations or approved future SQL names. `origin/main` has V1–V9 (verified against `nichigo_backend/src/main/resources/db/migration/`), including V6 Rights history, V7 Path eligibility, V8 operator pipeline metadata and V9 Guest foundation (`guest_identities`, `guest_lesson_unlocks`, `skill_bookmarks`). Assessment attempt and learner-progress tables remain absent. See JPN-002 and JPN-010A implementation notes for the earlier schema.
 The [Nichigo Hybrid curriculum proposal](04-CONTENT-AND-LEARNING.md) adds a conceptual Learning Path → Stage → Chapter → Lesson hierarchy, independent Skills/Practice entry points, and separate lesson-completion versus item-mastery concerns. The merged JPN-020 model represents the hierarchy with identified tables; Railway station granularity remains open.
 
 - `users(id,email,password_hash,status,created_at)`; `auth_sessions(id,user_id,expires_at,revoked_at)`.
@@ -53,7 +53,7 @@ The [Nichigo Hybrid curriculum proposal](04-CONTENT-AND-LEARNING.md) adds a conc
 - `guest_daily_usage(guest_id,local_date,quota_type,used_count)` with unique composite key.
 - `import_batches(id,source,status,created_at)`; `import_records`; `audit_logs`.
 
-Use canonical content references and a join table for Lesson membership. Guest identity is server-issued through a secured browser cookie/session; Guest access, bookmarks, attempts and progress persist server-side while valid, with cleanup eligibility after 90 days without qualifying activity. Cookie loss/device change may prevent recovery before account linkage; merge/conflict policy remains open. Include uniqueness constraints for progress and import keys; enforce first Lesson unlock (2 new Lessons per Asia/Ho_Chi_Minh day) and the shared 20-current-canonical-Skills-Item Guest bookmark limit atomically, including concurrent requests. Revisit/completion/retry do not consume unlocks; removal frees a bookmark slot. Store timestamps in UTC; compute quota date in Asia/Ho_Chi_Minh. These Guest tables and rules are not implemented.
+Use canonical content references and a join table for Lesson membership. Guest identity is server-issued through a secured browser cookie/session; Guest access, bookmarks, attempts and progress persist server-side while valid, with cleanup eligibility after 90 days without qualifying activity. Cookie loss/device change may prevent recovery before account linkage; merge/conflict policy remains open. Include uniqueness constraints for progress and import keys; enforce first Lesson unlock (2 new Lessons per Asia/Ho_Chi_Minh day) and the shared 20-current-canonical-Skills-Item Guest bookmark limit atomically, including concurrent requests. Revisit/completion/retry do not consume unlocks; removal frees a bookmark slot. Store timestamps in UTC; compute quota date in Asia/Ho_Chi_Minh. The Guest identity, unlock and bookmark tables and rules are implemented in the backend (V9, JPN-011, PR #35); frontend integration and Guest-to-account claim are not.
 
 ## JPN-020 learning content foundation (merged in `origin/main`)
 

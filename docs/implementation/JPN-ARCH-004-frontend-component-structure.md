@@ -1,6 +1,6 @@
 # JPN-ARCH-004 — Frontend component structure and test CI
 
-> **Maintenance status.** A behavior-preserving reorganization of `nichigo_frontend/src/components/` plus CI hardening. No product feature, route, API, authentication, state lifecycle, backend, database or content change. The work is on branch `jpn-arch-004/chore/frontend-component-structure` and under review in [PR #38](https://github.com/HoangDang1123/nichigo-japanese-learning/pull/38): it is **not merged and not released**.
+> **Maintenance status.** A behavior-preserving reorganization of `nichigo_frontend/src/components/` plus CI hardening. No product feature, route, API, authentication, state lifecycle, backend, database or content change. The work was developed on branch `jpn-arch-004/chore/frontend-component-structure` and is **merged via [PR #38](https://github.com/HoangDang1123/nichigo-japanese-learning/pull/38)** (merge commit `86e3421` on `main`, a regular merge, not a squash). It is **not released**. The verification below is branch-era evidence; no GitHub CI result for the new steps is recorded in this note.
 
 **Ticket:** JPN-ARCH-004 (registered in [the backlog](../05-BACKLOG.md); Product Owner approved, P1). **Branch:** `jpn-arch-004/chore/frontend-component-structure`, from `main` at `9aaadfb`. **Depends on:** JPN-003, JPN-UI-003, JPN-035, JPN-036, JPN-037, JPN-DOC-001 (shared skills script).
 

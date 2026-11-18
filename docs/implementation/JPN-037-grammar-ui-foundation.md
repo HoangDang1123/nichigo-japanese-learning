@@ -1,6 +1,6 @@
 # JPN-037 — Grammar Skill UI Foundation (frontend)
 
-> **Prototype status.** This is a **frontend UI prototype on demo data**. Product Owner visual approval of *Grammar UI prototype v1* is a visual approval only. It does not approve the whole ticket, the content, the learning rules or a release. The work is on a local branch: it is **not merged and not released**.
+> **Prototype status.** This is a **frontend UI prototype on demo data**. Product Owner visual approval of *Grammar UI prototype v1* is a visual approval only. It does not approve the whole ticket, the content, the learning rules or a release. The work is **merged via PR #34** (`20b050e` on `main`) and **not released**.
 
 **Ticket:** JPN-037 — Grammar Skill UI Foundation (registered in [the backlog](../05-BACKLOG.md)). **Branch:** `jpn-037/features/frontend-grammar-ui-foundation`. **Depends on:** JPN-003, JPN-UI-002, JPN-035 (Skills overview), JPN-036 (Vocabulary reading and rōmaji conventions). Frontend only: no backend, database or API changes, so there is no FE/BE integration to verify.
 
@@ -24,7 +24,7 @@ Not included: Flashcards (JPN-033), Kanji or other Skills; Grammar study flow, q
   - Browsers other than Chromium.
 - **Open observation:** during the Loading/Error preview, the Next.js development overlay showed a `1 Issue` badge. Its cause was **not investigated and is unverified**; it was seen only in the development server with the temporary preview route and not in the production build. It must not be treated as resolved.
 - **Not implemented:** backend, API, database, persistence, progress, bookmarks, assessment, mastery, spaced repetition, audio.
-- **Merged:** no. **Released:** no.
+- **Merged:** yes, via PR #34 (`20b050e`); the merge does not complete the integrated Grammar feature. **Released:** no. The test results above are branch-era evidence, not rerun for this documentation update.
 
 ## Routes
 | Route | Screen |

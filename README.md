@@ -2,7 +2,7 @@
 
 A Vietnamese-first Japanese learning website for absolute beginners, built with a learn-by-building approach.
 
-> **Source status (2026-11-04, `origin/main` at `c1b254c`):** Bootstrap, semantic themes, PostgreSQL/Flyway V1–V3, frontend/backend email-password authentication, and the refined shared AppShell are merged. PR #13 merged sidebar commit `e2c8c08`, including collapse controls, centered icons and bottom Profile/Settings navigation. The sidebar appearance was owner-approved; that review and the recorded automated checks do not establish full JPN-003 acceptance or a public release. Learning content, guest quota, progress and deployment are not evidenced in current source.
+> **Source status (2026-11-18, `origin/main` at `86e3421`, the PR #38 merge commit):** Merged in source: bootstrap, semantic themes, the AppShell, email-password authentication, Learning Content backend (JPN-020–JPN-023, JPN-ARCH-002), the JPN-011 Guest Foundation **backend** (PR #35), the JPN-033 Skills Content API **backend foundation** (PR #36), the JPN-035/JPN-036/JPN-037 Skills **UI prototypes on demo data** (PR #30, #31, #34), shared agent skills (PR #37) and the JPN-ARCH-004 frontend component structure and test CI (PR #38). PostgreSQL/Flyway migrations are V1–V9 (V9 adds Guest tables). Not evidenced: Guest frontend integration, Skills UI integration with the published-content API, a Lesson reader, Assessment, learner progress, and any deployment or release. Merged does not mean released. See the [backlog](docs/05-BACKLOG.md) for per-feature status.
 
 ---
 
@@ -58,7 +58,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | `npm run start`     | Serve production build locally       |
 | `npm run lint`      | ESLint                               |
 | `npm run type-check`| TypeScript type check (no emit)      |
-| `npm test`          | Available auth/theme unit tests      |
+| `npm test`          | Node test runner suites (auth, theme, skeleton, Skills Kana/Vocabulary/Grammar) |
 
 ---
 
@@ -129,8 +129,8 @@ Health check: `curl http://localhost:8080/api/v1/health`
 
 GitHub Actions runs on every `push` and `pull_request` to `main`:
 
-- **Frontend:** `npm ci` → `lint` → `type-check` → `build`
-- **Backend:** `./mvnw test`
+- **Frontend:** agent-skills drift check (`node scripts/sync-agent-skills.mjs --check`) → `npm ci` → `lint` → `type-check` → `test` → `build`
+- **Backend:** isolated PostgreSQL 17 schema → `./mvnw test` → `./mvnw verify -DskipTests`
 
 See [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
@@ -138,4 +138,4 @@ See [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
 ## Feature status
 
-The [feature roadmap](docs/05-BACKLOG.md) maps historical JPN tickets to complete user-facing capabilities and separates implemented, tested, reviewed, merged and released states. JPN-001/JPN-002 foundations, JPN-010 auth source and JPN-003's latest sidebar refinement are merged in `origin/main` at `c1b254c`. `/learn`, `/skills` and `/progress` are presentation placeholders. No lesson, quiz, spotlight tour, content import or deployment is evidenced by the current source.
+The [feature roadmap](docs/05-BACKLOG.md) maps historical JPN tickets to complete user-facing capabilities and separates implemented, tested, reviewed, merged and released states. Foundations, authentication, the Learning Content backend, the JPN-011 Guest backend and the JPN-033 Skills API foundation are merged in `origin/main` at `86e3421`; no feature is evidenced as released. `/learn` is a railway preview, `/skills` screens (Kana, Vocabulary, Grammar) use demo data with no API or persistence, and `/progress` is an empty state. No Lesson reader, Assessment, spotlight tour, Guest frontend integration or deployment is evidenced by the current source. CI configuration exists; whether required checks are enforced by GitHub branch protection is unverified.

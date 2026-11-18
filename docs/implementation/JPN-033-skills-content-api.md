@@ -1,8 +1,8 @@
 # JPN-033 Skills Content API foundation
 
-This is one backend/API foundation slice of JPN-033 Skills & Practice on `jpn-033/backend/skills-content-api`. JPN-033 as a whole is not complete: frontend integration, any review experience, and production content remain pending. JPN-037 remains the separate Grammar UI frontend ticket.
+This is one backend/API foundation slice of JPN-033 Skills & Practice, **merged via PR #36** (`3a39048` on `main`; developed on `jpn-033/backend/skills-content-api`). Not released. JPN-033 as a whole is not complete: frontend integration (the Kana, Vocabulary and Grammar UIs still use demo data and do not call this API), any review experience or Flashcard review persistence, and production content remain pending. JPN-037 remains the separate Grammar UI frontend ticket.
 
-## Draft implementation contract
+## Implemented API contract
 
 All routes are public GET under `/api/v1`, return `Cache-Control: no-store`, and use the existing `{ "code", "message" }` error shape. They do not create a Guest identity, consume Lesson unlocks, or mutate bookmarks. Directory contains eight Skills; content list/detail/search/flashcards remain limited to the four canonical Skills kinds (`kana`, `vocabulary`, `grammar`, `kanji`). Existing `/skills/{type}/items` remains available with its original DTO and cursor semantics.
 
@@ -33,4 +33,4 @@ The source uses `SkillsContentController`, `SkillsContentService`, and `SkillsCo
 
 On 2026-11-17, `mvnw.cmd -q test` passed **74 tests, zero failures/errors** against a fresh, isolated PostgreSQL 17 schema (`jpn021_jpn033_review`) with Flyway V1–V9. `SkillsContentIntegrationTest` covers all eight Directory entries, eligible counts, stable availability, related Item tags, an eligible Flashcard before Rights revocation and absence across every paginated page afterward, anonymous Directory/list/detail/flashcard reads with `Cache-Control: no-store`, and no Guest identity creation. The suite also includes JPN-011 Guest/unlock/bookmark regressions, existing Auth and content tests, and the populated migration test. `mvnw.cmd -q -DskipTests package` passed using JDK 25.0.4.1. The isolated cluster was started from the ignored backend `target/` directory. Earlier suite runs used a `public` schema that two existing tests correctly refused, and then reused a schema whose fixed fixture key collided. The final run on a fresh schema passed.
 
-Pending: FE integration and responsive/visual review, independently reviewed and published Skills content, any eligible Example presentation contract, and Product Owner review of the full feature. This backend foundation is not merged or released.
+Pending: FE integration and responsive/visual review, independently reviewed and published Skills content, any eligible Example presentation contract, and Product Owner review of the full feature. This backend foundation is merged (PR #36) but not released. The test results above are branch-era evidence, not rerun for this documentation update.

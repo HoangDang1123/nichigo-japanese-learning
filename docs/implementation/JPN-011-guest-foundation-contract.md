@@ -1,8 +1,8 @@
 # JPN-011 — Guest Foundation API Contract
 
-**APPROVED TECHNICAL CONTRACT — BACKEND IMPLEMENTED ON REVIEW BRANCH; NOT MERGED**
+**APPROVED TECHNICAL CONTRACT — BACKEND IMPLEMENTED AND MERGED (PR #35); FRONTEND NOT INTEGRATED; NOT RELEASED**
 
-This document specifies the approved HTTP and persistence boundaries for the **approved product rules** in [ADR-002, ADR-018 and ADR-019](../02-DECISIONS.md). Its baseline and draft wording below record the state before JPN-011 implementation. The [backend implementation note](JPN-011-guest-foundation-backend.md) records the backend review branch source and test evidence. This contract does not define JPN-012 account claiming, JPN-032 Assessment mechanics, JPN-040 completion or Item mastery. `/api/v1` prefixes all paths below.
+This document specifies the approved HTTP and persistence boundaries for the **approved product rules** in [ADR-002, ADR-018 and ADR-019](../02-DECISIONS.md). Its baseline and draft wording below record the state before JPN-011 implementation. The [backend implementation note](JPN-011-guest-foundation-backend.md) records the merged backend source and its branch-era test evidence. This contract does not define JPN-012 account claiming, JPN-032 Assessment mechanics, JPN-040 completion or Item mastery. `/api/v1` prefixes all paths below.
 
 ## Pre-JPN-011 system baseline — HISTORICAL SOURCE BEHAVIOR
 

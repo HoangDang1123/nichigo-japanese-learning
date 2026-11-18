@@ -1,6 +1,6 @@
 # JPN-011 — Guest Foundation Backend Implementation
 
-**Status:** Implemented and tested on the JPN-011 backend review branch; not merged or deployed. This note records backend scope only. Frontend integration and production cookie topology have not been verified.
+**Status:** Backend implemented, tested on its branch, and **merged via PR #35** (`e0c04b9` on `main`). Not deployed or released. This note records backend scope only: Guest identity/session, the daily Lesson unlock quota and the Skills bookmark quota exist in the backend. Frontend Guest integration is not done, production cookie/deployment topology is not verified, and JPN-012 Guest-to-Account claim remains undecided. JPN-011 is not an end-to-end complete feature. The Verification section below is historical branch-era evidence, not rerun for this documentation update.
 
 ## Implemented scope
 

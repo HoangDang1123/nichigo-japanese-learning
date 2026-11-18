@@ -34,6 +34,15 @@ public class SkillsContentService {
     public record Flashcard(UUID id, String key, int revision, String kind,
                             String front, String back, String reading) {}
     public record FlashcardPage(List<Flashcard> cards, String nextCursor) {}
+    public record KanjiExample(UUID id, String key, int revision, String textJa,
+                               String translationVi, JsonNode segments) {}
+    public record KanjiVocabulary(UUID id, String key, int revision, String surface,
+                                  String reading, String glossVi, List<KanjiExample> examples) {}
+    public record StrokeOrder(String status, UUID mediaId, Integer revision,
+                              String mimeType, String altTextVi) {}
+    public record KanjiDetail(UUID id, String key, int revision, String glyph, String meaningVi,
+                              JsonNode onReadings, JsonNode kunReadings,
+                              List<KanjiVocabulary> relatedVocabulary, StrokeOrder strokeOrder) {}
 
     @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
     public Directory directory() {
@@ -67,6 +76,39 @@ public class SkillsContentService {
         try { id = UUID.fromString(rawId); }
         catch (IllegalArgumentException ex) { throw new ContentNotFoundException(); }
         return repository.detail(id).map(this::item).orElseThrow(ContentNotFoundException::new);
+    }
+
+    @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
+    public KanjiDetail kanjiDetail(String rawId) {
+        UUID id;
+        try { id = UUID.fromString(rawId); }
+        catch (IllegalArgumentException ex) { throw new ContentNotFoundException(); }
+        SkillsContentRepository.Row kanji = repository.detail(id)
+                .filter(row -> row.kind().equals("kanji")).orElseThrow(ContentNotFoundException::new);
+        JsonNode source = payload(kanji);
+        List<KanjiVocabulary> vocabulary = repository.pinnedTargets(id, kanji.revision(),
+                "related-vocabulary", "vocabulary").stream().map(row -> {
+            JsonNode word = payload(row);
+            List<KanjiExample> examples = repository.pinnedTargets(row.id(), row.revision(),
+                    "example", "example").stream().filter(example -> {
+                JsonNode data = payload(example);
+                return ExampleFurigana.readyForKanjiDetail(data);
+            }).map(example -> {
+                JsonNode data = payload(example);
+                return new KanjiExample(example.id(), example.key(), example.revision(),
+                        data.path("textJa").asText(), data.path("translationVi").asText(), data.path("segments"));
+            }).toList();
+            return new KanjiVocabulary(row.id(), row.key(), row.revision(),
+                    word.path("surface").asText(), word.path("reading").asText(),
+                    word.path("glossVi").asText(), examples);
+        }).toList();
+        StrokeOrder stroke = repository.stroke(id, kanji.revision())
+                .map(media -> new StrokeOrder("metadata_only", media.id(), media.revision(),
+                        media.mimeType(), media.altTextVi()))
+                .orElseGet(() -> new StrokeOrder("unavailable", null, null, null, null));
+        return new KanjiDetail(id, kanji.key(), kanji.revision(), source.path("glyph").asText(),
+                source.path("meaningVi").asText(), source.path("onReadings"),
+                source.path("kunReadings"), vocabulary, stroke);
     }
 
     @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)

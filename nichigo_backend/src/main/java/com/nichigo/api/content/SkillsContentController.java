@@ -33,6 +33,11 @@ public class SkillsContentController {
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(content.item(itemId));
     }
 
+    @GetMapping("/kanji/{itemId}")
+    public ResponseEntity<SkillsContentService.KanjiDetail> kanjiDetail(@PathVariable String itemId) {
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(content.kanjiDetail(itemId));
+    }
+
     @GetMapping("/flashcards")
     public ResponseEntity<SkillsContentService.FlashcardPage> flashcards(
             @RequestParam(required = false) String type, @RequestParam(defaultValue = "20") int limit,

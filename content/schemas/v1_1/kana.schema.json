@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"Kana payload","type":"object","additionalProperties":false,"required":["script","glyph","reading"],"properties":{"script":{"type":"string","enum":["hiragana","katakana"]},"glyph":{"type":"string","maxLength":16},"reading":{"type":"string","maxLength":80}}}

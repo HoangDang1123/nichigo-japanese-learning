@@ -40,16 +40,12 @@ public final class ContentPackageValidator {
     private static final Set<String> JSON_CELLS = Set.of("payload", "knowledgeDomains", "languageSkills", "topics", "mediaRefs");
 
     private final ObjectMapper mapper;
-    private final ContentSchemaValidator schemas;
-    private final CanonicalContentValidator canonical;
 
     public ContentPackageValidator() {
         JsonFactory factory = JsonFactory.builder().streamReadConstraints(StreamReadConstraints.builder()
                 .maxNestingDepth(40).maxStringLength(4000).maxNumberLength(100).build())
                 .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION).build();
         mapper = new ObjectMapper(factory);
-        schemas = new ContentSchemaValidator(mapper);
-        canonical = new CanonicalContentValidator(mapper);
     }
 
     /** Input is a trusted caller-provided file map, not arbitrary paths to open or URLs to fetch. */
@@ -85,9 +81,11 @@ public final class ContentPackageValidator {
 
         JsonNode manifest = parseJson(files.get("manifest.json"), "manifest.json", context);
         if (manifest == null) return invalid(context);
-        schemas.validate("manifest", manifest, "", issue(context, "manifest.json", null, null, null));
-        if (!"1.0".equals(text(manifest, "schemaVersion")))
+        String version = text(manifest, "schemaVersion");
+        if (!List.of("1.0", "1.1").contains(version))
             context.error("PACKAGE_VERSION_UNSUPPORTED", "manifest.json", null, null, "schemaVersion", "/schemaVersion", null);
+        if (!context.errors.isEmpty()) return invalid(context);
+        new ContentSchemaValidator(mapper, version).validate("manifest", manifest, "", issue(context, "manifest.json", null, null, null));
         if (!context.errors.isEmpty()) return invalid(context);
 
         Map<String, String> declared = new LinkedHashMap<>();
@@ -116,10 +114,10 @@ public final class ContentPackageValidator {
             if (path == null) continue;
             entries.put(type, CSV_HEADERS.containsKey(type)
                     ? parseCsv(files.get(path), path, type, context)
-                    : parseArrayFile(files.get(path), path, type, context));
+                    : parseArrayFile(files.get(path), path, type, version, context));
         }
         if (context.truncated) return invalid(context);
-        canonical.validate(entries, resolver, context);
+        new CanonicalContentValidator(mapper, version).validate(entries, resolver, context);
         ValidationReport report = context.report();
         return report.valid() ? new ParsedPackage(report, manifest, Map.copyOf(entries))
                 : new ParsedPackage(report, null, Map.of());
@@ -162,7 +160,7 @@ public final class ContentPackageValidator {
         return rows;
     }
 
-    private List<CanonicalRecord> parseArrayFile(byte[] bytes, String file, String type, Context context) {
+    private List<CanonicalRecord> parseArrayFile(byte[] bytes, String file, String type, String version, Context context) {
         JsonNode root = parseJson(bytes, file, context);
         if (root == null) return List.of();
         String arrayName = type;
@@ -171,7 +169,7 @@ public final class ContentPackageValidator {
             context.error("PACKAGE_JSON_SHAPE", file, null, null, null, "", null);
             return List.of();
         }
-        if (!"1.0".equals(text(root, "schemaVersion"))) {
+        if (!version.equals(text(root, "schemaVersion"))) {
             context.error("PACKAGE_VERSION_UNSUPPORTED", file, null, null, "schemaVersion", "/schemaVersion", null);
             return List.of();
         }

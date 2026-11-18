@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Kanji payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "glyph",
+    "meaningVi"
+  ],
+  "properties": {
+    "glyph": {
+      "type": "string",
+      "maxLength": 16
+    },
+    "meaningVi": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "onReadings": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "string",
+        "maxLength": 80
+      }
+    },
+    "kunReadings": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "string",
+        "maxLength": 80
+      }
+    },
+    "relatedVocabularyRefs": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+        "maxLength": 80
+      }
+    }
+  }
+}

@@ -159,6 +159,7 @@ public class PublicContentRepository {
                 JOIN media_asset_revisions mr
                   ON mr.media_id = im.media_id AND mr.revision = im.media_revision
                 WHERE li.lesson_id = ? AND li.lesson_revision = ?
+                  AND media_revision_public(im.media_id, im.media_revision)
                 ORDER BY li.section_id, li.position, im.position LIMIT 5001
                 """, (rs, n) -> new MediaRow(rs.getObject("section_id", UUID.class),
                 rs.getInt("item_position"), rs.getObject("media_id", UUID.class),

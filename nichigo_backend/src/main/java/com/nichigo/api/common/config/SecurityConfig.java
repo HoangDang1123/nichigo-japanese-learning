@@ -50,7 +50,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/learning-paths", "/api/v1/learning-paths/**",
                                 "/api/v1/lessons/**", "/api/v1/skills", "/api/v1/skills/items",
                                 "/api/v1/skills/items/**",
-                                "/api/v1/skills/flashcards", "/api/v1/skills/*/items").permitAll()
+                                "/api/v1/skills/flashcards", "/api/v1/skills/*/items",
+                                "/api/v1/skills/kanji/*").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/lessons/*/unlock",
                                 "/api/v1/learning-paths/*/placements/*/lesson/unlock").permitAll()
                         .anyRequest().authenticated())

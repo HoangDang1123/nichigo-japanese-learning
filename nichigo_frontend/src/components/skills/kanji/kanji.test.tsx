@@ -314,3 +314,25 @@ test("detail: three steps in learning order with plain labels, terms behind Lear
   assert.match(html, /<a [^>]*href="\/skills\/kanji"[^>]*>Học chữ Kanji khác<\/a>/);
   assert.doesNotMatch(html, /<button[^>]*disabled/, "no disabled placeholder buttons");
 });
+
+test("overview: a Kanji without a Vietnamese meaning never shows an empty meaning area (QA fixture 火 regression)", () => {
+  // Cause: the fixture sent no meaningVi (and no displayTextVi); the adapter correctly maps that to null and the card
+  // used to render nothing in the meaning area. The card now states the absence in plain words; nothing is invented.
+  const noMeaning = kanji(ID_C, { glyph: "火", onReadings: ["カ"] });
+  assert.equal(toKanjiEntry(noMeaning)?.meaningVi, null);
+  const html = renderOverview(kanjiListReducer(startSearch(1), { type: "loaded", seq: 1, append: false, page: page([noMeaning, full]) }));
+  const card = html.slice(html.indexOf(ID_C));
+  assert.match(card.slice(0, card.indexOf("</li>")), /<span class="meaningMissing">Chưa có nghĩa tiếng Việt<\/span>/);
+  assert.doesNotMatch(card.slice(0, card.indexOf("</li>")), /class="meaning"/);
+  const withMeaning = html.slice(html.indexOf(ID_A));
+  assert.doesNotMatch(withMeaning.slice(0, withMeaning.indexOf("</li>")), /meaningMissing/, "a card with a meaning is unchanged");
+});
+
+test("overview guide: clear 富士山 and 山 examples, tendency wording, still collapsible", () => {
+  const html = renderOverview(INITIAL_LIST_STATE);
+  assert.match(html, /富士山（ふじさん）<\/span>— núi Phú Sĩ/);
+  assert.match(html, /山（やま）<\/span>— núi/);
+  assert.match(html, /xu hướng thường gặp, không phải quy tắc tuyệt đối/);
+  assert.match(html, /có thể mang một hoặc nhiều ý nghĩa, tùy vào cách sử dụng/);
+  assert.match(html, /aria-expanded="true"/);
+});

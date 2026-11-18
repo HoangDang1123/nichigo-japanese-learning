@@ -172,7 +172,9 @@ function KanjiCard({ entry }: { entry: KanjiEntry }) {
     <Link href={`/skills/kanji/${encodeURIComponent(entry.id)}`} className={styles.card} aria-label={label}>
       <span className={styles.glyph} lang="ja" aria-hidden="true">{entry.glyph}</span>
       <span className={styles.cardBody}>
-        {entry.meaningVi && <span className={styles.meaning}>{entry.meaningVi}</span>}
+        {entry.meaningVi
+          ? <span className={styles.meaning}>{entry.meaningVi}</span>
+          : <span className={styles.meaningMissing}>Chưa có nghĩa tiếng Việt</span>}
       </span>
     </Link>
   );

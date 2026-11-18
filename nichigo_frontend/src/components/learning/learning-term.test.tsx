@@ -31,12 +31,20 @@ test("glossary: the six required terms exist and every entry is complete", () =>
   assert.equal(new Set(TERM_IDS.map((id) => GLOSSARY[id].explanationVi)).size, TERM_IDS.length, "no duplicated explanations");
 });
 
-test("glossary: nothing is marked reviewed without a named reviewer and date (Product Owner has not approved the wording yet)", () => {
+test("glossary: review metadata is complete for every reviewed entry and the Kanji wording is the approved one", () => {
   for (const id of TERM_IDS) {
     const r = GLOSSARY[id].review;
-    if (r.status === "reviewed") assert.ok(r.reviewedBy.trim() && /^\d{4}-\d{2}-\d{2}$/.test(r.reviewedAt), `${id}: reviewed needs reviewer and ISO date`);
+    if (r.status === "reviewed") {
+      assert.ok(r.reviewedBy.trim(), `${id}: reviewer named`);
+      assert.match(r.reviewedAt, /^\d{4}-\d{2}-\d{2}$/, `${id}: ISO date`);
+      assert.ok(!Number.isNaN(Date.parse(r.reviewedAt)), `${id}: real date`);
+    }
   }
-  assert.deepEqual(TERM_IDS.filter((id) => GLOSSARY[id].review.status === "reviewed"), [], "all entries are still pending Product Owner review");
+  assert.deepEqual(TERM_IDS.filter((id) => GLOSSARY[id].review.status !== "reviewed"), [], "all six entries were approved by the Product Owner on 2026-11-18");
+  assert.equal(
+    GLOSSARY.kanji.explanationVi,
+    "Kanji là chữ Hán được dùng trong tiếng Nhật. Mỗi chữ Kanji có thể mang một hoặc nhiều ý nghĩa, tùy vào cách sử dụng.",
+  );
 });
 
 test("glossary: examples are the ones verified in the design (readings and sound changes)", () => {

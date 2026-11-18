@@ -24,16 +24,20 @@ export function KanjiIntro({ defaultOpen = true }: { defaultOpen?: boolean }) {
         <ol className={styles.introSteps} id={panelId}>
           <li>
             <strong>Kanji là gì?</strong>
-            <p><LearningTerm term="kanji" /> là chữ Hán dùng trong tiếng Nhật. Mỗi chữ thường mang một ý nghĩa riêng, ví dụ <span lang="ja">山</span> nghĩa là “núi”.</p>
+            <p><LearningTerm term="kanji" /> là chữ Hán dùng trong tiếng Nhật. Mỗi chữ Kanji có thể mang một hoặc nhiều ý nghĩa, tùy vào cách sử dụng. Ví dụ <span lang="ja">山</span> nghĩa là “núi”.</p>
           </li>
           <li>
             <strong>Vì sao một chữ có nhiều cách đọc?</strong>
             <p>
               Tiếng Nhật mượn chữ Hán nhưng vẫn giữ những từ của riêng mình. Vì vậy một chữ có thể đọc theo{" "}
               <LearningTerm term="onyomi">âm Hán (On&apos;yomi)</LearningTerm> hoặc theo{" "}
-              <LearningTerm term="kunyomi">tiếng Nhật (Kun&apos;yomi)</LearningTerm>. Ví dụ <span lang="ja">山</span> đọc là{" "}
-              <span lang="ja">さん</span> trong <span lang="ja">富士山</span> và đọc là <span lang="ja">やま</span> khi đứng một mình.
+              <LearningTerm term="kunyomi">tiếng Nhật (Kun&apos;yomi)</LearningTerm>. Hãy xem chữ <span lang="ja">山</span>:
             </p>
+            <ul className={styles.introExamples}>
+              <li><span lang="ja">富士山（ふじさん）</span>— núi Phú Sĩ <small>Trong từ ghép này, <span lang="ja">山</span> đọc là <span lang="ja">さん</span> (âm Hán).</small></li>
+              <li><span lang="ja">山（やま）</span>— núi <small>Khi đứng một mình, <span lang="ja">山</span> đọc là <span lang="ja">やま</span> (tiếng Nhật).</small></li>
+            </ul>
+            <p>Đây chỉ là xu hướng thường gặp, không phải quy tắc tuyệt đối: có những từ không theo cách này.</p>
           </li>
           <li>
             <strong>Người mới nên học thế nào?</strong>

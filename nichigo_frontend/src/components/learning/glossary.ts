@@ -4,8 +4,8 @@
  * Static educational copy of the interface (JPN-033 Kanji v2a). It is NOT a canonical Skills Item and is never
  * returned by the content API. Kana, Vocabulary and Grammar can reuse it later without duplicating text.
  *
- * Review: every entry starts as `pending`. An entry may become `reviewed` only after the Product Owner has approved
- * its wording, and then it must name who reviewed it and when (enforced by the glossary test).
+ * Review: an entry is `reviewed` only for the exact wording the Product Owner approved, with reviewer and date
+ * (enforced by the glossary test). Any later wording change must go back to `pending` until it is approved again.
  * Pure TypeScript: no React.
  */
 
@@ -38,7 +38,8 @@ export interface GlossaryTerm {
   review: GlossaryReview;
 }
 
-const pending: GlossaryReview = { status: "pending" };
+/** Wording approved by the Product Owner on 2026-11-18 (all six entries, kanji with the corrected second sentence). */
+const reviewed: GlossaryReview = { status: "reviewed", reviewedBy: "Product Owner", reviewedAt: "2026-11-18" };
 
 export const GLOSSARY: Readonly<Record<TermId, GlossaryTerm>> = {
   kanji: {
@@ -46,9 +47,9 @@ export const GLOSSARY: Readonly<Record<TermId, GlossaryTerm>> = {
     labelVi: "Kanji",
     ja: "漢字",
     jaReading: "かんじ",
-    explanationVi: "Kanji là chữ Hán được dùng trong tiếng Nhật. Mỗi chữ thường mang một ý nghĩa riêng.",
+    explanationVi: "Kanji là chữ Hán được dùng trong tiếng Nhật. Mỗi chữ Kanji có thể mang một hoặc nhiều ý nghĩa, tùy vào cách sử dụng.",
     example: { ja: "山", noteVi: "Chữ 山 nghĩa là “núi”." },
-    review: pending,
+    review: reviewed,
   },
   onyomi: {
     id: "onyomi",
@@ -57,7 +58,7 @@ export const GLOSSARY: Readonly<Record<TermId, GlossaryTerm>> = {
     jaReading: "おんよみ",
     explanationVi: "Cách đọc có gốc từ âm Hán, thường gặp khi chữ nằm trong từ ghép gồm nhiều chữ Hán.",
     example: { ja: "富士山", noteVi: "Trong 富士山 (ふじさん), chữ 山 đọc là さん." },
-    review: pending,
+    review: reviewed,
   },
   kunyomi: {
     id: "kunyomi",
@@ -66,7 +67,7 @@ export const GLOSSARY: Readonly<Record<TermId, GlossaryTerm>> = {
     jaReading: "くんよみ",
     explanationVi: "Cách đọc theo từ tiếng Nhật vốn có cho nghĩa của chữ, thường gặp khi chữ đứng một mình hoặc đi kèm chữ hiragana.",
     example: { ja: "山", noteVi: "Khi đứng một mình, 山 đọc là やま." },
-    review: pending,
+    review: reviewed,
   },
   furigana: {
     id: "furigana",
@@ -75,7 +76,7 @@ export const GLOSSARY: Readonly<Record<TermId, GlossaryTerm>> = {
     jaReading: "ふりがな",
     explanationVi: "Furigana là những chữ kana nhỏ viết phía trên hoặc bên cạnh chữ Hán để cho biết cách đọc.",
     example: { ja: "山", ruby: { base: "山", reading: "やま" }, noteVi: "Chữ nhỏ やま phía trên 山 cho biết chữ này đọc là やま." },
-    review: pending,
+    review: reviewed,
   },
   dakuten: {
     id: "dakuten",
@@ -84,7 +85,7 @@ export const GLOSSARY: Readonly<Record<TermId, GlossaryTerm>> = {
     jaReading: "だくてん",
     explanationVi: "Dakuten, còn gọi là tenten (てんてん), là hai nét nhỏ ゛ thêm vào chữ kana để đổi sang âm đục.",
     example: { ja: "か → が", noteVi: "か (ka) thêm ゛ thành が (ga)." },
-    review: pending,
+    review: reviewed,
   },
   handakuten: {
     id: "handakuten",
@@ -93,7 +94,7 @@ export const GLOSSARY: Readonly<Record<TermId, GlossaryTerm>> = {
     jaReading: "はんだくてん",
     explanationVi: "Handakuten, còn gọi là maru (まる, nghĩa là “vòng tròn”), là vòng tròn nhỏ ゜. Dấu này chỉ đi với các chữ ở hàng は.",
     example: { ja: "は → ぱ", noteVi: "は (ha) thêm ゜ thành ぱ (pa)." },
-    review: pending,
+    review: reviewed,
   },
 };
 

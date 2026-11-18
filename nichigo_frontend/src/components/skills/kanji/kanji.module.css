@@ -25,6 +25,10 @@
 .cardBody { display: flex; min-width: 0; flex-direction: column; gap: var(--space-1); }
 .meaning { font-size: var(--font-size-base); font-weight: var(--font-weight-bold); color: var(--color-text); overflow-wrap: anywhere; }
 
+.meaningMissing { font-size: var(--font-size-sm); color: var(--color-text-subtle); overflow-wrap: anywhere; }
+.introExamples { display: flex; flex-direction: column; gap: var(--space-1); margin: var(--space-2) 0 0; padding: var(--space-3) var(--space-4); list-style: none; background: var(--color-primary-subtle); border-radius: var(--radius-md); }
+.introExamples li { color: var(--color-text); overflow-wrap: anywhere; }
+.introExamples small { display: block; font-size: var(--font-size-xs); color: var(--color-text-muted); }
 .actions { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
 .button { display: inline-flex; align-items: center; justify-content: center; min-height: 2.75rem; padding: 0 var(--space-6); font: inherit; font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text); text-decoration: none; background: var(--color-surface); border: var(--border-width) solid var(--color-border); border-radius: var(--radius-full); cursor: pointer; }
 .button:hover:not(:disabled) { border-color: var(--color-border-hover); background: var(--color-surface-hover); }

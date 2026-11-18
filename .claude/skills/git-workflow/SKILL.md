@@ -31,6 +31,21 @@ Write operations: branch create/rename/switch/delete, stage, commit, push, PR op
 - Report incoming commits and any path overlap with local changes before integrating.
 
 ## 3. Create or switch a branch
+**Branch reuse check (read-only, before any branch is proposed or created; `AGENTS.md` rule 11).**
+```bash
+git branch --show-current && git status -sb
+git branch -vv                              # local branches and upstreams
+git fetch origin && git branch -r           # remote branches (fetch is safe)
+git branch -r --merged origin/main          # remote branches already merged
+git log --oneline origin/main..<candidate>  # unmerged commits; also <candidate>..origin/main for divergence
+```
+Check PR status of each candidate when `gh` or the GitHub UI is available (a merged or closed PR means the branch is complete). Filter candidates by ticket id and purpose, then classify and give the reason:
+1. **Continue existing branch:** same ticket and scope, unmerged or unfinished, no unrelated changes mixed in, safe for uncommitted work, a suitable base, and not owned by another agent or clone.
+2. **Create separate branch:** no suitable branch; the earlier branch is merged or closed and the new work is independent; the scope needs its own PR; or reuse would mix history or tickets. The same ticket alone is not a reason to reuse.
+3. **Stop and ask the Product Owner:** several candidates, diverged history, a merged branch that still holds uncommitted work, another agent's branch, or any doubt.
+
+Report the candidates and recommendation; do not check out, create or rewrite anything from the audit alone. Never create a branch per commit, and do not name a branch after a PR number unless the task is about that PR.
+
 1. Preflight (section 0). Identify unfinished work and who owns it.
 2. Collision check against the target:
 ```bash

@@ -101,6 +101,7 @@ Examples:
 8. Do not rename or rewrite existing historical branches solely to conform to this new convention.
 9. If a task spans multiple features, stop and identify the correct scope before implementation.
 10. Keep this convention recorded here and referenced in relevant project workflow documentation.
+11. **Reuse before create.** Before proposing or creating a branch, inspect the current, local and remote branches for the same ticket and purpose, and check scope, unmerged work, history and any existing PR status. Prefer an existing unmerged branch whose work matches the requested scope when it is safe to continue. Create a new branch only when no suitable branch exists, the previous branch is completed, a separate PR is justified, or reuse would mix unrelated changes. The same ticket does not automatically require the same branch. One branch may hold several commits; never create a branch per commit. Branch names describe the work, not PR numbers, unless the task is specific to that PR. Never take over a branch that belongs to another agent or clone without authorization. If uncertain, report the candidate branches and ask the Product Owner. Every Git write operation still requires explicit, scoped authorization under rule 7 and "Authorization and Git write operations".
 
 ## Git Commit Message Convention
 

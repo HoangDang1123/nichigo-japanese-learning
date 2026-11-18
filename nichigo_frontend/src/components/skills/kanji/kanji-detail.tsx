@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import Link from "next/link";
@@ -7,7 +7,8 @@ import { skillsApi } from "../../../api/skills";
 import { EmptyState } from "../../states/empty-state";
 import { ErrorState } from "../../states/error-state";
 import shared from "../shared/skills-detail.module.css";
-import { DETAIL_LOADING, loadKanjiDetail, type KanjiDetailState, type KanjiEntry } from "./kanji-data";
+import { KanjiArticle } from "./kanji-article";
+import { DETAIL_LOADING, loadKanjiDetail, type KanjiDetailState } from "./kanji-data";
 import { KanjiDetailSkeleton } from "./kanji-skeleton";
 import styles from "./kanji.module.css";
 
@@ -60,30 +61,3 @@ export function KanjiDetailView({ state, onRetry }: { state: KanjiDetailState; o
   );
 }
 
-function ReadingSection({ id, title, ja, values }: { id: string; title: string; ja: string; values: string[] }) {
-  return (
-    <section className={styles.section} aria-labelledby={id}>
-      <h2 className={styles.sectionTitle} id={id}>{title} <span lang="ja">({ja})</span></h2>
-      {values.length > 0 ? (
-        <ul className={styles.readingList} lang="ja">{values.map((v, i) => <li key={`${v}-${i}`}>{v}</li>)}</ul>
-      ) : (
-        <p className={styles.noData}>Chưa có dữ liệu</p>
-      )}
-    </section>
-  );
-}
-
-function KanjiArticle({ entry }: { entry: KanjiEntry }) {
-  return (
-    <article>
-      <div className={styles.hero}>
-        <h1 className={styles.heroGlyph} lang="ja">{entry.glyph}</h1>
-        {entry.meaningVi ? <p className={styles.heroMeaning}>{entry.meaningVi}</p> : <p className={styles.noData}>Chưa có nghĩa tiếng Việt</p>}
-      </div>
-      <div className={styles.sections}>
-        <ReadingSection id="kanji-on" title="Âm On" ja="音読み" values={entry.onReadings} />
-        <ReadingSection id="kanji-kun" title="Âm Kun" ja="訓読み" values={entry.kunReadings} />
-      </div>
-    </article>
-  );
-}

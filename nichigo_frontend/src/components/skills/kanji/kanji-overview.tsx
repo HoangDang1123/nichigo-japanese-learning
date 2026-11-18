@@ -15,6 +15,7 @@ import {
   type KanjiEntry,
   type KanjiListState,
 } from "./kanji-data";
+import { KanjiIntro } from "./kanji-intro";
 import { KanjiGridSkeleton } from "./kanji-skeleton";
 import styles from "./kanji.module.css";
 
@@ -97,8 +98,10 @@ export function KanjiOverviewView({ state, searchValue, onSearchChange, onRetry,
           <h1 className={shared.pageTitle}>Kanji</h1>
           <span className={shared.pageJapaneseTitle} lang="ja">漢字</span>
         </div>
-        <p className={shared.pageDescription}>Tra cứu chữ Hán: nghĩa tiếng Việt và âm đọc On&apos;yomi, Kun&apos;yomi của từng chữ.</p>
+        <p className={shared.pageDescription}>Kanji là chữ Hán trong tiếng Nhật. Chọn một chữ để xem nghĩa và cách đọc của nó.</p>
       </header>
+
+      <KanjiIntro />
 
       <div className={styles.searchRow}>
         <div className={styles.searchWrapper}>
@@ -170,8 +173,6 @@ function KanjiCard({ entry }: { entry: KanjiEntry }) {
       <span className={styles.glyph} lang="ja" aria-hidden="true">{entry.glyph}</span>
       <span className={styles.cardBody}>
         {entry.meaningVi && <span className={styles.meaning}>{entry.meaningVi}</span>}
-        {entry.onReadings.length > 0 && <span className={styles.reading}><b>On: </b><span lang="ja">{entry.onReadings.join("、")}</span></span>}
-        {entry.kunReadings.length > 0 && <span className={styles.reading}><b>Kun: </b><span lang="ja">{entry.kunReadings.join("、")}</span></span>}
       </span>
     </Link>
   );

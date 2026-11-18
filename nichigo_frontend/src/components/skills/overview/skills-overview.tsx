@@ -3,11 +3,20 @@
 import * as React from "react";
 import Link from "next/link";
 import { Search, X, ChevronRight, Lock, BookOpen, LayoutGrid, BarChart3, Star } from "lucide-react";
+import { skillsApi } from "../../../api/skills";
+import { ErrorState } from "../../states/error-state";
+import { EmptyState } from "../../states/empty-state";
+import type { SkillFilterGroup } from "../shared/skills-categories";
 import {
-  SKILL_CATEGORIES,
-  type CategoryMeta,
-  type SkillFilterGroup,
-} from "../shared/skills-categories";
+  LOADING_STATE,
+  backendStatus,
+  filterEntries,
+  loadDirectory,
+  usesDemoData,
+  type DirectoryEntry,
+  type DirectoryState,
+} from "./skills-directory";
+import { SkillsSkeleton } from "./skills-skeleton";
 import styles from "./skills-overview.module.css";
 
 // ---------------------------------------------------------------------------
@@ -259,7 +268,9 @@ function CardDecorSvg({ categoryKey }: { categoryKey: string }) {
 // ---------------------------------------------------------------------------
 // Individual card
 // ---------------------------------------------------------------------------
-function SkillCard({ category }: { category: CategoryMeta }) {
+function SkillCard({ entry }: { entry: DirectoryEntry }) {
+  const category = entry.meta;
+  const status = backendStatus(entry);
   const isDemo = category.availability === "demo";
   const isPlanned = category.availability === "planned";
 
@@ -281,11 +292,17 @@ function SkillCard({ category }: { category: CategoryMeta }) {
       <h3 className={styles.cardTitle}>{category.title}</h3>
       <span className={styles.cardSubtitle} lang="ja">{category.subtitle}</span>
       <p className={styles.cardDescription}>{category.description}</p>
+      {usesDemoData(entry) && <p className={styles.cardNote}>Giao diện đang dùng dữ liệu minh họa</p>}
     </div>
   );
 
   const footerArea = (
     <div className={styles.cardFooter}>
+      {status && (
+        <span className={`${styles.cardStatus} ${status.tone === "published" ? styles.cardStatusPublished : ""}`}>
+          {status.text}
+        </span>
+      )}
       {isDemo ? (
         <ChevronRight size={18} className={styles.cardChevron} aria-hidden="true" />
       ) : isPlanned ? (
@@ -328,7 +345,48 @@ function SkillCard({ category }: { category: CategoryMeta }) {
 // ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
+/** Container: loads GET /api/v1/skills once and supports retry. Reads only; no Guest identity is created. */
 export function SkillsOverview() {
+  const [state, setState] = React.useState<DirectoryState>(LOADING_STATE);
+  const [attempt, setAttempt] = React.useState(0);
+
+  React.useEffect(() => {
+    const controller = new AbortController();
+    loadDirectory((signal) => skillsApi.directory(signal), controller.signal).then(
+      (next) => { if (!controller.signal.aborted) setState(next); },
+      () => { /* cancelled: a newer request or unmount owns the state */ },
+    );
+    return () => controller.abort();
+  }, [attempt]);
+
+  const retry = React.useCallback(() => {
+    setState(LOADING_STATE);
+    setAttempt((value) => value + 1);
+  }, []);
+
+  return <SkillsOverviewView state={state} onRetry={retry} />;
+}
+
+export function SkillsOverviewView({ state, onRetry }: { state: DirectoryState; onRetry: () => void }) {
+  if (state.status === "loading") return <SkillsSkeleton />;
+  if (state.status === "error") {
+    return (
+      <div className={styles.container}>
+        <ErrorState title="Không thể tải danh sách kỹ năng" description={state.message} onRetry={onRetry} />
+      </div>
+    );
+  }
+  if (state.entries.length === 0) {
+    return (
+      <div className={styles.container}>
+        <EmptyState title="Chưa có dữ liệu kỹ năng" description="Máy chủ chưa trả về kỹ năng nào. NichiGo không hiển thị dữ liệu giả lập thay thế." />
+      </div>
+    );
+  }
+  return <SkillsDirectory entries={state.entries} />;
+}
+
+function SkillsDirectory({ entries }: { entries: DirectoryEntry[] }) {
   const [activeFilter, setActiveFilter] = React.useState<SkillFilterGroup | "all">("all");
   const [searchQuery, setSearchQuery] = React.useState("");
   const searchInputRef = React.useRef<HTMLInputElement>(null);
@@ -344,26 +402,10 @@ export function SkillsOverview() {
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
-  const filteredCategories = React.useMemo(() => {
-    let cats = SKILL_CATEGORIES;
-
-    // Filter by group
-    if (activeFilter !== "all") {
-      cats = cats.filter((c) => c.filterGroup === activeFilter);
-    }
-
-    // Filter by search
-    if (normalizedQuery) {
-      cats = cats.filter(
-        (c) =>
-          c.title.toLowerCase().includes(normalizedQuery) ||
-          c.subtitle.toLowerCase().includes(normalizedQuery) ||
-          c.description.toLowerCase().includes(normalizedQuery)
-      );
-    }
-
-    return cats;
-  }, [activeFilter, normalizedQuery]);
+  const filteredCategories = React.useMemo(
+    () => filterEntries(entries, activeFilter, normalizedQuery),
+    [entries, activeFilter, normalizedQuery],
+  );
 
   return (
     <div className={styles.container}>
@@ -431,7 +473,7 @@ export function SkillsOverview() {
       {filteredCategories.length > 0 ? (
         <div className={styles.sections} aria-live="polite" aria-atomic="false">
           {SECTIONS.map((section) => {
-            const cats = filteredCategories.filter((c) => c.filterGroup === section.group);
+            const cats = filteredCategories.filter((e) => e.meta.filterGroup === section.group);
             if (cats.length === 0) return null;
             return (
               <section key={section.group} className={styles.section} aria-labelledby={`skills-section-${section.group}`}>
@@ -441,8 +483,8 @@ export function SkillsOverview() {
                   <span className={styles.sectionRule} aria-hidden="true" />
                 </div>
                 <div className={styles.cardGrid}>
-                  {cats.map((category) => (
-                    <SkillCard key={category.key} category={category} />
+                  {cats.map((entry) => (
+                    <SkillCard key={entry.meta.key} entry={entry} />
                   ))}
                 </div>
               </section>

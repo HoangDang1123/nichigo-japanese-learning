@@ -315,11 +315,30 @@
   margin: var(--space-1) 0 0;
 }
 
+/* Honest status lines: frontend demo note and backend published-content status */
+.cardNote {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-subtle);
+  margin: var(--space-1) 0 0;
+}
+
+.cardStatus {
+  margin-right: auto;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.cardStatusPublished {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+}
+
 /* Card footer */
 .cardFooter {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  gap: var(--space-3);
   padding: var(--space-3) var(--space-5);
   background-color: color-mix(in srgb, var(--color-surface) 70%, transparent);
   border-top: var(--border-width) solid var(--color-border);

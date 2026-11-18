@@ -49,6 +49,10 @@ public class ContentPublicationService {
             throw new IllegalStateException("Current draft lacks language review.");
         Map<String,Integer> required=required(kind,root.id);
         if(!required.keySet().equals(pins.keySet())) throw new IllegalArgumentException("Pins must name every dependency exactly once.");
+        if (kind.equals("item") && root.current == null
+                && "kanji".equals(db.queryForObject("SELECT kind FROM content_items WHERE id=?", String.class, root.id))
+                && db.queryForObject("SELECT count(*) FROM content_item_edges WHERE source_item_id=? AND role_code='related-vocabulary'", Integer.class, root.id) == 0)
+            throw new IllegalStateException("First Kanji publication requires reviewed published Vocabulary.");
         // A single deterministic lock order also protects direct and transitive Rights
         // from concurrent revocation until the new pointer is committed.
         db.query("SELECT id FROM content_rights ORDER BY id FOR SHARE",rs->{});
@@ -81,8 +85,22 @@ public class ContentPublicationService {
         List<Map<String,Object>> rows=db.queryForList("SELECT im.*,m.stable_key FROM content_item_media im JOIN media_assets m ON m.id=im.media_id WHERE im.item_id=? ORDER BY im.position",id);
         for(Map<String,Object> row:rows){
             UUID media=(UUID)row.get("media_id"); int pin=pins.get((String)row.get("stable_key"));
+            if ("stroke-order".equals(row.get("role_code")) && !Boolean.TRUE.equals(db.queryForObject(
+                    "SELECT i.kind='kanji' AND m.media_kind='writing' FROM content_items i JOIN media_assets m ON m.id=? WHERE i.id=?",
+                    Boolean.class,media,id)))
+                throw new IllegalStateException("Stroke-order Media requires a Kanji and writing asset.");
             if(!eligible("media_revision_public",media,pin)) throw new IllegalStateException("Selected Media revision unavailable.");
             db.update("INSERT INTO content_item_revision_media(item_id,item_revision,position,role_code,media_id,media_revision) VALUES (?,?,?,?,?,?)",id,rev,row.get("position"),row.get("role_code"),media,pin);
+        }
+        List<Map<String,Object>> edges=db.queryForList("SELECT e.*, t.stable_key FROM content_item_edges e JOIN content_items t ON t.id=e.target_item_id WHERE e.source_item_id=? ORDER BY e.role_code,e.position",id);
+        for(Map<String,Object> edge:edges) {
+            UUID target=(UUID)edge.get("target_item_id");
+            int pin=pins.get("item:"+edge.get("stable_key"));
+            Integer published=db.queryForObject("SELECT published_revision FROM content_items WHERE id=?",Integer.class,target);
+            if (published==null || published<pin || !eligible("item_revision_public",target,pin))
+                throw new IllegalStateException("Selected related Item revision is not reviewed published and eligible.");
+            db.update("INSERT INTO content_item_revision_edges(source_item_id,source_revision,target_item_id,target_revision,role_code,position) VALUES (?,?,?,?,?,?)",
+                    id,rev,target,pin,edge.get("role_code"),edge.get("position"));
         }
     }
     private void lesson(UUID id,int rev,Map<String,Integer> pins){
@@ -113,13 +131,13 @@ public class ContentPublicationService {
     private Map<String,Integer> required(String kind,UUID id){
         String sql=switch(kind){
             case "media"->null;
-            case "item"->"SELECT DISTINCT m.stable_key FROM content_item_media im JOIN media_assets m ON m.id=im.media_id WHERE im.item_id=?";
+            case "item"->"SELECT m.stable_key FROM content_item_media im JOIN media_assets m ON m.id=im.media_id WHERE im.item_id=? UNION SELECT 'item:' || t.stable_key FROM content_item_edges e JOIN content_items t ON t.id=e.target_item_id WHERE e.source_item_id=?";
             case "lesson"->"SELECT DISTINCT i.stable_key FROM lesson_items li JOIN lesson_sections s ON s.id=li.section_id JOIN content_items i ON i.id=li.item_id WHERE s.lesson_id=?";
             case "path"->"SELECT DISTINCT l.stable_key FROM chapter_lessons cl JOIN stage_chapters c ON c.id=cl.chapter_id JOIN path_stages s ON s.id=c.stage_id JOIN lessons l ON l.id=cl.lesson_id WHERE s.path_id=?";
             default->throw new IllegalArgumentException("Unknown content kind.");
         };
         Map<String,Integer> result=new LinkedHashMap<>();
-        if(sql!=null) for(String key:db.query(sql,(rs,row)->rs.getString(1),id)) result.put(key,null);
+        if(sql!=null) for(String key:db.query(sql,(rs,row)->rs.getString(1),kind.equals("item") ? new Object[]{id,id} : new Object[]{id})) result.put(key,null);
         return result;
     }
     private record Root(UUID id,long version,Integer current,UUID rights,boolean reviewed,boolean withdrawn){}

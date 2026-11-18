@@ -1,5 +1,7 @@
 package com.nichigo.api.contentimport;
 
+import com.nichigo.api.content.ExampleFurigana;
+
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
@@ -19,9 +21,15 @@ public final class CanonicalContentValidator {
     public static final int MAX_DIAGNOSTICS = 200;
     private static final List<String> FILE_TYPES = List.of("rights", "media", "items", "lessons", "paths");
     private final ContentSchemaValidator schemas;
+    private final String version;
 
     public CanonicalContentValidator(ObjectMapper mapper) {
-        this.schemas = new ContentSchemaValidator(mapper);
+        this(mapper, "1.0");
+    }
+
+    public CanonicalContentValidator(ObjectMapper mapper, String version) {
+        this.schemas = new ContentSchemaValidator(mapper, version);
+        this.version = version;
     }
 
     public ValidationReport validate(Map<String, List<CanonicalRecord>> groups,
@@ -97,9 +105,27 @@ public final class CanonicalContentValidator {
             if (kind.equals("kanji")) {
                 duplicateStrings(payload.path("onReadings"), entry, "/payload/onReadings", context);
                 duplicateStrings(payload.path("kunReadings"), entry, "/payload/kunReadings", context);
+                duplicateStrings(payload.path("relatedVocabularyRefs"), entry, "/payload/relatedVocabularyRefs", context);
+            }
+            if (kind.equals("example") && payload.path("segments").isArray()) {
+                if (!ExampleFurigana.matchesText(payload))
+                    error(context, "EXAMPLE_SEGMENTS_MISMATCH", entry, "/payload/segments");
+            }
+            if (kind.equals("example") && "yes".equals(text(payload, "kanjiDetailCandidate"))) {
+                if (!ExampleFurigana.readyForKanjiDetail(payload))
+                    error(context, "EXAMPLE_KANJI_FURIGANA_REQUIRED", entry, "/payload/segments");
             }
         }
         duplicatePositions(item.path("mediaRefs"), entry, "/mediaRefs", "position", context);
+        if (version.equals("1.1") && kind != null) {
+            int strokes = 0;
+            for (JsonNode ref : item.path("mediaRefs"))
+                if ("stroke-order".equals(text(ref, "role"))) {
+                    strokes++;
+                    if (!kind.equals("kanji")) error(context, "STROKE_ROLE_REQUIRES_KANJI", entry, "/mediaRefs");
+                }
+            if (strokes > 1) error(context, "STROKE_ROLE_DUPLICATE", entry, "/mediaRefs");
+        }
         for (String tag : List.of("knowledgeDomains", "languageSkills", "topics"))
             duplicateStrings(item.path(tag), entry, "/" + tag, context);
     }
@@ -210,7 +236,7 @@ public final class CanonicalContentValidator {
             add(rightsKeys, text(entry.node(), "rightsKey"));
             if (entry.node().has("payload")) {
                 JsonNode payload = entry.node().path("payload");
-                for (String field : List.of("exampleRefs", "itemRefs")) for (JsonNode ref : payload.path(field))
+                for (String field : List.of("exampleRefs", "itemRefs", "relatedVocabularyRefs")) for (JsonNode ref : payload.path(field))
                     if (ref.isTextual()) add(itemKeys, ref.asText());
                 for (JsonNode turn : payload.path("turns")) add(mediaKeys, text(turn, "audioKey"));
                 for (JsonNode ref : entry.node().path("mediaRefs")) add(mediaKeys, text(ref, "mediaKey"));
@@ -233,7 +259,7 @@ public final class CanonicalContentValidator {
         for (CanonicalRecord entry : groups.getOrDefault("items", List.of())) {
             JsonNode payload = entry.node().path("payload");
             references += entry.node().path("mediaRefs").size() + payload.path("exampleRefs").size()
-                    + payload.path("itemRefs").size();
+                    + payload.path("itemRefs").size() + payload.path("relatedVocabularyRefs").size();
             for (JsonNode turn : payload.path("turns")) if (turn.has("audioKey")) references++;
         }
         for (CanonicalRecord entry : groups.getOrDefault("lessons", List.of())) {
@@ -261,24 +287,34 @@ public final class CanonicalContentValidator {
                     && !existing.itemKinds().get(key).equals(text(entry.node(), "kind")))
                 error(context, "CONTENT_KIND_CONFLICT", entry, "/kind");
             JsonNode payload = entry.node().path("payload");
-            for (String field : List.of("exampleRefs", "itemRefs")) {
+            for (String field : List.of("exampleRefs", "itemRefs", "relatedVocabularyRefs")) {
                 for (int i = 0; i < payload.path(field).size(); i++) {
                     JsonNode ref = payload.path(field).get(i);
                     if (!ref.isTextual()) continue;
                     String target = ref.asText();
                     reference(target, items, existing.itemKinds().keySet(), resolver, entry,
                             "/payload/" + field + "/" + i, context);
-                    if (field.equals("exampleRefs")) {
+                    if (!field.equals("itemRefs")) {
                         String targetKind = items.containsKey(target) ? text(items.get(target).node(), "kind")
                                 : existing.itemKinds().get(target);
-                        if (targetKind != null && !targetKind.equals("example"))
+                        String expectedKind = field.equals("exampleRefs") ? "example" : "vocabulary";
+                        if (targetKind != null && !targetKind.equals(expectedKind))
                             error(context, "CONTENT_REFERENCE_KIND", entry, "/payload/" + field + "/" + i);
                     }
                 }
             }
-            for (int i = 0; i < entry.node().path("mediaRefs").size(); i++)
-                reference(text(entry.node().path("mediaRefs").get(i), "mediaKey"), media,
+            for (int i = 0; i < entry.node().path("mediaRefs").size(); i++) {
+                JsonNode mediaRef=entry.node().path("mediaRefs").get(i);
+                String mediaKey=text(mediaRef, "mediaKey");
+                reference(mediaKey, media,
                         existing.mediaKinds().keySet(), resolver, entry, "/mediaRefs/" + i + "/mediaKey", context);
+                if (version.equals("1.1") && mediaKey != null && "stroke-order".equals(text(mediaRef, "role"))) {
+                    String mediaKind=media.containsKey(mediaKey) ? text(media.get(mediaKey).node(), "kind")
+                            : existing.mediaKinds().get(mediaKey);
+                    if (mediaKind != null && !mediaKind.equals("writing"))
+                        error(context, "STROKE_MEDIA_KIND", entry, "/mediaRefs/" + i + "/mediaKey");
+                }
+            }
             for (int i = 0; i < payload.path("turns").size(); i++) {
                 String audio = text(payload.path("turns").get(i), "audioKey");
                 if (audio != null) reference(audio, media, existing.mediaKinds().keySet(), resolver, entry,

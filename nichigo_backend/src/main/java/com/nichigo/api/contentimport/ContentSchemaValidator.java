@@ -15,9 +15,18 @@ public final class ContentSchemaValidator {
     private final Map<String, JsonNode> schemas = new HashMap<>();
 
     public ContentSchemaValidator(ObjectMapper mapper) {
+        this(mapper, "1.0");
+    }
+
+    public ContentSchemaValidator(ObjectMapper mapper, String version) {
+        String folder = switch (version) {
+            case "1.0" -> "v1";
+            case "1.1" -> "v1_1";
+            default -> throw new IllegalArgumentException("Unsupported package schema version.");
+        };
         for (String name : new String[]{"manifest", "item", "rights", "media", "lesson", "path",
                 "kana", "vocabulary", "grammar", "kanji", "example", "dialogue"}) {
-            String resource = "content/schemas/v1/" + name + ".schema.json";
+            String resource = "content/schemas/" + folder + "/" + name + ".schema.json";
             try (InputStream input = getClass().getClassLoader().getResourceAsStream(resource)) {
                 if (input == null) throw new IllegalStateException("Missing schema: " + resource);
                 schemas.put(name, mapper.readTree(input));
@@ -71,6 +80,8 @@ public final class ContentSchemaValidator {
         } else if (value.isTextual()) {
             String text = value.asText();
             if (text.isBlank()) issue.accept("CONTENT_BLANK_FIELD", pointer);
+            if (text.codePointCount(0, text.length()) < schema.path("minLength").asInt(0))
+                issue.accept("CONTENT_TEXT_LENGTH", pointer);
             if (text.codePointCount(0, text.length()) > schema.path("maxLength").asInt(Integer.MAX_VALUE))
                 issue.accept("CONTENT_TEXT_LENGTH", pointer);
             if (schema.has("pattern") && !Pattern.compile(schema.path("pattern").asText()).matcher(text).matches())

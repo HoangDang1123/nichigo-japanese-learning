@@ -70,6 +70,8 @@ public class ContentImportService {
                             lessonId,id("lessons","stable_key",prior.asText()));
             }
         }
+        for (CanonicalRecord record : parsed.records().getOrDefault("items", List.of()))
+            itemEdges(record.node(), value(parsed.manifest(), "schemaVersion"));
         UUID batchId = UUID.randomUUID();
         String jsonCounts = "{\"rights\":" + counts.get("rights") + ",\"media\":" + counts.get("media")
                 + ",\"items\":" + counts.get("items") + ",\"lessons\":" + counts.get("lessons")
@@ -118,6 +120,25 @@ public class ContentImportService {
         for (JsonNode ref : n.path("mediaRefs")) db.update("INSERT INTO content_item_media(id,item_id,media_id,role_code,position) VALUES (?,?,?,?,?)",
                 UUID.randomUUID(),r.id,id("media_assets","stable_key",value(ref,"mediaKey")),value(ref,"role"),ref.path("position").asInt());
         ownership("item",r,owner,version);
+    }
+
+    private void itemEdges(JsonNode n, String schemaVersion) {
+        // A 1.0 package has no ordered Item edge contract, so it must not
+        // reconcile relationships authored by a later package version.
+        if (!"1.1".equals(schemaVersion)) return;
+        UUID source = id("content_items", "stable_key", value(n, "key"));
+        db.update("DELETE FROM content_item_edges WHERE source_item_id=?", source);
+        String field = switch (value(n, "kind")) {
+            case "kanji" -> "relatedVocabularyRefs";
+            case "vocabulary" -> "exampleRefs";
+            default -> null;
+        };
+        if (field == null) return;
+        String role = field.equals("relatedVocabularyRefs") ? "related-vocabulary" : "example";
+        int position = 1;
+        for (JsonNode target : n.path("payload").path(field))
+            db.update("INSERT INTO content_item_edges(source_item_id,target_item_id,role_code,position) VALUES (?,?,?,?)",
+                    source, id("content_items", "stable_key", target.asText()), role, position++);
     }
 
     private void lesson(JsonNode n, String owner, String version) {

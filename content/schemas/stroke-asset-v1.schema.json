@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NichiGo static stroke asset v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["assetVersion", "glyph", "codepoint", "viewBox", "strokeCount", "strokes"],
+  "properties": {
+    "assetVersion": {"const": 1},
+    "glyph": {"type": "string", "minLength": 1},
+    "codepoint": {"type": "string", "pattern": "^U\\+[0-9A-F]{4,6}$"},
+    "viewBox": {"type": "object", "additionalProperties": false, "required": ["width", "height"], "properties": {"width": {"type": "number", "exclusiveMinimum": 0, "maximum": 4096}, "height": {"type": "number", "exclusiveMinimum": 0, "maximum": 4096}}},
+    "strokeCount": {"type": "integer", "minimum": 1, "maximum": 64},
+    "strokes": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"type": "object", "additionalProperties": false, "required": ["order", "outline", "numberAt"], "properties": {"order": {"type": "integer", "minimum": 1, "maximum": 64}, "outline": {"type": "array", "minItems": 1, "maxItems": 16, "items": {"type": "string", "minLength": 1, "maxLength": 8192}}, "numberAt": {"$ref": "#/$defs/point"}, "arrow": {"type": "object", "additionalProperties": false, "required": ["from", "to"], "properties": {"from": {"$ref": "#/$defs/point"}, "to": {"$ref": "#/$defs/point"}}}}}
+  },
+  "$defs": {"point": {"type": "object", "additionalProperties": false, "required": ["x", "y"], "properties": {"x": {"type": "number"}, "y": {"type": "number"}}}}
+}

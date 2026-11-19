@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/skills")
 public class SkillsContentController {
     private final SkillsContentService content;
+    private final StrokeAssetService strokeAssets;
 
-    public SkillsContentController(SkillsContentService content) { this.content = content; }
+    public SkillsContentController(SkillsContentService content, StrokeAssetService strokeAssets) {
+        this.content = content; this.strokeAssets = strokeAssets;
+    }
 
     @GetMapping
     public ResponseEntity<SkillsContentService.Directory> directory() {
@@ -36,6 +39,14 @@ public class SkillsContentController {
     @GetMapping("/kanji/{itemId}")
     public ResponseEntity<SkillsContentService.KanjiDetail> kanjiDetail(@PathVariable String itemId) {
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(content.kanjiDetail(itemId));
+    }
+
+    @GetMapping(value="/kanji/{itemId}/stroke-asset", produces="application/json")
+    public ResponseEntity<byte[]> strokeAsset(@PathVariable String itemId) {
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore())
+                .header("X-Content-Type-Options", "nosniff")
+                .header("Content-Type", "application/json")
+                .body(strokeAssets.delivery(itemId));
     }
 
     @GetMapping("/flashcards")

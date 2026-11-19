@@ -1,5 +1,10 @@
 # MVP Release Gate / QA Checklist
 
+- [ ] JPN-033 stroke delivery: approve and configure a private persistent `STROKE_STORAGE_ROOT` mount outside public/static paths; verify restart, multi-instance access, backup and permissions.
+- [ ] Verify root and ancestor ACLs deny write/delete/rename to untrusted principals; verify atomic hard links and no shared writable mount. The adapter assumes this trust boundary because Java path checks do not eliminate parent-swap TOCTOU.
+- [ ] Approve provenance/licensing and human review for each Kanji stroke JSON, including direction arrows; do not import AnimCJK production assets while Rights are pending.
+- [ ] Verify stroke 200/404/503, no-store, no key exposure and revocation in the deployment environment; FE integration requires separate review.
+
 ## Product
 - [ ] Beginner path and free skill browsing both work.
 - [ ] Spotlight tour targets correct elements, dim overlay + arrow, Back/Next/Skip/Finish, progress, replay.

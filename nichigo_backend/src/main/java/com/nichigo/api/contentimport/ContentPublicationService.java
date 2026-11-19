@@ -4,6 +4,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
+import com.nichigo.api.content.StrokeAssetService;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,8 +15,9 @@ import java.util.UUID;
 @Service
 public class ContentPublicationService {
     private final JdbcTemplate db;
+    private final StrokeAssetService strokeAssets;
     private final ObjectMapper json=new ObjectMapper();
-    public ContentPublicationService(JdbcTemplate db){this.db=db;}
+    public ContentPublicationService(JdbcTemplate db, StrokeAssetService strokeAssets){this.db=db;this.strokeAssets=strokeAssets;}
     public record Candidate(String kind,String key,long editVersion,Integer currentRevision,
                             Map<String,Integer> requiredPins,Map<String,Integer> selectedPins){}
     public record Published(String kind,String key,int revision,Map<String,Integer> pins){}
@@ -90,6 +92,10 @@ public class ContentPublicationService {
                     Boolean.class,media,id)))
                 throw new IllegalStateException("Stroke-order Media requires a Kanji and writing asset.");
             if(!eligible("media_revision_public",media,pin)) throw new IllegalStateException("Selected Media revision unavailable.");
+            if ("stroke-order".equals(row.get("role_code"))) {
+                String glyph=db.queryForObject("SELECT payload->>'glyph' FROM content_item_revisions WHERE item_id=? AND revision=?",String.class,id,rev);
+                strokeAssets.requirePublishedStrokeBytes(media,pin,glyph);
+            }
             db.update("INSERT INTO content_item_revision_media(item_id,item_revision,position,role_code,media_id,media_revision) VALUES (?,?,?,?,?,?)",id,rev,row.get("position"),row.get("role_code"),media,pin);
         }
         List<Map<String,Object>> edges=db.queryForList("SELECT e.*, t.stable_key FROM content_item_edges e JOIN content_items t ON t.id=e.target_item_id WHERE e.source_item_id=? ORDER BY e.role_code,e.position",id);

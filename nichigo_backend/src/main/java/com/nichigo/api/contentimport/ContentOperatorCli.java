@@ -1,6 +1,8 @@
 package com.nichigo.api.contentimport;
 
 import com.nichigo.api.ApiApplication;
+import com.nichigo.api.content.StrokeAssetService;
+import com.nichigo.api.content.StrokeAssetValidator;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -10,6 +12,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -34,7 +37,7 @@ public final class ContentOperatorCli {
             try {var report=new ContentPackageValidator().dryRun(files(args[1]),null);emit(report);return report.valid()?0:1;}
             catch(Exception e){emit(Map.of("code","INPUT_ERROR"));return 2;}
         }
-        if(!readOnly && !List.of("import","rights","language","publish").contains(args[0]))return usage();
+        if(!readOnly && !List.of("import","rights","language","publish","stroke").contains(args[0]))return usage();
         ContentOperatorAuth.Principal operator;
         try{operator=readOnly?null:authenticate();}
         catch(SecurityException | IOException ex){emit(Map.of("code","AUTH_FAILED"));return 3;}
@@ -82,6 +85,18 @@ public final class ContentOperatorCli {
                 case "import" -> {
                     if(args.length!=3 || !args[2].equals("--confirm"))return usage();
                     emit(context.getBean(ContentImportService.class).apply(files(args[1]),operator));return 0;
+                }
+                case "stroke" -> {
+                    if (args.length!=6 || !args[1].equals("ingest") || !args[5].equals("--confirm")) return usage();
+                    Path source=Path.of(args[4]);
+                    if (!Files.isRegularFile(source,LinkOption.NOFOLLOW_LINKS)) throw new IllegalArgumentException("Invalid stroke asset.");
+                    byte[] bytes;
+                    try (InputStream input=Files.newInputStream(source,java.nio.file.StandardOpenOption.READ,LinkOption.NOFOLLOW_LINKS)) {
+                        bytes=input.readNBytes(StrokeAssetValidator.MAX_BYTES+1);
+                    }
+                    if (bytes.length>StrokeAssetValidator.MAX_BYTES) throw new IllegalArgumentException("Invalid stroke asset.");
+                    context.getBean(StrokeAssetService.class).ingest(args[2],args[3],bytes,operator);
+                    emit(Map.of("status","ingested"));return 0;
                 }
                 case "rights" -> {
                     if(args.length!=5 || !args[1].equals("review") || !args[4].equals("--confirm"))return usage();

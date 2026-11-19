@@ -31,6 +31,8 @@ server:
 # Guest credential is independent of the 30-minute Auth/CSRF SESSION.
 # Configure Secure and SameSite for the actual HTTPS/frontend topology.
 nichigo:
+  stroke:
+    storage-root: ${STROKE_STORAGE_ROOT:}
   guest:
     cookie:
       secure: ${GUEST_COOKIE_SECURE:${SESSION_COOKIE_SECURE:false}}

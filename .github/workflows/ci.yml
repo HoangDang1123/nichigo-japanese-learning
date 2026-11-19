@@ -92,6 +92,26 @@ jobs:
       - name: Run tests
         run: bash ./mvnw test --no-transfer-progress
 
+      - name: Verify Linux stroke symlink test ran
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          import xml.etree.ElementTree as ET
+
+          report = pathlib.Path('target/surefire-reports/TEST-com.nichigo.api.content.StrokeAssetSecurityTest.xml')
+          assert report.is_file(), 'StrokeAssetSecurityTest Surefire report is missing'
+          suite = ET.parse(report).getroot()
+          matches = [case for case in suite.findall('testcase')
+                     if case.get('name') == 'rejectsParentAndTargetSymlinks']
+          assert len(matches) == 1, 'Linux symlink test was not discovered exactly once'
+          case = matches[0]
+          assert case.find('skipped') is None, 'Linux symlink test was skipped'
+          assert case.find('failure') is None and case.find('error') is None, 'Linux symlink test failed'
+          print('Linux stroke symlink test PASS (executed, not skipped)')
+          with open(pathlib.Path(__import__('os').environ['GITHUB_STEP_SUMMARY']), 'a', encoding='utf-8') as summary:
+              summary.write('Linux stroke symlink test: **PASS (executed, not skipped)**\n')
+          PY
+
       - name: Verify build
         run: bash ./mvnw verify -DskipTests --no-transfer-progress
 

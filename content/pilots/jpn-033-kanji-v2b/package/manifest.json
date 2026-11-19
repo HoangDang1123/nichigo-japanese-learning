@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "1.1",
+  "packageKey": "jpn-033-kanji-content-pilot",
+  "packageVersion": "1.0.0",
+  "locale": "vi",
+  "author": "NichiGo technical pilot; editorial and Rights review pending",
+  "files": [
+    {
+      "path": "rights.csv",
+      "type": "rights"
+    },
+    {
+      "path": "media.csv",
+      "type": "media"
+    },
+    {
+      "path": "items.csv",
+      "type": "items"
+    }
+  ]
+}

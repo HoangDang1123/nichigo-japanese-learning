@@ -1,0 +1,4 @@
+key,kind,storageKey,checksumSha256,mimeType,rightsKey
+pilot-stroke-yama,writing,pilot/pilot-stroke-yama.json,e9759a2510ac4d95d2d674cc013762d59e79d8dc83956561dee8a44826ee3a26,application/json,rights-pilot-stroke-yama
+pilot-stroke-kawa,writing,pilot/pilot-stroke-kawa.json,57382260bcc49c6e9d900847bb7b0086b596af7133e9618cb18d5f956d61ed5a,application/json,rights-pilot-stroke-kawa
+pilot-stroke-hito,writing,pilot/pilot-stroke-hito.json,104f7327ef1875df7e89461756e67a1d119f769e8896e7ee165120af535f8aee,application/json,rights-pilot-stroke-hito

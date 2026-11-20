@@ -2,7 +2,7 @@
 
 Short, link-first status for the Orchestrator across sessions. **Not a source of truth**: PRD, ADR, contracts and implementation notes win. If this file and Git disagree, verify with Git and fix this file. Do not start the "next" item below without the Product Owner (PO) asking for it.
 
-Last verified: 2026-11-20 against `origin/main` `ab764ee` (Git history only; GitHub PR/CI state not verified because `gh` is not installed on this machine).
+Last verified: 2026-11-21 against `main` / `origin/main` `a5e4bd8` (Git history only; GitHub PR/CI state not verified because `gh` is not installed on this machine).
 
 ## Workspace
 
@@ -17,7 +17,7 @@ Last verified: 2026-11-20 against `origin/main` `ab764ee` (Git history only; Git
 | Frontend | **PAUSED** by PO. Read-only audits only until PO resumes it. | — |
 | Backend Kanji v2b foundation | MERGED to `main` (squash commits): #42 `2489845` relations/revision pins/Furigana/Kanji Detail API, #43 `589809c` private stroke storage + Rights-gated delivery, #44 `ab764ee` content pilot fixtures + integration tests. Not released. | [v2b backend](../implementation/JPN-033-kanji-v2b-backend.md), [content pilot](../implementation/JPN-033-kanji-content-pilot.md) |
 | Frontend Kanji UI (v2a + stroke pilot) | Not on `main`. Lives on the PO's local FE branch (stroke pilot uncommitted there). FE integration with the v2b API not done. | — |
-| Orchestrator setup | Draft PR #45 (branch `chore/claude-orchestrator-setup`) open, awaiting PO review; not merged. CI not verified here (`gh` not installed). | [WORKFLOW](WORKFLOW.md) |
+| Orchestrator setup | MERGED to `main` as squash commit `a5e4bd8` (PR #45, `chore(jpn-doc-001)`), verified in Git history. CI for that PR not verified here (`gh` not installed). The branch `chore/claude-orchestrator-setup` still exists locally and on `origin`; not deleted. | [WORKFLOW](WORKFLOW.md) |
 
 Implementation priority (PO, 2026-11-18): Documentation alignment → Skills UI/API integration → Guest FE integration → Learning Path/Lesson → Progress/Home. See [backlog](../05-BACKLOG.md).
 
@@ -41,7 +41,13 @@ Implementation priority (PO, 2026-11-18): Documentation alignment → Skills UI/
 
 ## Local work to preserve
 
-The main checkout holds uncommitted/untracked FE work (Kanji stroke pilot, `skills-library.*`, `docs/designs/`, `docs/research/`, release-checklist edits). It is not part of `main`. Treat it as unpreserved: never reset, clean, stash or switch branches over it without explicit PO approval; use an isolated worktree for unrelated tasks.
+FE Kanji stroke pilot work (untracked: stroke pilot data, kana pilot JSON, `skills-library.*`, `docs/designs/`, `docs/research/`) is not part of `main`. A preservation copy (originals not removed) lives outside the repo:
+
+- `H:\Code\Projects\_nichigo-artifacts\backups\jpn-033-fe-preservation\` (manifest with sha256: `MANIFEST.tsv`; taken 2026-11-21 from branch `jpn-033/features/frontend-kanji-ui` @ `7763d43`)
+- `H:\Code\Projects\_nichigo-artifacts\preserved-work\jpn-033-fe-local\`
+- Local doc drafts: `H:\Code\Projects\_nichigo-artifacts\backups\jpn-doc-001-local-drafts\`
+
+One git stash also exists (`stash@{0}`, from `jpn-041/features/frontend-study-desk`, 2026-11-07). Never reset, clean, drop the stash or switch branches over FE work without explicit PO approval. The two temporary worktrees (`orchestrator-config`, `nichigo-main`) were removed on 2026-11-21 after being verified clean; use an isolated worktree only when really needed and authorized.
 
 ## Next proposed task (not started)
 

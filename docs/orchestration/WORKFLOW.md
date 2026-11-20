@@ -42,6 +42,14 @@ Give the subagent: task ID, scope and non-goals, acceptance criteria, the few fi
 
 Do not delegate: simple questions, brainstorming, concept explanations, confirming decisions, a quick `git status`, short reports from existing context.
 
+### Who does the work (communication rule, PO-approved 2026-11-21)
+
+- **Say who owns each task, briefly, in Vietnamese**, when starting it and in updates: Orchestrator handles it directly · delegated to `nichigo-fe` · delegated to `nichigo-be` · FE/BE coordination (state order and who owns which files).
+- **Implementation tasks** (source, tests, migrations, UI, FE/BE docs tied to code) must be done by the native subagent that matches the approved scope: `nichigo-fe` for Frontend, `nichigo-be` for Backend. The Orchestrator does not implement them itself to save time. If a task needs both, settle the contract and decisions first, then order the two tasks.
+- **Orchestrator may handle directly**, without calling a subagent just to have a delegation: Git, PR, CI checks, cleanup, Project State, planning, documentation governance, and Product Decisions. Hand these to a subagent only when it really helps.
+- **Final report must include a "Thực hiện bởi" section** that separates (a) work actually delegated and run by a subagent, (b) work done directly by the Orchestrator, and (c) delegation only proposed and not yet run. Never write that a subagent did something it was not actually invoked for.
+- This rule creates no new subagent and does not change the existing limits (no Agent Teams, no QA subagent, subagents do not delegate to each other, no extra paid usage without PO approval).
+
 ## 5. Orchestrator review (by risk)
 
 - Small UI: diff, relevant tests, screenshot if visual.
@@ -53,7 +61,7 @@ Check the subagent's docs-impact statement against the diff. Reject cosmetic doc
 
 ## 6. Git delivery
 
-All write operations need explicit PO authorization (see AGENTS.md). Once authorized, before a PR check branch/base, diff, no secrets, no unrelated files, tests, docs. Before a merge check the right PR, the head commit, CI for that commit, mergeability, review blockers, changed files, scope and docs. Any failed gate means no merge. Report the real merge commit only after it is confirmed in history. `gh` is not installed on the current machine; PR/CI state must be obtained another way or reported as not verified.
+All write operations need explicit PO authorization (see AGENTS.md). Once authorized, before a PR check branch/base, diff, no secrets, no unrelated files, tests, docs. Before a merge check the right PR, the head commit, CI for that commit, mergeability, review blockers, changed files, scope and docs. Any failed gate means no merge. Report the real merge commit only after it is confirmed in history. GitHub CLI (`gh`, installed and authenticated via browser login on the PO's machine, 2026-11-21) is the Orchestrator's tool for reading PRs, diffs, checks and failed-run logs, and for creating PRs and squash merging only when the PO authorizes each operation. Never use `--admin` or any bypass, never print or store tokens, and never change branch protection or rulesets. As of 2026-11-21 `main` has no branch protection or ruleset (read-only API check), so the CI gate rests on this procedure; report that gap and do not claim the branch is protected. If `gh` is unavailable or unauthenticated, report PR/CI state as not verified.
 
 ## 7. Artifacts, backups, cleanup
 

@@ -31,20 +31,20 @@ Do not commit, push, merge, deploy, delete branches, or rewrite Git history with
 
 ## Assigned-clone Git workflow
 
-The Product Owner authorizes two independent clones of the same monorepo and GitHub repository: Anti uses `H:\Code\Projects\nichigo-japanese-learning` for Frontend work; Codex uses `H:\Code\Projects\nichigo-japanese-learning-codex` for Backend, Database and Content work. Each agent must work only inside its assigned clone and must not modify the other's checkout. Coordinate shared documentation and cross-layer changes through GitHub review. Do not create further worktrees or clones without Product Owner authorization. The steps below apply only once the owner has authorized the corresponding Git operation (see Authorization and Git write operations).
+NichiGo uses one official development clone: `H:\Code\Projects\nichigo-japanese-learning`. The main Claude Code session is the Orchestrator and talks with the Product Owner. Frontend and Backend implementation is delegated to the native subagents `nichigo-fe` and `nichigo-be` (see `CLAUDE.md` and `.claude/agents/`); these are not Agent Teams, and subagents do not delegate to each other. Never let two agents edit the same file, and settle cross-layer contracts before delegating. The retired second clone (`nichigo-japanese-learning-codex`) must not be read, edited or deleted. Do not create further clones, and create a worktree only when real isolation is needed and the Product Owner authorizes it (review artifacts go outside the repo; see `.claude/rules/workspace-hygiene.md`). Coordinate cross-layer changes through GitHub review. The steps below apply only once the owner has authorized the corresponding Git operation (see Authorization and Git write operations).
 
 ### Starting a ticket
 
 1. Read the relevant project instructions and ticket requirements. Inspect `git status`, the current branch, and untracked files before switching tickets.
 2. If the current ticket has unfinished legitimate work, review it, then, once the owner authorizes it, commit and push it to its appropriate ticket branch. Separate unrelated tickets into distinct commits and branches; never stage every changed file blindly.
 3. Never discard uncommitted or untracked work. If changes cannot be separated and preserved safely, stop and report the blocker instead of switching branches.
-4. Fetch the latest remote state and synchronize the assigned clone with `main` before creating the next ticket branch. Use the branch naming convention below and start only when that checkout is safe and the owner has authorized the branch operation.
+4. Fetch the latest remote state and synchronize the clone with `main` before creating the next ticket branch. Use the branch naming convention below and start only when that checkout is safe and the owner has authorized the branch operation.
 
 ### Completing a ticket
 
 1. Review the diff, run relevant checks and tests, and update implementation documentation.
 2. When the owner authorizes it, commit one logical ticket-scoped change at a time using the Conventional Commits convention below; push the branch and open or update a PR targeting `main` for review.
-3. Merge only when the work is complete, verified, and explicitly authorized. Never merge an unfinished feature. After merge, synchronize the assigned clone with `main` before starting another independent ticket.
+3. Merge only when the work is complete, verified, and explicitly authorized. Never merge an unfinished feature. After merge, synchronize the clone with `main` before starting another independent ticket.
 
 Never use `git reset --hard`, `git clean -fd`, force-push, or destructive checkout to resolve a branch switch. Do not delete or overwrite unfinished work or rewrite historical commits to satisfy a newer convention. If a Git operation could lose work or rewrite history, stop and report the risk.
 
@@ -55,7 +55,7 @@ Never use `git reset --hard`, `git clean -fd`, force-push, or destructive checko
 - **CI gate.** All required CI checks must pass before merging. Never merge with failed, pending or unconfirmed checks; never bypass (including admin bypass), disable, delete or weaken checks or tests; local results are not CI evidence. If required checks are not configured in GitHub branch protection or rulesets, report the gap and do not claim the branch is protected. Changing the required-check list is a separate governance decision for the Product Owner.
 - **Merge readiness.** Besides CI: owner approval for the scope, no unresolved conflicts, no known serious regression without an approved plan, updated documentation, and the PR's acceptance criteria verified. UI approval is not approval of the whole feature. Merging requires explicit owner authorization of the merge itself.
 - **Conflicts.** Read both sides and check them against business rules, API contracts and architecture. Never apply blanket `ours`/`theirs`, overwrite another agent's work, or force-push after resolving. Stop and ask the owner when a conflict touches business policy, security, data schema or work outside scope.
-- **After merge.** Verify the merge on GitHub or in Git history; for a squash merge find the squash commit on `main` (the original commits are not ancestors). Mark **Merged** only with that evidence and **Released** only with deployment evidence. Synchronize the assigned clone only when authorized, and never delete branches, clear stashes or clean untracked files unless the owner asks.
+- **After merge.** Verify the merge on GitHub or in Git history; for a squash merge find the squash commit on `main` (the original commits are not ancestors). Mark **Merged** only with that evidence and **Released** only with deployment evidence. Synchronize the clone only when authorized, and never delete branches, clear stashes or clean untracked files unless the owner asks.
 
 ## Typography Rule
 
@@ -101,7 +101,8 @@ Examples:
 8. Do not rename or rewrite existing historical branches solely to conform to this new convention.
 9. If a task spans multiple features, stop and identify the correct scope before implementation.
 10. Keep this convention recorded here and referenced in relevant project workflow documentation.
-11. **Reuse before create.** Before proposing or creating a branch, inspect the current, local and remote branches for the same ticket and purpose, and check scope, unmerged work, history and any existing PR status. Prefer an existing unmerged branch whose work matches the requested scope when it is safe to continue. Create a new branch only when no suitable branch exists, the previous branch is completed, a separate PR is justified, or reuse would mix unrelated changes. The same ticket does not automatically require the same branch. One branch may hold several commits; never create a branch per commit. Branch names describe the work, not PR numbers, unless the task is specific to that PR. Never take over a branch that belongs to another agent or clone without authorization. If uncertain, report the candidate branches and ask the Product Owner. Every Git write operation still requires explicit, scoped authorization under rule 7 and "Authorization and Git write operations".
+11. **Reuse before create.** Before proposing or creating a branch, inspect the current, local and remote branches for the same ticket and purpose, and check scope, unmerged work, history and any existing PR status. Prefer an existing unmerged branch whose work matches the requested scope when it is safe to continue. Create a new branch only when no suitable branch exists, the previous branch is completed, a separate PR is justified, or reuse would mix unrelated changes. The same ticket does not automatically require the same branch. One branch may hold several commits; never create a branch per commit. Branch names describe the work, not PR numbers, unless the task is specific to that PR. Never take over a branch that belongs to another agent or worktree without authorization. If uncertain, report the candidate branches and ask the Product Owner. Every Git write operation still requires explicit, scoped authorization under rule 7 and "Authorization and Git write operations".
+12. **Approved exception (PR #45).** The Product Owner approved the branch `chore/claude-orchestrator-setup` (ticket `jpn-doc-001`) for the one-time Claude Orchestrator configuration migration, although it does not follow the standard format. This exception covers only that PR; every other branch follows the format above.
 
 ## Git Commit Message Convention
 
@@ -141,7 +142,7 @@ Definition of Done for a feature: approved acceptance criteria, necessary FE/BE/
 
 ## Shared agent skills
 
-Reusable procedures live in `.agents/skills/<name>/SKILL.md`, the single canonical source for Claude Code and Codex. `.claude/skills/` is generated from it by `scripts/sync-agent-skills.mjs`; never edit the generated copies. Run `node scripts/sync-agent-skills.mjs --check` after changing a skill. See [the skills README](.agents/skills/README.md).
+Reusable procedures live in `.agents/skills/<name>/SKILL.md`, the single canonical source for Claude Code (the Orchestrator and the native subagents). `.claude/skills/` is generated from it by `scripts/sync-agent-skills.mjs`; never edit the generated copies. Run `node scripts/sync-agent-skills.mjs --check` after changing a skill. See [the skills README](.agents/skills/README.md).
 
 - `feature-development` — implement an approved feature end to end.
 - `git-workflow` — execute Git operations (preflight, sync, branch, stage, commit, push, PR, conflicts, merge, post-merge) under the rules in this file.

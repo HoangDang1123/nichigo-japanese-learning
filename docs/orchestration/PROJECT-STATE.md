@@ -17,7 +17,7 @@ Last verified: 2026-11-20 against `origin/main` `ab764ee` (Git history only; Git
 | Frontend | **PAUSED** by PO. Read-only audits only until PO resumes it. | — |
 | Backend Kanji v2b foundation | MERGED to `main` (squash commits): #42 `2489845` relations/revision pins/Furigana/Kanji Detail API, #43 `589809c` private stroke storage + Rights-gated delivery, #44 `ab764ee` content pilot fixtures + integration tests. Not released. | [v2b backend](../implementation/JPN-033-kanji-v2b-backend.md), [content pilot](../implementation/JPN-033-kanji-content-pilot.md) |
 | Frontend Kanji UI (v2a + stroke pilot) | Not on `main`. Lives on the PO's local FE branch (stroke pilot uncommitted there). FE integration with the v2b API not done. | — |
-| Orchestrator setup | Config pushed on branch `chore/claude-orchestrator-setup`; Draft PR to be opened manually (`gh` not installed); awaiting PO review, not merged. | [WORKFLOW](WORKFLOW.md) |
+| Orchestrator setup | Draft PR #45 (branch `chore/claude-orchestrator-setup`) open, awaiting PO review; not merged. CI not verified here (`gh` not installed). | [WORKFLOW](WORKFLOW.md) |
 
 Implementation priority (PO, 2026-11-18): Documentation alignment → Skills UI/API integration → Guest FE integration → Learning Path/Lesson → Progress/Home. See [backlog](../05-BACKLOG.md).
 
@@ -31,7 +31,7 @@ Implementation priority (PO, 2026-11-18): Documentation alignment → Skills UI/
 
 ## Pending PO decisions
 
-- Root `AGENTS.md` "Assigned-clone Git workflow" still describes the two-clone Anti/Codex model; the single-clone model is now in force. Needs PO approval to update.
+- `docs/implementation/README.md` step 9 still describes the two-clone Anti/Codex model. `AGENTS.md` was moved to the single-clone model in PR #45 (PO-approved); aligning that README line is a separate small docs task.
 - Open product questions: [02-DECISIONS.md](../02-DECISIONS.md#open-questions-do-not-silently-decide).
 
 ## Proposed, not approved

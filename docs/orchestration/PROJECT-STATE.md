@@ -2,12 +2,13 @@
 
 Short, link-first status for the Orchestrator across sessions. **Not a source of truth**: PRD, ADR, contracts and implementation notes win. If this file and Git disagree, verify with Git and fix this file. Do not start the "next" item below without the Product Owner (PO) asking for it.
 
-Last verified: 2026-11-21 against `main` / `origin/main` `a5e4bd8` (Git history plus read-only `gh` checks of PRs and CI).
+Last verified: 2026-11-21 against `main` / `origin/main` `817aa1f` (Git history plus read-only `gh` checks of PRs and CI). This verification predates the docs-only delivery PR below.
 
 ## Workspace
 
 - GitHub CLI installed and authenticated (2026-11-21). `main` has **no branch protection or ruleset** (read-only API check): required checks are not enforced by GitHub; the PO decides whether to enable them.
 - Single official clone: `H:\Code\Projects\nichigo-japanese-learning`. The old Codex clone is retired: do not read, edit or delete it.
+- Standing authorization (PO, 2026-11-21): the Orchestrator may deliver ordinary docs-only changes end to end (branch to squash merge and task-branch cleanup) without per-step approval. Scope, exclusions and safety conditions: "Standing authorization: docs-only delivery" in [AGENTS.md](../../AGENTS.md). Product Decisions, architecture, security and Git governance changes still need a specific PO approval.
 - Review artifacts live outside the repo in `H:\Code\Projects\_nichigo-artifacts`.
 - Backend and docs status below is taken from `origin/main`, not from any local feature branch. Older local branches carry a Backend that predates PRs #42–#44: never read production state from them.
 

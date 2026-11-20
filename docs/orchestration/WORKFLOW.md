@@ -47,7 +47,7 @@ Do not delegate: simple questions, brainstorming, concept explanations, confirmi
 - **Say who owns each task, briefly, in Vietnamese**, when starting it and in updates: Orchestrator handles it directly · delegated to `nichigo-fe` · delegated to `nichigo-be` · FE/BE coordination (state order and who owns which files).
 - **Implementation tasks** (source, tests, migrations, UI, FE/BE docs tied to code) must be done by the native subagent that matches the approved scope: `nichigo-fe` for Frontend, `nichigo-be` for Backend. The Orchestrator does not implement them itself to save time. If a task needs both, settle the contract and decisions first, then order the two tasks.
 - **Orchestrator may handle directly**, without calling a subagent just to have a delegation: Git, PR, CI checks, cleanup, Project State, planning, documentation governance, and Product Decisions. Hand these to a subagent only when it really helps.
-- **Final report must include a "Thực hiện bởi" section** that separates (a) work actually delegated and run by a subagent, (b) work done directly by the Orchestrator, and (c) delegation only proposed and not yet run. Never write that a subagent did something it was not actually invoked for.
+- **The final report ends with a short "Thực hiện bởi" line** (the fourth item of the default report in `CLAUDE.md`: what was done, result, what needs the PO, who did it). Only when a subagent was actually involved or delegation is merely proposed, separate (a) work really delegated and run, (b) work done directly by the Orchestrator, and (c) delegation only proposed. Never write that a subagent did something it was not actually invoked for.
 - This rule creates no new subagent and does not change the existing limits (no Agent Teams, no QA subagent, subagents do not delegate to each other, no extra paid usage without PO approval).
 
 ## 5. Orchestrator review (by risk)
@@ -77,7 +77,7 @@ After each task decide whether status, PR/merge commit, decisions, blockers or w
 
 ## 9. Quota
 
-Sonnet for Orchestrator and both subagents. No QA subagent, no Agent Teams, no pricier model or extra usage without PO approval. Prefer sequential work, short briefs, git diff/tests/CI over re-reading source, and return only needed logs. Never trade away tests, security checks, diff review, docs or a Decision Gate to save quota; if quota is short, report what is done and what is unverified.
+Sonnet for Orchestrator and both subagents. No QA subagent, no Agent Teams, no pricier model or extra usage without PO approval. Prefer sequential work, short briefs, git diff/tests/CI over re-reading source, and return only needed logs. Do not call a subagent for simple questions or small research the Orchestrator can do itself; delegate only for a clear gain in quality, scope or context. This never waives the required `nichigo-fe`/`nichigo-be` delegation for approved implementation. Prefer direct tools over any other agent; ask the PO first before using an agent other than `nichigo-fe`/`nichigo-be` or before large, token-heavy research, and never create a custom agent without PO approval. Never trade away tests, security checks, diff review, docs or a Decision Gate to save quota; if quota is short, report what is done and what is unverified.
 
 ## 10. Future QA subagent
 

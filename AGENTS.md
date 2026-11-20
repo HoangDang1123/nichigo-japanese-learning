@@ -7,12 +7,40 @@ Work on one approved feature at a time. Read the actual source and Git state bef
 These rules are mandatory for every agent and take precedence over any workflow description below or in a skill.
 
 1. **Default: no Git write operation without explicit owner authorization.** This covers creating, renaming, switching, merging and deleting branches; staging and committing; pushing; opening or updating pull requests; merging; deploying; and rewriting history. Read-only Git commands (`status`, `log`, `diff`, `show`, `ls-remote`) are always allowed. `git fetch` only updates remote-tracking references and is allowed when it cannot affect the working tree.
-2. **Authorization is specific.** It names the operation and its scope. Approval of one operation (for example creating or switching a branch) does not authorize another (committing, pushing, merging, deleting), and approval in one task does not carry to the next.
+2. **Authorization is specific.** It names the operation and its scope. Approval of one operation (for example creating or switching a branch) does not authorize another (committing, pushing, merging, deleting), and approval in one task does not carry to the next. The only standing exception is "Standing authorization: docs-only delivery" below.
 3. **The workflow sections below describe the procedure to follow once an operation is authorized.** They never authorize an operation by themselves.
 4. **Preserve all uncommitted and untracked work.** Never discard it; if work cannot be separated and preserved safely, stop and report the blocker.
 5. **Never use `git reset --hard`, `git clean -fd`, force-push, or destructive checkout**, and do not stash, delete or overwrite unfinished work unless the owner has explicitly asked for that exact operation.
 6. Never silently change approved business rules, authentication/security contracts, or release scope.
 7. **Fetch, pull, merge and rebase are different operations with different risk and need separate authorization where they write.** Rebase (including interactive), amending a pushed commit, cherry-pick and revert alter history or behaviour and need explicit authorization naming the branch and commits. Force-push is never the default way to resolve a conflict.
+
+## Standing authorization: docs-only delivery
+
+Approved by the Product Owner on 2026-11-21. This is the one exception to rules 1 and 2 above. It lets the Orchestrator run the full Git delivery of an ordinary documentation change without asking per step. Rules 4 to 7 still apply.
+
+**Steps covered:** create a branch (following the naming convention and "reuse before create"), edit the docs, review the diff for accuracy, commit, push, open a PR, check CI, squash merge, verify the merge, delete the merged task branch.
+
+**In scope (ordinary docs only):**
+- README and usage guides.
+- Task status, progress and release-checklist updates.
+- Syncing docs with changes already merged or decisions already approved.
+- Fixing typos, formatting, links and outdated information.
+- Implementation notes that state verified status accurately.
+
+**Still needs a specific Product Owner approval:**
+- Creating or changing a Product Decision or ADR.
+- Changing scope, business rules, learning rules or the roadmap.
+- Changing architecture, API contract, database schema or security policy.
+- Changing workflow, agent permissions or Git rules, including this section.
+- A diff that touches source code, learning data or runtime configuration.
+- Any content that lacks evidence to confirm it.
+
+**Safety conditions:**
+- Apply only when the PR is docs-only and in scope. If the diff goes beyond ordinary docs, stop and ask.
+- Both required CI checks (Frontend and Backend) must be SUCCESS on the exact head commit of the PR, confirmed with `gh`. Missing, pending or failed checks mean no merge; no bypass of CI or branch protection; no merge while a required review is unresolved. `main` currently has no branch protection (verified 2026-11-21), so this check is the Orchestrator's own gate; never change repository settings.
+- Never push directly to `main`. Never replace the PR with a local merge. If `gh` or GitHub access is unavailable, report the limit and stop.
+- Delete only the branch this docs task created, after the merge is verified in Git history and nothing unmerged, no worktree and no unpreserved work depends on it. Never delete FE WIP, backup or preservation branches, and never touch stashes, preserved work or other worktrees.
+- After the merge, confirm `main` and `origin/main` are in sync and the working tree is clean.
 
 ## Read before each development ticket
 
@@ -55,7 +83,7 @@ Never use `git reset --hard`, `git clean -fd`, force-push, or destructive checko
 - **CI gate.** All required CI checks must pass before merging. Never merge with failed, pending or unconfirmed checks; never bypass (including admin bypass), disable, delete or weaken checks or tests; local results are not CI evidence. If required checks are not configured in GitHub branch protection or rulesets, report the gap and do not claim the branch is protected. Changing the required-check list is a separate governance decision for the Product Owner.
 - **Merge readiness.** Besides CI: owner approval for the scope, no unresolved conflicts, no known serious regression without an approved plan, updated documentation, and the PR's acceptance criteria verified. UI approval is not approval of the whole feature. Merging requires explicit owner authorization of the merge itself.
 - **Conflicts.** Read both sides and check them against business rules, API contracts and architecture. Never apply blanket `ours`/`theirs`, overwrite another agent's work, or force-push after resolving. Stop and ask the owner when a conflict touches business policy, security, data schema or work outside scope.
-- **After merge.** Verify the merge on GitHub or in Git history; for a squash merge find the squash commit on `main` (the original commits are not ancestors). Mark **Merged** only with that evidence and **Released** only with deployment evidence. Synchronize the clone only when authorized, and never delete branches, clear stashes or clean untracked files unless the owner asks.
+- **After merge.** Verify the merge on GitHub or in Git history; for a squash merge find the squash commit on `main` (the original commits are not ancestors). Mark **Merged** only with that evidence and **Released** only with deployment evidence. Synchronize the clone only when authorized, and never delete branches, clear stashes or clean untracked files unless the owner asks, except the task branch deleted under "Standing authorization: docs-only delivery".
 
 ## Typography Rule
 

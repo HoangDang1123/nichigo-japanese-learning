@@ -21,6 +21,7 @@ Record the branch, HEAD, staged/unstaged/untracked counts and stash SHAs before 
 ## 1. Authorization gate (before every write operation)
 Write operations: branch create/rename/switch/delete, stage, commit, push, PR open/update, merge, pull, rebase, cherry-pick, revert, amend, stash, tag.
 - Proceed only when the owner's authorization names this operation and its scope (branch, commits, PR). Earlier approval of a different operation does not count.
+- Exception: an ordinary docs-only change inside the scope of "Standing authorization: docs-only delivery" in `AGENTS.md` needs no per-step authorization. Follow the same procedures below and its safety conditions (CI SUCCESS on the exact head commit, no direct push to `main`, delete only the task's own branch).
 - If unsure, stop and ask in one short message: the operation, the exact branch/paths, the expected effect and the risk.
 - Read-only commands and a `git fetch` that cannot touch the working tree need no authorization.
 

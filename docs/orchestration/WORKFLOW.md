@@ -61,7 +61,7 @@ Check the subagent's docs-impact statement against the diff. Reject cosmetic doc
 
 ## 6. Git delivery
 
-All write operations need explicit PO authorization (see AGENTS.md). Once authorized, before a PR check branch/base, diff, no secrets, no unrelated files, tests, docs. Before a merge check the right PR, the head commit, CI for that commit, mergeability, review blockers, changed files, scope and docs. Any failed gate means no merge. Report the real merge commit only after it is confirmed in history. `gh` is not installed on the current machine; PR/CI state must be obtained another way or reported as not verified.
+All write operations need explicit PO authorization (see AGENTS.md). Once authorized, before a PR check branch/base, diff, no secrets, no unrelated files, tests, docs. Before a merge check the right PR, the head commit, CI for that commit, mergeability, review blockers, changed files, scope and docs. Any failed gate means no merge. Report the real merge commit only after it is confirmed in history. GitHub CLI (`gh`, installed and authenticated via browser login on the PO's machine, 2026-11-21) is the Orchestrator's tool for reading PRs, diffs, checks and failed-run logs, and for creating PRs and squash merging only when the PO authorizes each operation. Never use `--admin` or any bypass, never print or store tokens, and never change branch protection or rulesets. As of 2026-11-21 `main` has no branch protection or ruleset (read-only API check), so the CI gate rests on this procedure; report that gap and do not claim the branch is protected. If `gh` is unavailable or unauthenticated, report PR/CI state as not verified.
 
 ## 7. Artifacts, backups, cleanup
 

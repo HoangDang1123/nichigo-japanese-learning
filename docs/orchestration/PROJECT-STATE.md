@@ -2,10 +2,11 @@
 
 Short, link-first status for the Orchestrator across sessions. **Not a source of truth**: PRD, ADR, contracts and implementation notes win. If this file and Git disagree, verify with Git and fix this file. Do not start the "next" item below without the Product Owner (PO) asking for it.
 
-Last verified: 2026-11-21 against `main` / `origin/main` `a5e4bd8` (Git history only; GitHub PR/CI state not verified because `gh` is not installed on this machine).
+Last verified: 2026-11-21 against `main` / `origin/main` `a5e4bd8` (Git history plus read-only `gh` checks of PRs and CI).
 
 ## Workspace
 
+- GitHub CLI installed and authenticated (2026-11-21). `main` has **no branch protection or ruleset** (read-only API check): required checks are not enforced by GitHub; the PO decides whether to enable them.
 - Single official clone: `H:\Code\Projects\nichigo-japanese-learning`. The old Codex clone is retired: do not read, edit or delete it.
 - Review artifacts live outside the repo in `H:\Code\Projects\_nichigo-artifacts`.
 - Backend and docs status below is taken from `origin/main`, not from any local feature branch. Older local branches carry a Backend that predates PRs #42–#44: never read production state from them.
@@ -17,7 +18,7 @@ Last verified: 2026-11-21 against `main` / `origin/main` `a5e4bd8` (Git history 
 | Frontend | **PAUSED** by PO. Read-only audits only until PO resumes it. | — |
 | Backend Kanji v2b foundation | MERGED to `main` (squash commits): #42 `2489845` relations/revision pins/Furigana/Kanji Detail API, #43 `589809c` private stroke storage + Rights-gated delivery, #44 `ab764ee` content pilot fixtures + integration tests. Not released. | [v2b backend](../implementation/JPN-033-kanji-v2b-backend.md), [content pilot](../implementation/JPN-033-kanji-content-pilot.md) |
 | Frontend Kanji UI (v2a + stroke pilot) | Not on `main`. Lives on the PO's local FE branch (stroke pilot uncommitted there). FE integration with the v2b API not done. | — |
-| Orchestrator setup | MERGED to `main` as squash commit `a5e4bd8` (PR #45, `chore(jpn-doc-001)`), verified in Git history. CI for that PR not verified here (`gh` not installed). The branch `chore/claude-orchestrator-setup` still exists locally and on `origin`; not deleted. | [WORKFLOW](WORKFLOW.md) |
+| Orchestrator setup | MERGED to `main` as squash commit `a5e4bd8` (PR #45, `chore(jpn-doc-001)`), verified in Git history. PR state MERGED and both CI checks (Frontend, Backend) SUCCESS confirmed with `gh`. The branch `chore/claude-orchestrator-setup` still exists locally and on `origin`; not deleted. | [WORKFLOW](WORKFLOW.md) |
 
 Implementation priority (PO, 2026-11-18): Documentation alignment → Skills UI/API integration → Guest FE integration → Learning Path/Lesson → Progress/Home. See [backlog](../05-BACKLOG.md).
 

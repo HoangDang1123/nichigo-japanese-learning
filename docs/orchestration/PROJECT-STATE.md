@@ -31,7 +31,7 @@ Implementation priority (PO, 2026-11-18): Documentation alignment → Skills UI/
 
 ## Pending PO decisions
 
-- `docs/implementation/README.md` step 9 still describes the two-clone Anti/Codex model. `AGENTS.md` was moved to the single-clone model in PR #45 (PO-approved); aligning that README line is a separate small docs task.
+- Minor leftovers, not workflow-mandating, not changed in PR #45: `docs/03-ARCHITECTURE.md` and `.agents/skills/README.md` still name Codex as a skills consumer, and `.agents/skills/git-workflow/SKILL.md` says "clone ownership". Edit the skills only via `.agents/skills/` plus the sync script, and only if the PO wants them aligned.
 - Open product questions: [02-DECISIONS.md](../02-DECISIONS.md#open-questions-do-not-silently-decide).
 
 ## Proposed, not approved

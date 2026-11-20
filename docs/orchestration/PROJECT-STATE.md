@@ -17,7 +17,7 @@ Last verified: 2026-11-20 against `origin/main` `ab764ee` (Git history only; Git
 | Frontend | **PAUSED** by PO. Read-only audits only until PO resumes it. | — |
 | Backend Kanji v2b foundation | MERGED to `main` (squash commits): #42 `2489845` relations/revision pins/Furigana/Kanji Detail API, #43 `589809c` private stroke storage + Rights-gated delivery, #44 `ab764ee` content pilot fixtures + integration tests. Not released. | [v2b backend](../implementation/JPN-033-kanji-v2b-backend.md), [content pilot](../implementation/JPN-033-kanji-content-pilot.md) |
 | Frontend Kanji UI (v2a + stroke pilot) | Not on `main`. Lives on the PO's local FE branch (stroke pilot uncommitted there). FE integration with the v2b API not done. | — |
-| Orchestrator setup | Config delivered by branch `chore/claude-orchestrator-setup` as a Draft PR; awaiting PO review, not merged. | [WORKFLOW](WORKFLOW.md) |
+| Orchestrator setup | Config pushed on branch `chore/claude-orchestrator-setup`; Draft PR to be opened manually (`gh` not installed); awaiting PO review, not merged. | [WORKFLOW](WORKFLOW.md) |
 
 Implementation priority (PO, 2026-11-18): Documentation alignment → Skills UI/API integration → Guest FE integration → Learning Path/Lesson → Progress/Home. See [backlog](../05-BACKLOG.md).
 

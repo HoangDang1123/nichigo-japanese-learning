@@ -37,7 +37,7 @@ Pending: FE integration and responsive/visual review, independently reviewed and
 
 ## Frontend Slice 1: Skills API client and Directory integration
 
-Branch `jpn-033/features/frontend-skills-directory-api`. **Implemented and locally tested; not pushed, not reviewed by the Product Owner, not merged, not released.** JPN-033 as a whole remains incomplete. Kanji UI, Flashcards UI, Skill Detail integration and Guest frontend are not part of this slice.
+Merged to `main` via PR #41 (`70d9885`; developed on branch `jpn-033/features/frontend-skills-directory-api`). **Implemented and locally tested on 2026-11-18 (evidence below is not rerun); merged; no Product Owner review of the two added status lines is recorded; not released.** JPN-033 as a whole remains incomplete. Kanji UI, Flashcards UI, Skill Detail integration and Guest frontend are not part of this slice.
 
 **Scope.** `/skills` now loads `GET /api/v1/skills` and renders the eight backend Skills in backend group and Skill order. Flashcards stays a frontend review tool (`planned`), not a ninth backend Skill. Kana, Vocabulary, Grammar and Kanji screens are unchanged and still use demo data.
 

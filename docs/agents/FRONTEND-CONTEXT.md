@@ -112,7 +112,7 @@ All primitives live in `src/components/ui/` with scoped `.module.css`:
 |---|---|---|
 | `/` | **Home Study Desk** | Auth-aware desktop layout with Redux session check and skeleton loading adapter. |
 | `/learn` | **Railway Journey Preview** | Presentation preview of ordered learning stages with static empty station panels. |
-| `/skills` | **Skills directory (demo data)** | `SkillsOverview` with category cards from `shared/skills-categories.ts`; availability labels are honest. `SkillsSkeleton` is ready for published data but not mounted. |
+| `/skills` | **Skills directory (backend Directory API; screens behind the cards still demo)** | `SkillsOverview` loads `GET /api/v1/skills` via `src/api/skills.ts` (PR #41), with `SkillsSkeleton` while loading, `ErrorState` with Retry and `EmptyState`. Card metadata comes from `shared/skills-categories.ts`; cards that open a demo screen say so. Item, Kanji and Flashcard endpoints exist in the client but no screen consumes them. |
 | `/skills/kana` | **Kana reference (demo data)** | Chart, drawer and verified stroke guidance from vendored AnimCJK-derived data. |
 | `/skills/vocabulary` (+ `explore`, `saved`, `study/[topicId]`) | **Vocabulary UI prototype (demo data)** | In-memory state in `VocabularyProvider`, mounted by `app/skills/vocabulary/layout.tsx`; it survives in-app navigation and resets on reload. |
 | `/skills/grammar` (+ `[grammarId]`) | **Grammar UI prototype (demo data)** | Filter chips, local search, pattern cards, detail notebook; no persistence. |

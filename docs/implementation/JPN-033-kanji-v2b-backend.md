@@ -2,7 +2,7 @@
 
 ## Scope and status
 
-Implemented locally on the Codex clone's `jpn-033/backend/kanji-v2b-foundation` branch for a separate Draft PR. This is not the complete JPN-033 feature. Frontend integration, production content review, media byte delivery, AnimCJK licensing and release remain pending. No production publication was performed.
+Merged to `main` via PR #42 (relationships, Furigana, Kanji Detail) and PR #43 (private JSON stroke delivery); see the [implementation index](README.md). This is not the complete JPN-033 feature. Frontend integration, production content review, production private storage mount, stroke asset Rights clearance, AnimCJK licensing and release remain pending. No production publication was performed.
 
 ## Data model and import
 
@@ -16,7 +16,7 @@ Example 1.1 `segments` hold authored text and optional reading. Schema and seman
 
 `GET /api/v1/skills/kanji/{itemId}` uses the current eligible Kanji revision. It resolves ordered pinned Vocabulary and Example revisions, filtering each by live Rights and publication status. Missing or revoked related Items produce empty child lists without replacing the pins or hiding Kanji. Direct Kanji revocation returns 404. The response exposes canonical identities, revisions, glyph/meaning/readings, Vocabulary presentation fields and structured Example segments. It does not return raw Item reference keys or Rights evidence.
 
-Kanji stroke Media uses the existing `writing` kind and `stroke-order` role. V10 exempts only that role/kind on a Kanji revision from the otherwise mandatory Item Media eligibility gate and applies the same exception to V7's set-based Path check. The Lesson Media projection filters revoked Media metadata. Kanji Detail returns eligible stroke metadata with `status: metadata_only`, or `status: unavailable` and null fields. It returns no storage key or byte URL. The repository has Media metadata but no private object-store adapter or safe byte-serving endpoint; implementing one requires storage configuration, byte integrity/MIME/size checks, SVG/JSON sanitization, per-request Rights checks and cache policy. Previously downloaded bytes cannot be recalled. AnimCJK Kanji asset provenance and Arphic Public License obligations remain pending review; no asset was imported or cleared here.
+Kanji stroke Media uses the existing `writing` kind and `stroke-order` role. V10 exempts only that role/kind on a Kanji revision from the otherwise mandatory Item Media eligibility gate and applies the same exception to V7's set-based Path check. The Lesson Media projection filters revoked Media metadata. Kanji Detail returns eligible stroke metadata with `status: metadata_only`, or `status: unavailable` and null fields. It returns no storage key or byte URL; bytes are served only by the separate Rights-gated `stroke-asset` route described under "Stroke byte delivery follow-up". Previously downloaded bytes cannot be recalled. AnimCJK Kanji asset provenance and Arphic Public License obligations remain pending review; no asset was imported or cleared here.
 
 ## Verification
 
@@ -34,10 +34,10 @@ Example 1.1 segment `text` and `reading` now declare `minLength: 1` and a non-wh
 
 For the separate backend Draft PR, this work was transferred onto `origin/main` at `70d9885`. The only source integration changes were current-main documentation wording in the backlog and implementation index; the backend implementation and schemas match the PM-reviewed final snapshot. On 2026-11-19, `mvnw.cmd -q test --no-transfer-progress` passed 75 tests with 0 failures, errors or skips against a fresh isolated PostgreSQL 17 schema (`jpn021_v2b_pr`). Flyway V10 had no version collision on that main baseline.
 
-- Media byte delivery and asset validation require a real private storage adapter; no delivery endpoint or production URL exists.
+- Stroke byte delivery and validation are implemented (see the follow-up section below); the approved persistent private storage mount, production stroke assets and their Rights clearance do not exist yet.
 - A qualified reviewer must verify Kanji Detail Furigana boundaries and reading completeness for each candidate Example. The technical validator cannot prove Japanese correctness.
 - Frontend Kanji v2b integration and visual/accessibility checks remain outstanding.
-- The branch starts from `origin/main` at `70d9885` and carries only this backend slice. Later upstream changes need a separate review before merge.
+- Historical: this slice was prepared on `origin/main` at `70d9885` and has since been merged (PR #42, PR #43).
 
 ## Stroke byte delivery follow-up (Draft PR scope)
 

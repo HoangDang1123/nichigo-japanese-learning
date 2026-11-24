@@ -2,7 +2,7 @@
 
 Short, link-first status for the Orchestrator across sessions. **Not a source of truth**: PRD, ADR, contracts and implementation notes win. If this file and Git disagree, verify with Git and fix this file. Do not start the "next" item below without the Product Owner (PO) asking for it.
 
-Last verified: 2026-11-21 against `main` / `origin/main` `817aa1f` (Git history plus read-only `gh` checks of PRs and CI). This verification predates the docs-only delivery PR below.
+Last verified: 2026-11-24 against `main` / `origin/main` `b962452` (Git history plus read-only `gh` checks of PRs and CI; no open PRs, CI on `main` green for the latest three commits).
 
 ## Workspace
 
@@ -18,7 +18,8 @@ Last verified: 2026-11-21 against `main` / `origin/main` `817aa1f` (Git history 
 |---|---|---|
 | Frontend | **PAUSED** by PO. Read-only audits only until PO resumes it. | — |
 | Backend Kanji v2b foundation | MERGED to `main` (squash commits): #42 `2489845` relations/revision pins/Furigana/Kanji Detail API, #43 `589809c` private stroke storage + Rights-gated delivery, #44 `ab764ee` content pilot fixtures + integration tests. Not released. | [v2b backend](../implementation/JPN-033-kanji-v2b-backend.md), [content pilot](../implementation/JPN-033-kanji-content-pilot.md) |
-| Frontend Kanji UI (v2a + stroke pilot) | Not on `main`. Lives on the PO's local FE branch (stroke pilot uncommitted there). FE integration with the v2b API not done. | — |
+| Frontend Kanji UI (v2a + stroke pilot) | Not on `main`. Lives on the PO's local FE branch `jpn-033/features/frontend-kanji-ui`; the stroke pilot is now committed there as `2c6d730` (2026-11-21, local only, 1 commit ahead of `origin`, not pushed). FE integration with the v2b API not done. | — |
+| Backend read-only audit (BE-AUDIT-001) | Done 2026-11-24 by `nichigo-be` as a first trial of the subagent (read-only, working tree stayed clean). Rights gate for stroke delivery verified by reading code and tests only; tests were not run. Stale lines in the v2b note fixed via PR #49. Unverified: storage adapter/validator internals, pilot fixture counts, `contracts/01-API-CONTRACT.md` DTO lines. | [v2b backend](../implementation/JPN-033-kanji-v2b-backend.md) |
 | Orchestrator setup | MERGED to `main` as squash commit `a5e4bd8` (PR #45, `chore(jpn-doc-001)`), verified in Git history. PR state MERGED and both CI checks (Frontend, Backend) SUCCESS confirmed with `gh`. The branch `chore/claude-orchestrator-setup` still exists locally and on `origin`; not deleted. | [WORKFLOW](WORKFLOW.md) |
 
 Implementation priority (PO, 2026-11-18): Documentation alignment → Skills UI/API integration → Guest FE integration → Learning Path/Lesson → Progress/Home. See [backlog](../05-BACKLOG.md).
@@ -43,7 +44,7 @@ Implementation priority (PO, 2026-11-18): Documentation alignment → Skills UI/
 
 ## Local work to preserve
 
-FE Kanji stroke pilot work (untracked: stroke pilot data, kana pilot JSON, `skills-library.*`, `docs/designs/`, `docs/research/`) is not part of `main`. A preservation copy (originals not removed) lives outside the repo:
+FE Kanji stroke pilot work is not part of `main`. It is committed locally as `2c6d730` on `jpn-033/features/frontend-kanji-ui` (not pushed). The untracked material recorded on 2026-11-21 (kana pilot JSON, `skills-library.*`, `docs/designs/`, `docs/research/`) is not covered by that commit and was not re-checked on 2026-11-24. A preservation copy (originals not removed) lives outside the repo:
 
 - `H:\Code\Projects\_nichigo-artifacts\backups\jpn-033-fe-preservation\` (manifest with sha256: `MANIFEST.tsv`; taken 2026-11-21 from branch `jpn-033/features/frontend-kanji-ui` @ `7763d43`)
 - `H:\Code\Projects\_nichigo-artifacts\preserved-work\jpn-033-fe-local\`

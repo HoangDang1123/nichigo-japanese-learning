@@ -78,7 +78,7 @@ Số lượng bài, thứ tự, mục tiêu cụ thể và mức JLPT của từ
 - **Phương án A:** station đại diện Chapter; chọn station có thể hiện các Lesson trong vùng thông tin hiện có hoặc Chapter Canvas. Có hành động rõ để tiếp tục Lesson kế tiếp và điều hướng Stage dễ hiểu.
 - **Phương án B:** station tiếp tục đại diện Lesson, được nhóm trực quan theo Chapter.
 
-Mức station là Chapter hay Lesson vẫn **OPEN**. Nếu hiển thị tiến độ Chapter sau này, chỉ tổng hợp từ tiến độ Lesson đã xác minh; không tự tạo giá trị hoàn thành, ôn tập, chuỗi học hay mastery trong Railway.
+**Đã quyết (ADR-026, 2026-11-28): mỗi station là một Chapter, mỗi Chapter chứa các Lesson.** Nếu hiển thị tiến độ Chapter sau này, chỉ tổng hợp từ tiến độ Lesson đã xác minh; không tự tạo giá trị hoàn thành, ôn tập, chuỗi học hay mastery trong Railway.
 
 ## PROPOSED — Tác động lên mô hình nội dung
 
@@ -95,8 +95,8 @@ Product Owner cần quyết định trước khi chốt thiết kế/triển kha
 1. Số lượng và thứ tự Chapter, Lesson chính thức.
 2. Syllabus Chapter và mức bao phủ N5 đã được kiểm chứng.
 3. Cách hiển thị kiến thức tiên quyết và các giới hạn truy cập khác nếu có; soft unlock giữa các Lesson đã được duyệt.
-4. Chapter Review có bắt buộc hay không.
-5. Railway station đại diện Chapter hay Lesson.
+4. Chapter Review có bắt buộc hay không. *(MVP: không có Chapter Review, ADR-025.)*
+5. ~~Railway station đại diện Chapter hay Lesson.~~ *(Đã quyết: Chapter, ADR-026.)*
 6. Tiêu chí hoàn thành Chapter; Lesson cần Assessment hoàn thành khi qua từ 80%, Lesson không có Assessment cần thao tác hoàn thành rõ ràng.
 7. Mức theo dõi mastery và thuật toán review.
 8. Quyền sử dụng nội dung, giấy phép và tính sẵn có của audio/hình/nét viết đã được rà soát.

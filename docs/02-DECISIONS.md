@@ -24,6 +24,12 @@
 | ADR-020 | APPROVED — JPN-032 V1 | Practice gives immediate feedback without an official score; official Lesson Assessment uses five Activity types, server grading, equal full-or-zero weight, 80% pass, unlimited retries and pinned reviewed published revisions | Types: Single Choice, Matching Pairs, Fill in the Blank, Ordering, Typed Answer. Rotate reviewed bank with fallback reuse; size configurable per Lesson (typically 5 or 8–10). Keep answer keys, accepted answers and explanations private until submission; use authored alternatives and controlled Unicode/whitespace normalization, without equating Kana, Kanji and Romaji. Persist attempts/latest/best; later failure does not revoke pass. Not implemented. |
 | ADR-021 | APPROVED — ASSESSMENT RECOVERY | Autosave in-progress answers on the backend; support refresh and reconnect recovery, temporary offline drafts, reconciliation, stale-save protection and duplicate-submit protection | Do not submit unsynced incomplete answers. Only successful submission earns a grade. Deliberate restart creates a new attempt under a pending lifecycle contract. Rights revocation stops an affected unfinished attempt without failure while retaining valid historical scores/completions. Exact transport, version/conflict codes, draft storage and incomplete-attempt retention are PENDING CONTRACT. Not implemented. |
 | ADR-022 | APPROVED — DISTINCT REVIEW FLOWS | Vocabulary Quick Check remains a lightweight Skills review with immediate feedback and optional client evaluation; it is separate from official Lesson Assessment | Quick Check creates no official Assessment attempt, Lesson completion, unlock or authoritative mastery. Preserve the existing demo flow, including its `correctIndex`/`evaluateQuiz`; its 30-second demo retry countdown is not an Assessment rule. |
+| ADR-023 | APPROVED — FRONTEND RESUMED (2026-11-28) | Frontend work resumes. Connect the frontend to every area that already has a backend API; areas with no backend yet keep clearly labelled mock/demo data | Follows the approved priority order (Skills UI/API → Guest FE → Learning Path/Lesson → Progress/Home). Mock data is never presented as published content. |
+| ADR-024 | APPROVED — CONTENT REVIEW ROLES (2026-11-28) | The Product Owner performs Rights review. Language review is trialled with a dedicated reviewing subagent whose report the Product Owner accepts or rejects | The subagent is a separate reviewer from whoever drafts the content. Content passed this way is "AI-reviewed and owner-accepted", never labelled expert-reviewed. Whether this is sufficient for public release is reassessed after the trial. |
+| ADR-025 | APPROVED — MVP ASSESSMENT SCOPE (2026-11-28) | The MVP has official Lesson Assessment only (ADR-016, ADR-020); Chapter Review is not part of the MVP. Attempt persistence follows ADR-020/021 with minimal offline recovery | Exact endpoints, DTOs, version/conflict codes and incomplete-attempt retention remain a pending contract (open question 8). Per-item mastery and review policy remain open. |
+| ADR-026 | APPROVED — RAILWAY STATIONS ARE CHAPTERS (2026-11-28) | Each Railway station represents a Chapter; each Chapter contains its Lessons | Content is organized in topic-based Chapters that progress from easy to hard (Irodori-style framework as reference only, ADR-014); a word is taught in kana before its Kanji. The chapter syllabus itself is not yet approved. |
+| ADR-027 | APPROVED — GUEST CLAIM IN MVP (2026-11-28) | Guest data is claimed into a new account at sign-up only, in one idempotent transaction; logging into an existing account does not merge Guest data in the MVP | Bookmarks are unioned; unlock history is kept; progress keeps completion and best results. Implement after learner progress (JPN-040). Merge on login to an existing account is post-MVP. |
+| ADR-028 | APPROVED — ACCOUNT EMAIL FEATURES (2026-11-28) | Email verification and password reset are required for the beta | The email provider and its cost need a separate Product Owner decision. |
 
 ### ADR-015 technical rationale (approved architecture)
 
@@ -38,13 +44,13 @@ The public pointer changes only to a sealed revision of the same stable identity
 - MVP first content release limited to reviewed Hiragana and a small set of introductory lessons; scope must be explicitly approved before public launch.
 
 ## Open questions (do not silently decide)
-1. Guest-to-account recovery details beyond the approved active-use retention policy.
-2. Whether guest→account merge is mandatory for first public MVP and conflict policy.
-3. Email verification/password reset at first beta versus later; associated email provider and cost.
+1. Guest-to-account recovery details beyond the approved active-use retention policy (sign-up claim decided in ADR-027; merge on login to an existing account is post-MVP).
+2. ~~Whether guest→account merge is mandatory for first public MVP and conflict policy.~~ Resolved for the MVP by ADR-027.
+3. Email verification/password reset at first beta versus later; associated email provider and cost. Required for beta (ADR-028); provider still open.
 4. First release minimum content quantity and rights-cleared audio/stroke assets.
 5. Public beta date, target audience, performance budget, backup retention/RPO/RTO.
 6. Final public domain, final logo asset and any legal/trademark checks; **product name Nichigo is approved**.
-7. Whether Chapter Review is required and the per-item mastery/review policy; Lesson completion criteria are approved in ADR-016.
+7. Whether Chapter Review is required and the per-item mastery/review policy; Lesson completion criteria are approved in ADR-016. Chapter Review is not part of the MVP (ADR-025); mastery/review policy still open.
 8. Assessment endpoint/DTO/version/conflict details, deliberate-restart lifecycle and incomplete-attempt retention; the earlier seven-day suggestion was not approved.
 
 ## Change control

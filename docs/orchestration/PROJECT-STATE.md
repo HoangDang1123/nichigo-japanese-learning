@@ -16,7 +16,7 @@ Last verified: 2026-11-26 against `main` / `origin/main` `20cbb5c` (Git history;
 
 | Workstream | Status | Source |
 |---|---|---|
-| Frontend | **PAUSED** by PO. Read-only audits only until PO resumes it. | — |
+| Frontend | **RESUMED** by PO on 2026-11-28 (ADR-023): connect FE to existing backend APIs, keep labelled mock where no backend exists. | [Decisions](../02-DECISIONS.md) |
 | Backend Kanji v2b foundation | MERGED to `main` (squash commits): #42 `2489845` relations/revision pins/Furigana/Kanji Detail API, #43 `589809c` private stroke storage + Rights-gated delivery, #44 `ab764ee` content pilot fixtures + integration tests. Not released. | [v2b backend](../implementation/JPN-033-kanji-v2b-backend.md), [content pilot](../implementation/JPN-033-kanji-content-pilot.md) |
 | Frontend Kanji UI (v2a + stroke pilot) | Not on `main`. Lives on the PO's local FE branch `jpn-033/features/frontend-kanji-ui`; the stroke pilot is now committed there as `2c6d730` (2026-11-21, local only, 1 commit ahead of `origin`, not pushed). FE integration with the v2b API not done. | — |
 | Backend read-only audit (BE-AUDIT-001) | Done 2026-11-24 by `nichigo-be` as a first trial of the subagent (read-only, working tree stayed clean). Rights gate for stroke delivery verified by reading code and tests only; tests were not run. Stale lines in the v2b note fixed via PR #49. Unverified: storage adapter/validator internals, pilot fixture counts, `contracts/01-API-CONTRACT.md` DTO lines. | [v2b backend](../implementation/JPN-033-kanji-v2b-backend.md) |

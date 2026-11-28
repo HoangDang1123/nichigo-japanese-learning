@@ -2,8 +2,8 @@
 
 import * as React from "react";
 
-export function usePopover() {
-  const rootRef = React.useRef<HTMLDivElement>(null);
+export function usePopover<T extends HTMLElement = HTMLDivElement>() {
+  const rootRef = React.useRef<T>(null);
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const [open, setOpen] = React.useState(false);
 

@@ -92,6 +92,8 @@ test("availability mapping keeps backend status, frontend readiness and demo dat
   assert.equal(backendStatus(by("listening")), null, "feature_unavailable: the Chưa khả dụng badge already says it");
   assert.equal(backendStatus(by("flashcards")), null);
   assert.equal(usesDemoData(by("listening")), false);
+  assert.equal(usesDemoData(by("kanji")), false, "Kanji now reads the Skills API, so it is not labelled demo");
+  assert.equal(by("kanji").meta.availability, "demo", "still an available, clickable screen");
   const noCount = buildDirectoryEntries({ groups: [{ id: "foundation-knowledge", skills: [{ type: "kana", availability: "available", itemCount: null }] }] });
   assert.equal(backendStatus(noCount[0])?.text, "Đã có nội dung xuất bản");
   assert.ok(!/0/.test(backendStatus(noCount[0])!.text));

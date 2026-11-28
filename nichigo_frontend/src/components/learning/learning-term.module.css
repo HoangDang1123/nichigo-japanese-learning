@@ -1,0 +1,18 @@
+/* LearningTerm: semantic tokens only. The panel is fixed-position and placed inside the viewport by popover-position.ts. */
+.root { display: inline; }
+.trigger { display: inline; margin: 0; padding: 0; font: inherit; font-weight: var(--font-weight-medium); color: var(--color-primary); text-align: inherit; background: none; border: none; border-bottom: 1.5px dotted currentColor; border-radius: var(--radius-sm); cursor: pointer; }
+.trigger:hover { color: var(--color-primary-hover); }
+.trigger:focus-visible, .close:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.trigger[aria-expanded="true"] { background: var(--color-primary-subtle); }
+
+.panel { position: fixed; z-index: 100; left: var(--space-4); top: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); box-sizing: border-box; max-width: calc(100vw - 2 * var(--space-4)); max-height: calc(100vh - 2 * var(--space-4)); overflow-y: auto; padding: var(--space-4); font-size: var(--font-size-sm); font-weight: var(--font-weight-regular); line-height: var(--line-height-normal); color: var(--color-text); text-align: left; background: var(--color-surface); border: var(--border-width) solid var(--color-border-hover); border-radius: var(--radius-lg); box-shadow: 0 var(--space-2) var(--space-6) var(--color-primary-subtle); }
+.panel:focus { outline: none; }
+.head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-2); }
+.title { font-weight: var(--font-weight-bold); overflow-wrap: anywhere; }
+.close { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; margin: calc(-1 * var(--space-1)) calc(-1 * var(--space-1)) 0 0; padding: 0; color: var(--color-text-muted); background: var(--color-surface-hover); border: none; border-radius: var(--radius-full); cursor: pointer; }
+.close:hover { color: var(--color-text); background: var(--color-surface-raised); }
+.japanese { font-family: var(--font-japanese); color: var(--color-primary); }
+.body { display: block; color: var(--color-text); overflow-wrap: anywhere; }
+.example { display: flex; flex-direction: column; gap: var(--space-1); padding: var(--space-3); background: var(--color-primary-subtle); border-radius: var(--radius-md); }
+.exampleLabel { font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); color: var(--color-text-muted); }
+.exampleJa { font-family: var(--font-japanese); font-size: var(--font-size-xl); line-height: 1.6; overflow-wrap: anywhere; }

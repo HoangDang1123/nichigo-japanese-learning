@@ -36,6 +36,7 @@ nichigo_frontend/
 │   │   ├── auth/     # AuthForm, AuthLayout
 │   │   ├── branding/ # BrandLogo component
 │   │   ├── home/     # HomeStudyDesk, state adapter, home-skeleton, home.module.css
+│   │   ├── learning/ # LearningTerm glossary popover (shared learning terms)
 │   │   ├── layout/   # AppShell, DesktopSidebar, MobileNav, AppHeader, navigation.ts
 │   │   ├── learning-path/ # Railway journey UI preview, state adapter & skeleton
 │   │   ├── providers/     # ReduxProvider
@@ -43,6 +44,7 @@ nichigo_frontend/
 │   │   │   ├── overview/    # /skills directory: SkillsOverview, SkillsSkeleton
 │   │   │   ├── kana/        # Kana chart, drawer, stroke guidance (+ data adapter, types, mock data, tests)
 │   │   │   ├── category/    # /skills/[category] detail (Kanji demo, "unavailable" placeholders) and its mock data
+│   │   │   ├── kanji/       # /skills/kanji and /skills/kanji/[itemId]: Skills Content API (mapping, list reducer, detail loader, dev-only demo fallback, tests)
 │   │   │   ├── vocabulary/  # Vocabulary feature (provider, logic, data, tests)
 │   │   │   ├── grammar/     # Grammar feature (overview, detail, data, logic, tests)
 │   │   │   ├── shared/      # skills-detail.module.css (page chrome) and skills-categories.ts (category metadata), used by more than one area
@@ -112,11 +114,12 @@ All primitives live in `src/components/ui/` with scoped `.module.css`:
 |---|---|---|
 | `/` | **Home Study Desk** | Auth-aware desktop layout with Redux session check and skeleton loading adapter. |
 | `/learn` | **Railway Journey Preview** | Presentation preview of ordered learning stages with static empty station panels. |
-| `/skills` | **Skills directory (backend Directory API; screens behind the cards still demo)** | `SkillsOverview` loads `GET /api/v1/skills` via `src/api/skills.ts` (PR #41), with `SkillsSkeleton` while loading, `ErrorState` with Retry and `EmptyState`. Card metadata comes from `shared/skills-categories.ts`; cards that open a demo screen say so. Item, Kanji and Flashcard endpoints exist in the client but no screen consumes them. |
+| `/skills` | **Skills directory (backend Directory API; screens behind the cards still demo)** | `SkillsOverview` loads `GET /api/v1/skills` via `src/api/skills.ts` (PR #41), with `SkillsSkeleton` while loading, `ErrorState` with Retry and `EmptyState`. Card metadata comes from `shared/skills-categories.ts`; cards that open a demo screen say so. The Kanji card opens the real-API Kanji screens (not labelled demo). Flashcard endpoints exist in the client but no screen consumes them. |
+| `/skills/kanji`, `/skills/kanji/[itemId]` | **Kanji on the Skills Content API (JPN-033 Slice 2)** | Overview: `skillsApi.items` with search and cursor "Tải thêm"; Detail (dynamic route, real UUIDs): `skillsApi.kanjiDetail` with readings, related Vocabulary and Examples; stroke order shows only a neutral note (no renderer, asset not fetched). Empty API = honest EmptyState; `NEXT_PUBLIC_SKILLS_DEMO_FALLBACK=true` (default off, dev only) shows labelled "Dữ liệu minh họa" Kanji instead. |
 | `/skills/kana` | **Kana reference (demo data)** | Chart, drawer and verified stroke guidance from vendored AnimCJK-derived data. |
 | `/skills/vocabulary` (+ `explore`, `saved`, `study/[topicId]`) | **Vocabulary UI prototype (demo data)** | In-memory state in `VocabularyProvider`, mounted by `app/skills/vocabulary/layout.tsx`; it survives in-app navigation and resets on reload. |
 | `/skills/grammar` (+ `[grammarId]`) | **Grammar UI prototype (demo data)** | Filter chips, local search, pattern cards, detail notebook; no persistence. |
-| `/skills/[category]` | **Category detail** | Kanji demo; other categories show an "unavailable" notice. Kana, Vocabulary and Grammar have their own routes. |
+| `/skills/[category]` | **Category detail** | Kanji no longer generated here (own routes above; its old demo branch is unreachable); other categories show an "unavailable" notice. Kana, Vocabulary and Grammar have their own routes. |
 | `/progress` | **Empty State** | Wraps `EmptyState` in `AppShell`. |
 | `/login`, `/register` | **Auth Pages** | Form components connected to Redux auth actions. |
 | `/dev/ui`, `/dev/states` | **Dev Showcases** | Development-only verification pages; return `404` in production builds. |
@@ -127,6 +130,7 @@ All primitives live in `src/components/ui/` with scoped `.module.css`:
 
 - **Axios Client (`src/api/index.ts`):** Pre-configured with `withCredentials: true`, JSON headers, and typed `ApiError` hierarchy (`configuration_error`, `network_error`, `http_error`, `cancelled`).
 - **Base URL:** Reads `NEXT_PUBLIC_API_BASE_URL` without trailing slash.
+- **Demo fallback flag:** `NEXT_PUBLIC_SKILLS_DEMO_FALLBACK=true` (exact string, default off, set in `.env.local`) lets the Kanji screens show labelled demo content only when the API has no published Kanji. Never enable by default or in CI.
 - **CSRF & Mutations (`src/api/auth.ts`):** Mutations call `bootstrapCsrf()` to obtain `X-CSRF-TOKEN`. Invalidated tokens clear cache automatically.
 - **Redux Store (`src/store/`):** Manages user session state (`user`, `status`, `error`). Use `useAppDispatch` and `useAppSelector` from `src/store/hooks.ts`.
 

@@ -37,6 +37,8 @@ export interface CategoryMeta {
   href: string;
   accentClass: string;
   // Legacy fields, used only by the LEGACY_SKILL_CATEGORIES entries
+  /** Where an available screen gets its content. Omitted = demo data for "demo" screens. "api" = public Skills Content API. */
+  contentSource?: "api";
   japaneseTitle?: string;
   isAvailable?: boolean;
 }
@@ -97,6 +99,7 @@ export const SKILL_CATEGORIES: CategoryMeta[] = [
     description: "Làm quen với chữ Hán và cách đọc trong tiếng Nhật.",
     filterGroup: "foundational",
     availability: "demo",
+    contentSource: "api",
     href: "/skills/kanji",
     accentClass: "accentKanji",
     japaneseTitle: "漢字",

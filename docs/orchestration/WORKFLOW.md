@@ -1,6 +1,6 @@
 # Orchestrator workflow
 
-How the main Claude Code session (Orchestrator) runs NichiGo with the Product Owner (PO) and two subagents, `nichigo-fe` and `nichigo-be`. Short rules are in [CLAUDE.md](../../CLAUDE.md) and `.claude/rules/`; this file holds the procedures. Git write rules, branch/commit conventions, completion language and the Definition of Done for features are in [AGENTS.md](../../AGENTS.md) and are not repeated here. If this file conflicts with AGENTS.md, AGENTS.md wins.
+How the main Claude Code session (Orchestrator) runs NichiGo with the Product Owner (PO) and three subagents: `nichigo-fe`, `nichigo-be` and `nichigo-content-review` (reviews content drafts only; ADR-024). Short rules are in [CLAUDE.md](../../CLAUDE.md) and `.claude/rules/`; this file holds the procedures. Git write rules, branch/commit conventions, completion language and the Definition of Done for features are in [AGENTS.md](../../AGENTS.md) and are not repeated here. If this file conflicts with AGENTS.md, AGENTS.md wins.
 
 ## 1. Classify the PO message first
 
